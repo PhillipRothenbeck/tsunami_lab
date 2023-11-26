@@ -87,8 +87,7 @@ Hence a new setup (ArtificialTsunami2d) was implemented:
 
 Visualization of the two-dimensional artificial Tsunami Event:
 
-.. figure:: ../_static/video_folder/assignment_5/
-  :width: 600px
+Unfortunately, for some reason Paraview was not able to read our output .csv files. 
 
 Implementation of NetCDF Input
 -------------------------------
@@ -395,8 +394,7 @@ Therefore, the smallest and largest values in the x and y directions are used to
 
 Visualization of the two-dimensional tsunami event with the netCDF files provided on the website:
 
-.. figure:: ../_static/video_folder/assignment_5/
-  :width: 600px
+Unfortunately, for some reason Paraview was not able to read our output .csv files. 
 
 
 
