@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Tsunami Lab'
-copyright = '2023, Bohdan Babii, Phillip Rothenbeck'
-author = 'Bohdan Babii, Phillip Rothenbeck'
+copyright = '2023, Bohdan Babii, Phillip Rothenbeck, Moritz Rätz, Marek Sommerfeld'
+author = 'Bohdan Babii, Phillip Rothenbeck, Moritz Rätz, Marek Sommerfeld'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

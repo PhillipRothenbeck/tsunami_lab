@@ -15,5 +15,7 @@
 
    chapters/assignment_3_phillip.rst
 
+   chapters/assignment_5.rst
+
 .. include:: chapters/overview.rst
 
