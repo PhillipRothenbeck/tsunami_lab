@@ -91,8 +91,11 @@ we needed the getter function ``patches::WavePropagation::getBathymetry`` to be 
 For demonstration, we constructed a created a DamBreak setup, that has bathymetry of 0 in all cells but 
 from 50% to 75% where it has a value of -3.75. This had the following result:
 
-.. figure:: ../_static/video_folder/assignment_3/only_hill.mp4
-  :width: 600px
+.. video:: _static/video_folder/assignment_3/only_hill.mp4
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
 .. _ch:part_3_2:
 
@@ -195,7 +198,6 @@ the condition is met. Four different methods for setting ghost cells:
 
 .. code-block:: c++
 
-
     ...
 
     if (!(strcmp(i_argv[3], "-f") == 0 || strcmp(i_argv[3], "-r") == 0))
@@ -249,12 +251,17 @@ the condition is met. Four different methods for setting ghost cells:
 
 **Visualization of left ghost cell with reflecting boundary condition and right ghost cell with outflow condition.**
 
+.. video:: _static/video_folder/assignment_3/boundary_condition.mp4
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
-.. figure:: ../_static/video_folder/assignment_3/boundary_condition.mp4
-  :width: 600px
-
-.. figure:: ../_static/video_folder/assignment_3/boundary_condition_mom.mp4
-  :width: 600px
+.. video:: _static/video_folder/assignment_3/boundary_condition_mom.mp4
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
 
 .. _ch:part_3_3:
@@ -372,18 +379,28 @@ When simulating these setups for 200 timesteps on 25 meters we got the following
 
 Subcritical Flow:
 
-.. figure:: ../_static/video_folder/assignment_3/subcritical_flow.mp4
-  :width: 600px
+.. video:: _static/video_folder/assignment_3/subcritical_flow.mp4
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
+
 
 Supercritical Flow:
 
-.. figure:: ../_static/video_folder/assignment_3/supercritical_flow.mp4
-  :width: 600px
+.. video:: _static/video_folder/assignment_3/supercritical_flow.mp4
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
 Supercritical Flow momentum:
 
-.. figure:: ../_static/video_folder/assignment_3/supercritical_flow_mom.mp4
-  :width: 600px
+.. video:: _static/video_folder/assignment_3/supercritical_flow_mom.mp4
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
 Stationary Discontinuity
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -548,7 +565,6 @@ So the implementation of the formulas are given in the following program.
 Changes in main.cpp for support of knew functionalities.
 
 .. code-block:: c++
-
 
     ...
     } else if (l_scenario == "TsunamiEvent1d") {

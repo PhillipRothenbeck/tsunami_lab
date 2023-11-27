@@ -341,7 +341,7 @@ Hence a new setup (ArtificialTsunami2d) was implemented:
 
 Visualization of the two-dimensional artificial Tsunami Event:
 
-.. video:: _static/video_folder/assignment_5/
+.. video:: _static/video_folder/assignment_5/artificial_tsunami_event.mp4
   :autoplay:
   :loop:
   :height: 300
