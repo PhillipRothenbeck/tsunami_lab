@@ -161,7 +161,7 @@ finally it writes the data into the file and deletes it's pointers:
     delete[] l_bathymetry;
 
     return 0;
-}
+    }
 
 The :code:`write` function writes continous data (i.e. the timestep, height an gets the variable Ids via the variable names):
 
@@ -265,7 +265,7 @@ It then appends the data to the variables and safes it.
     }
 
     return 0;
-}
+    }
 
 
 Implementation of Artificial Tsunami setup
@@ -341,7 +341,7 @@ Hence a new setup (ArtificialTsunami2d) was implemented:
 
 Visualization of the two-dimensional artificial Tsunami Event:
 
-.. video:: _static/video_folder/assignment_5/artificial_tsunami_event.mp4
+.. video:: ../_static/assignment_5/artificial_tsunami_event.mp4
   :autoplay:
   :loop:
   :height: 300
@@ -652,7 +652,7 @@ Therefore, the smallest and largest values in the x and y directions are used to
 
 Visualization of the two-dimensional tsunami event with the netCDF files provided on the website:
 
-.. video:: _static/video_folder/assignment_5/
+.. video:: ../_static/assignment_5/tsunami_event.mp4
   :autoplay:
   :loop:
   :height: 300

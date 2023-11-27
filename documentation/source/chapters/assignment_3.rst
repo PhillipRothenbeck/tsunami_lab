@@ -91,7 +91,7 @@ we needed the getter function ``patches::WavePropagation::getBathymetry`` to be 
 For demonstration, we constructed a created a DamBreak setup, that has bathymetry of 0 in all cells but 
 from 50% to 75% where it has a value of -3.75. This had the following result:
 
-.. video:: _static/video_folder/assignment_3/only_hill.mp4
+.. video:: ../_static/assignment_3/only_hill.mp4
   :autoplay:
   :loop:
   :height: 300
@@ -251,13 +251,13 @@ the condition is met. Four different methods for setting ghost cells:
 
 **Visualization of left ghost cell with reflecting boundary condition and right ghost cell with outflow condition.**
 
-.. video:: _static/video_folder/assignment_3/boundary_condition.mp4
+.. video:: ../_static/assignment_3/boundary_condition.mp4
   :autoplay:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_3/boundary_condition_mom.mp4
+.. video:: ../_static/assignment_3/boundary_condition_mom.mp4
   :autoplay:
   :loop:
   :height: 300
@@ -379,8 +379,9 @@ When simulating these setups for 200 timesteps on 25 meters we got the following
 
 Subcritical Flow:
 
-.. video:: _static/video_folder/assignment_3/subcritical_flow.mp4
+.. video:: ../_static/assignment_3/subcritical_flow.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
@@ -388,16 +389,18 @@ Subcritical Flow:
 
 Supercritical Flow:
 
-.. video:: _static/video_folder/assignment_3/supercritical_flow.mp4
+.. video:: ../_static/assignment_3/supercritical_flow.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
 Supercritical Flow momentum:
 
-.. video:: _static/video_folder/assignment_3/supercritical_flow_mom.mp4
+.. video:: ../_static/assignment_3/supercritical_flow_mom.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650

@@ -653,44 +653,43 @@ Visualization
 -------------
 **Initial state of water**
 
-.. image:: _static/01_picture.jpeg
-  :width: 400
-  :alt: First Picture of Visualization
+.. image:: ../_static/assignment_1/01_picture.jpeg
+  :width: 700
 
-.. image:: _static/02_picture.jpeg
+.. image:: ../_static/assignment_1/02_picture.jpeg
   :width: 400
   :alt: Second Picture of Visualization
 
-.. image:: _static/03_picture.jpeg
+.. image:: ../_static/assignment_1/03_picture.jpeg
   :width: 400
   :alt: Third Picture of Visualization
 
-.. image:: _static/04_picture.jpeg
+.. image:: ../_static/assignment_1/04_picture.jpeg
   :width: 400
   :alt: Forth Picture of Visualization
 
-.. image:: _static/05_picture.jpeg
+.. image:: ../_static/assignment_1/05_picture.jpeg
   :width: 400
   :alt: Fifth Picture of Visualization
 
 **Initial state of particle velocity**
 
-.. image:: _static/06_picture.jpeg
+.. image:: ../_static/assignment_1/06_picture.jpeg
   :width: 400
   :alt: Sixth Picture of Visualization
 
-.. image:: _static/07_picture.jpeg
+.. image:: ../_static/assignment_1/07_picture.jpeg
   :width: 400
   :alt: Seventh Picture of Visualization
 
-.. image:: _static/08_picture.jpeg
+.. image:: ../_static/assignment_1/08_picture.jpeg
   :width: 400
   :alt: Eighth Picture of Visualization
 
-.. image:: _static/09_picture.jpeg
+.. image:: ../_static/assignment_1/09_picture.jpeg
   :width: 400
   :alt: Nineth Picture of Visualization
 
-.. image:: _static/10_picture.jpeg
+.. image:: ../_static/assignment_1/10_picture.jpeg
   :width: 400
   :alt: Tenth Picture of Visualization

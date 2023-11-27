@@ -170,7 +170,7 @@ ar returning 0 for each position.
 
 The resulting simulation:
 
-.. video:: _static/video_folder/assignment_4/dambreak_2d.mp4
+.. video:: ../_static/assignment_4/dambreak_2d.mp4
   :autoplay:
   :loop:
   :height: 300
@@ -197,7 +197,7 @@ Finally for adding an obstacle. The method ``setups::DamBreak2d::getBathymetry``
 
 The influence of this can be seen in the resulting animation.
 
-.. video:: _static/video_folder/assignment_4/dambreak_2d_obs.mp4
+.. video:: ../_static/assignment_4/dambreak_2d_obs.mp4
   :autoplay:
   :loop:
   :height: 300

@@ -436,44 +436,51 @@ only depend on the hight and the gravitational constant
 Visualization
 ^^^^^^^^^^^^^
 
-.. video:: _static/video_folder/assignment_2/RareRare_10_5_mom.mp4
+.. video:: ../_static/assignment_2/RareRare_10_5_mom.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/RareRare_10_18.mp4
+.. video:: ../_static/assignment_2/RareRare_10_18.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650 
 
-.. video:: _static/video_folder/assignment_2/RareRare_10_5.mp4
+.. video:: ../_static/assignment_2/RareRare_10_5.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/RareRare_20_5.mp4
+.. video:: ../_static/assignment_2/RareRare_20_5.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/ShockShock_10_18.mp4
+.. video:: ../_static/assignment_2/ShockShock_10_18.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/ShockShock_10_5.mp4
+.. video:: ../_static/assignment_2/ShockShock_10_5.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/ShockShock_20_5.mp4
+.. video:: ../_static/assignment_2/ShockShock_20_5.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
@@ -505,32 +512,37 @@ If the wave travels on with the same speed, it reaches the village after 5227 se
 the village. 
 
 
-.. video:: _static/video_folder/assignment_2/DamBreak_10_0_3_3_mom.mp4
+.. video:: ../_static/assignment_2/DamBreak_10_0_3_3_mom.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/DamBreak_10_0_3_3.mp4
+.. video:: ../_static/assignment_2/DamBreak_10_0_3_3.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/db_10_0_3_15.mp4
+.. video:: ../_static/assignment_2/db_10_0_3_15.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/Dam_and_river_mom.mp4
+.. video:: ../_static/assignment_2/Dam_and_river_mom.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
 
-.. video:: _static/video_folder/assignment_2/Dam_and_river.mp4
+.. video:: ../_static/assignment_2/Dam_and_river.mp4
   :autoplay:
+  :nocontrols:
   :loop:
   :height: 300
   :width: 650
