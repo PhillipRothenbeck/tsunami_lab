@@ -8,110 +8,110 @@ Week Report 5
 Implementation of NetCDF Output
 -------------------------------
 
-Implemented a :code:`init` function which initializes the dimensions nad it's variables.
+Implemented a :code:`init` function which initializes the dimensions and it's variables.
 
 .. code-block:: c++
 
     int tsunami_lab::io::NetCDF::init(t_real i_dxy,
-                                  t_idx i_nx,
-                                  t_idx i_ny,
-                                  t_idx i_stride,
-                                  t_real const *i_b) {
-    m_dxy = i_dxy;
-    m_nx = i_nx;
-    m_ny = i_ny;
-    m_stride = i_stride;
-    m_b = i_b;
+                                      t_idx i_nx,
+                                      t_idx i_ny,
+                                      t_idx i_stride,
+                                      t_real const *i_b) {
+        m_dxy = i_dxy;
+        m_nx = i_nx;
+        m_ny = i_ny;
+        m_stride = i_stride;
+        m_b = i_b;
 
-    int l_dimXId,
-        l_dimYId, l_dimTimeId;
-    int l_varXId, l_varYId, l_varTimeId, l_varBathymetryId, l_varHeightId, l_varMomentumXId, l_varMomentumYId;
-    int l_nc_err;
+        int l_dimXId,
+            l_dimYId, l_dimTimeId;
+        int l_varXId, l_varYId, l_varTimeId, l_varBathymetryId, l_varHeightId, l_varMomentumXId, l_varMomentumYId;
+        int l_nc_err;
 
-    // create netCDF file
-    l_nc_err = nc_create(m_fileName.c_str(), NC_CLOBBER, &m_ncId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        // create netCDF file
+        l_nc_err = nc_create(m_fileName.c_str(), NC_CLOBBER, &m_ncId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    // define dimensions
-    l_nc_err = nc_def_dim(m_ncId, "x", i_nx, &l_dimXId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        // define dimensions
+        l_nc_err = nc_def_dim(m_ncId, "x", i_nx, &l_dimXId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_def_dim(m_ncId, "y", i_ny, &l_dimYId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_def_dim(m_ncId, "y", i_ny, &l_dimYId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_def_dim(m_ncId, "time", NC_UNLIMITED, &l_dimTimeId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_def_dim(m_ncId, "time", NC_UNLIMITED, &l_dimTimeId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    // define variables
-    l_nc_err = nc_def_var(m_ncId, "x", NC_FLOAT, 1, &l_dimXId, &l_varXId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        // define variables
+        l_nc_err = nc_def_var(m_ncId, "x", NC_FLOAT, 1, &l_dimXId, &l_varXId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_def_var(m_ncId, "y", NC_FLOAT, 1, &l_dimYId, &l_varYId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_def_var(m_ncId, "y", NC_FLOAT, 1, &l_dimYId, &l_varYId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_def_var(m_ncId, "time", NC_FLOAT, 1, &l_dimTimeId, &l_varTimeId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_def_var(m_ncId, "time", NC_FLOAT, 1, &l_dimTimeId, &l_varTimeId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    int l_dimBathymetryIds[2] = {l_dimXId, l_dimYId};
-    l_nc_err = nc_def_var(m_ncId, "bathymetry", NC_FLOAT, 2, l_dimBathymetryIds, &l_varBathymetryId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        int l_dimBathymetryIds[2] = {l_dimXId, l_dimYId};
+        l_nc_err = nc_def_var(m_ncId, "bathymetry", NC_FLOAT, 2, l_dimBathymetryIds, &l_varBathymetryId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    int l_dimHeightIds[3] = {l_dimTimeId, l_dimXId, l_dimYId};
-    l_nc_err = nc_def_var(m_ncId, "height", NC_FLOAT, 3, l_dimHeightIds, &l_varHeightId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        int l_dimHeightIds[3] = {l_dimTimeId, l_dimXId, l_dimYId};
+        l_nc_err = nc_def_var(m_ncId, "height", NC_FLOAT, 3, l_dimHeightIds, &l_varHeightId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    int l_dimMomentumXIds[3] = {l_dimTimeId, l_dimXId, l_dimYId};
-    l_nc_err = nc_def_var(m_ncId, "momentum_x", NC_FLOAT, 3, l_dimMomentumXIds, &l_varMomentumXId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        int l_dimMomentumXIds[3] = {l_dimTimeId, l_dimXId, l_dimYId};
+        l_nc_err = nc_def_var(m_ncId, "momentum_x", NC_FLOAT, 3, l_dimMomentumXIds, &l_varMomentumXId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    int l_dimMomentumYIds[3] = {l_dimTimeId, l_dimXId, l_dimYId};
-    l_nc_err = nc_def_var(m_ncId, "momentum_y", NC_FLOAT, 3, l_dimMomentumYIds, &l_varMomentumYId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        int l_dimMomentumYIds[3] = {l_dimTimeId, l_dimXId, l_dimYId};
+        l_nc_err = nc_def_var(m_ncId, "momentum_y", NC_FLOAT, 3, l_dimMomentumYIds, &l_varMomentumYId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_enddef(m_ncId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_enddef(m_ncId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
     
-it also covers the creation of the x, y and bathymetry data.
+it also covers the creation of the x, y and bathymetry data:
 
 .. code-block:: c++
 
-	 // write x coordinates
+	// write x coordinates
     t_real *l_dataX = new t_real[m_nx];
     for (t_idx l_ix = 0; l_ix < m_nx; l_ix++) {
         l_dataX[l_ix] = (l_ix + 0.5) * m_dxy;
@@ -146,7 +146,7 @@ it also covers the creation of the x, y and bathymetry data.
         return 1;
     }
 
-finally it writes the data into the file and deletes it's pointers.
+finally it writes the data into the file and deletes it's pointers:
 
 .. code-block:: c++
 
@@ -163,53 +163,53 @@ finally it writes the data into the file and deletes it's pointers.
     return 0;
 }
 
-The :code:`write` function writes continous data (i.e. the timestep, height an gets the variable Ids via the variable names.
+The :code:`write` function writes continous data (i.e. the timestep, height an gets the variable Ids via the variable names):
 
 .. code-block:: c++
 
 	int tsunami_lab::io::NetCDF::write(t_real i_time,
-                                   t_idx i_timeStep,
-                                   t_real const *i_h,
-                                   t_real const *i_hu,
-                                   t_real const *i_hv) {
-    int l_varTimeId, l_varHeightId, l_varMomentumXId, l_varMomentumYId;
-    int l_nc_err;
+                                      t_idx i_timeStep,
+                                      t_real const *i_h,
+                                      t_real const *i_hu,
+                                      t_real const *i_hv) {
+        int l_varTimeId, l_varHeightId, l_varMomentumXId, l_varMomentumYId;
+        int l_nc_err;
 
-    l_nc_err = nc_open(m_fileName.c_str(), NC_WRITE, &m_ncId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_open(m_fileName.c_str(), NC_WRITE, &m_ncId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_inq_varid(m_ncId, "time", &l_varTimeId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_inq_varid(m_ncId, "time", &l_varTimeId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_inq_varid(m_ncId, "height", &l_varHeightId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_inq_varid(m_ncId, "height", &l_varHeightId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_inq_varid(m_ncId, "momentum_x", &l_varMomentumXId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_inq_varid(m_ncId, "momentum_x", &l_varMomentumXId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_inq_varid(m_ncId, "momentum_y", &l_varMomentumYId);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_inq_varid(m_ncId, "momentum_y", &l_varMomentumYId);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
-    l_nc_err = nc_put_var1_float(m_ncId, l_varTimeId, &i_timeStep, &i_time);
-    if (l_nc_err != NC_NOERR) {
-        std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
-        return 1;
-    }
+        l_nc_err = nc_put_var1_float(m_ncId, l_varTimeId, &i_timeStep, &i_time);
+        if (l_nc_err != NC_NOERR) {
+            std::cout << "Error: " << nc_strerror(l_nc_err) << std::endl;
+            return 1;
+        }
 
 It then appends the data to the variables and safes it.
 
@@ -341,7 +341,11 @@ Hence a new setup (ArtificialTsunami2d) was implemented:
 
 Visualization of the two-dimensional artificial Tsunami Event:
 
-Unfortunately, for some reason Paraview was not able to read our output .csv files. 
+.. video:: _static/video_folder/assignment_5/
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
 Implementation of NetCDF Input
 -------------------------------
@@ -648,7 +652,11 @@ Therefore, the smallest and largest values in the x and y directions are used to
 
 Visualization of the two-dimensional tsunami event with the netCDF files provided on the website:
 
-Unfortunately, for some reason Paraview was not able to read our output .csv files. 
+.. video:: _static/video_folder/assignment_5/
+  :autoplay:
+  :loop:
+  :height: 300
+  :width: 650
 
 
 
