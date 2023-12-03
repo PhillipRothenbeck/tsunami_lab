@@ -78,7 +78,8 @@ Unfortunately although the two-dimensional tsunami event from last week works, o
 The expansion in y (and the set values for bathymetry) seems to be correct.
 
 .. image:: ../_static/assignment_6/chile_6.png
-    :width: 400
+  :width: 400
+  :alt: Chile, multiple coast lines
 
 
 500m Grid resolution
