@@ -1,0 +1,38 @@
+##
+# @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+# @section DESCRIPTION
+# Continuous integration using GitHub Actions for Sphinx.
+##
+name: Sphinx User Documentation
+
+on:
+   push:
+      branches: [documentation]
+
+permissions:
+   contents: write
+
+jobs:
+   build-and-deploy:
+      runs-on: ubuntu-latest
+
+      steps:
+         - uses: actions/checkout@v4
+         - uses: actions/setup-python@v3
+
+         - name: Dependencies
+           run: |
+              pip install sphinx sphinx_rtd_theme myst_parser sphinxcontrib-video
+
+         - name: Build
+           run: |
+              sphinx-build -M html documentation/source documentation/build
+              touch documentation/build/html/.nojekyll
+
+         - name: Deploy
+           uses: peaceiris/actions-gh-pages@v3
+           with:
+              publish_branch: gh-pages
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              publish_dir: documentation/build/html
+              force_orphan: true

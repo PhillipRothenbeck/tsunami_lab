@@ -6,3 +6,4 @@
 .vscode/
 .sconf_temp/
 config.log
+documentation/build/*

@@ -6,66 +6,66 @@
 name: Tsunami Lab
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    - cron: 0 0 * * *
+   push:
+      branches: [main]
+   pull_request:
+      branches: [main]
+   schedule:
+      - cron: 0 0 * * *
 
 jobs:
-  CI:
-    runs-on: ubuntu-latest
+   CI:
+      runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+      steps:
+         - uses: actions/checkout@v4
 
-      - name: Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install scons
-          sudo apt-get install valgrind
-          sudo apt-get install cppcheck
-          git submodule init
-          git submodule update
+         - name: Dependencies
+           run: |
+              sudo apt-get update
+              sudo apt-get install scons
+              sudo apt-get install valgrind
+              sudo apt-get install cppcheck
+              git submodule init
+              git submodule update
 
-      - name: Static Code Analysis
-        run: cppcheck src/ --template=gcc --force --error-exitcode=1
+         - name: Static Code Analysis
+           run: cppcheck src/ --template=gcc --force --error-exitcode=1
 
-      - name: Static Code Analysis
-        run: cppcheck src/ --template=gcc --force --error-exitcode=1
+         - name: Static Code Analysis
+           run: cppcheck src/ --template=gcc --force --error-exitcode=1
 
-      - name: Sanitize
-        run: |
-          scons mode=debug+san
-          ./build/tests
-          ./build/tsunami_lab DamBreak 25 -r
-          ./build/tsunami_lab DamBreak 25 -f
-          scons mode=release+san
-          ./build/tests
-          ./build/tsunami_lab DamBreak 500 -r
-          ./build/tsunami_lab DamBreak 500 -f
+         - name: Sanitize
+           run: |
+              scons mode=debug+san
+              ./build/tests
+              ./build/tsunami_lab DamBreak 25 -r
+              ./build/tsunami_lab DamBreak 25 -f
+              scons mode=release+san
+              ./build/tests
+              ./build/tsunami_lab DamBreak 500 -r
+              ./build/tsunami_lab DamBreak 500 -f
 
-      - name: Valgrind
-        run: |
-          scons mode=debug
-          valgrind ./build/tests
-          valgrind ./build/tsunami_lab DamBreak 25 -r
-          valgrind ./build/tsunami_lab DamBreak 25 -f
+         - name: Valgrind
+           run: |
+              scons mode=debug
+              valgrind ./build/tests
+              valgrind ./build/tsunami_lab DamBreak 25 -r
+              valgrind ./build/tsunami_lab DamBreak 25 -f
 
-      - name: Release
-        run: |
-          scons
-          ./build/tests
-          ./build/tsunami_lab DamBreak 500 -r
-          ./build/tsunami_lab DamBreak 500 -f
-          ./build/tsunami_lab Sanitize1d 500 -r
-          ./build/tsunami_lab Sanitize1d 500 -f
-          ./build/tsunami_lab ShockShock 500 -r
-          ./build/tsunami_lab ShockShock 500 -f
-          ./build/tsunami_lab RareRare 500 -r
-          ./build/tsunami_lab RareRare 500 -f
-          ./build/tsunami_lab CustomSetup 500 -r
-          ./build/tsunami_lab CustomSetup 500 -f
-          ./build/tsunami_lab SubcriticalFlow1d 250 -f
-          ./build/tsunami_lab SupercriticalFlow1d 250 -f
+         - name: Release
+           run: |
+              scons
+              ./build/tests
+              ./build/tsunami_lab DamBreak 500 -r
+              ./build/tsunami_lab DamBreak 500 -f
+              ./build/tsunami_lab Sanitize1d 500 -r
+              ./build/tsunami_lab Sanitize1d 500 -f
+              ./build/tsunami_lab ShockShock 500 -r
+              ./build/tsunami_lab ShockShock 500 -f
+              ./build/tsunami_lab RareRare 500 -r
+              ./build/tsunami_lab RareRare 500 -f
+              ./build/tsunami_lab CustomSetup 500 -r
+              ./build/tsunami_lab CustomSetup 500 -f
+              ./build/tsunami_lab SubcriticalFlow1d 250 -f
+              ./build/tsunami_lab SupercriticalFlow1d 250 -f
