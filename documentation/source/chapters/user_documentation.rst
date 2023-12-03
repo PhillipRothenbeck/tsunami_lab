@@ -143,14 +143,17 @@ Structure of a config file
 
 - "boundaryCond": string, that decides the boundary conditions
 
-Options: 1d: "OO", "RR", "RO", "OR"; 2d: "OO"
+Options: 
+1d: "OO", "RR", "RO", "OR"; 
+2d: "OOOO", "ROOO", "OROO", "OORO" (...) 
+(each letter represents a direction, in order: East, North, West, South)
+if "OO" is entered for 2d, it is filled with "OOOO" as the default value ("RR" = "RROO")
 
 - "setup": string, that decides the used setup
 
 Options: 
 1d: "DamBreak", "RareRare", "ShockShock", "SubcriticalFlow", "SupercriticalFlow", "TsunamiEvent", "Sanitize", "CustomSetup"; 
 2d: "DamBreak"
-
 
 
 .. _ch:Troubleshooting:
