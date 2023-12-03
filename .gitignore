@@ -3,3 +3,6 @@
 /.idea/
 /out/
 *.dblite
+.vscode/
+.sconf_temp/
+config.log
