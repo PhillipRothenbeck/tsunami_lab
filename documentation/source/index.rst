@@ -17,5 +17,7 @@
 
    chapters/assignment_6.rst
 
+   chapters/assignment_7.rst
+
 .. include:: chapters/overview.rst
 
