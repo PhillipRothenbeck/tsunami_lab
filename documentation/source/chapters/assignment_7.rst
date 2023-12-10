@@ -40,7 +40,7 @@ Furthermore the Simulation time :code:`SimTime` and End time :code:`EndTime` are
 The question of the time intervals between checkpoints is clarified in the :code:`Simulation.cpp` file. 
 We have opted for a variable amount of Checkpoints, which can be changed in the corresponding configuration file (per default ... Checkpoints per Simulation).
 
-The time interval between checkpoints is calculated by: :math:` \text{simTime}` % :math:`\frac{\text{endTime}}{n_\text{Checkpoints}}`
+The time interval between checkpoints is calculated by: :math:`\text{simTime}` % :math:`\frac{\text{endTime}}{n_\text{Checkpoints}}`
 
 There is no writeCheckpoint function or whatsoever. The :code:`write` function can be called with or without parameters, which determines how it is used. 
 
