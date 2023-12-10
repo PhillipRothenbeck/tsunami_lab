@@ -40,7 +40,7 @@ Furthermore the Simulation time :code:`SimTime` and End time :code:`EndTime` are
 The question of the time intervals between checkpoints is clarified in the :code:`Simulation.cpp` file. 
 We have opted for a variable amount of Checkpoints, which can be changed in the corresponding configuration file (per default ... Checkpoints per Simulation).
 
-The time interval between checkpoints is calculated by: :math:`\text{simTime}` % :math:`\frac{\text{endTime}}{n_\text{Checkpoints}}`
+The time interval between checkpoints is calculated by: :math:` \text{simTime}` % :math:`\frac{\text{endTime}}{n_\text{Checkpoints}}`
 
 There is no writeCheckpoint function or whatsoever. The :code:`write` function can be called with or without parameters, which determines how it is used. 
 
@@ -144,11 +144,11 @@ NetCDF :code:`write` function:
     }
 
 
-If there are older checkpoints, but you want to recalculate everything, there is a command line flag :code:`flag einfügen bitte` which can be used to ignore the existing checkpoints.
+If there are older checkpoints, but you want to recalculate everything, there is a command line flag :code:`C` which can be used to ignore the existing checkpoints.
 
 .. code-block:: c++
 
-    ./build/tsunami_lab/ chile_250m.json -FLAG
+    ./build/tsunami_lab/ chile_250m.json -C 
 
 
 We do not delete old checkpoint files using the code, as this is eventually done by hand.
@@ -165,7 +165,7 @@ Coarse Output
 To obtain a coarse output, several cells in a square must be combined into one cell. This works by iterating over the grid and taking every :math:`k \text{'th}` cell and using a :math:`2k-1 \times 2k-1` filter (similar to a blur filter in image processing).
 The value of the cells is being divided by the number of cells in the square, typically :math:`(2k-1)^2` , and added together.
 But it raises the question of what happens to cells that do not exist because they are outside the domain. If :math:`k = 5` then there are not enough ghost cells at the edge to combine the cells.
-In this case cells outside of the domain are ignored and the value of each cells is divided by :math:`(2k-1)^2 - n_\text{ignored cells}`.
+In this case cells outside of the domain are ignored and the value of each cells is divided by :math:`(2k-1)^2 - n_\text{ignored cells}`
 
 .. code-block:: c++
 
