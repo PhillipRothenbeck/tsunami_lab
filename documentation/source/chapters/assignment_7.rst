@@ -87,15 +87,15 @@ NetCDF :code:`write` function:
 .. code-block:: c++
 
     int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
-                                       long int i_checkpoint = -1,
+                                       std::string i_checkPointPath = "",
                                        t_real i_simTime = -1,
                                        t_real i_endTime = -1) {
         int l_nc_err = 0;
 
         // create netCDF file
         std::string l_outFileName;
-        if (i_checkpoint > -1) {
-            l_outFileName = "out/checkpoint_" + std::to_string(i_checkpoint) + ".nc";
+        if (i_checkPointPath.compare("") != 0) {
+            l_outFileName = i_checkPointPath;
         } else {
             l_outFileName = m_outFileName;
         }
@@ -107,24 +107,24 @@ NetCDF :code:`write` function:
         }
 
         // define dims and vars
-        init(i_currentFrame);
+        init(i_currentFrame, i_checkPointPath);
 
         // write data
-        l_nc_err = nc_put_var_float(m_ncId, m_varXId, m_dataX);
-        l_nc_err += nc_put_var_float(m_ncId, m_varYId, m_dataY);
-        l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, m_dataB);
+        if (i_checkPointPath.compare("") != 0) {
+            l_nc_err = nc_put_var_float(m_ncId, m_varXId, m_dataX);
+            l_nc_err += nc_put_var_float(m_ncId, m_varYId, m_dataY);
+            l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, m_dataB);
+            l_nc_err += nc_put_var_float(m_ncId, m_varHeightId, m_height);
+            l_nc_err += nc_put_var_float(m_ncId, m_varMomentumXId, m_momentumX);
+            l_nc_err += nc_put_var_float(m_ncId, m_varMomentumYId, m_momentumY);
+        }
+
         l_nc_err += nc_put_var_float(m_ncId, m_varTimeId, m_time);
-        l_nc_err += nc_put_var_float(m_ncId, m_varHeightId, m_height);
-        l_nc_err += nc_put_var_float(m_ncId, m_varMomentumXId, m_momentumX);
-        l_nc_err += nc_put_var_float(m_ncId, m_varMomentumYId, m_momentumY);
-        if (i_simTime != -1) {
-            t_real l_simTime[1] = {i_simTime};
-            l_nc_err += nc_put_var_float(m_ncId, m_varSimTimeId, l_simTime);
-        }
-        if (i_endTime != -1) {
-            t_real l_endTime[1] = {i_endTime};
-            l_nc_err += nc_put_var_float(m_ncId, m_varEndTimeId, l_endTime);
-        }
+
+        l_nc_err += nc_put_var_float(m_ncId, m_varSimTimeId, &i_simTime);
+        l_nc_err += nc_put_var_float(m_ncId, m_varEndTimeId, &i_endTime);
+        unsigned long long l_currentFrame = i_currentFrame;
+        l_nc_err += nc_put_var_ulonglong(m_ncId, m_varFrameId, &l_currentFrame);
         if (l_nc_err != NC_NOERR) {
             std::cout << "NCError: Put variables." << std::endl;
             return 1;
@@ -246,14 +246,32 @@ In this case cells outside of the domain are ignored and the value of each cells
 Simulation of 2011 Tohoku with coarse Output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As time was short at the end, we simulated chile at 1000m grid size. One time with a coarse output modifire of :math:`k = 20` and one time without to show the difference.
+As time was short at the end, we simulated chile at 1000m grid size. One time with a coarse output modifire of :math:`k = 100` and one time without to show the difference.
 
-Visualization of chile 1000m with coarse Output:
+.. code-block:: c++
 
-.. image:: ../_static/assignment_7/
-  :width: 400
+    {
+        "dimension": 2,
+        "nx": 3500,
+        "ny": 2950,
+        "xLen": 3500000.0,
+        "yLen": 2950000.0,
+        "bathymetryFileName": "chile_gebco20_usgs_250m_bath_fixed.nc",
+        "displacementsFileName": "chile_gebco20_usgs_250m_displ_fixed.nc",
+        "epicenterOffsetX": -3000000,
+        "epicenterOffsetY": -1450000,
+        "simTime": 1.25,
+        "boundaryCond": "OO",
+        "setup": "TsunamiEvent",
+        "coarseFactor": 100
+    }
 
 Visualization of chile 1000m without coarse Output:
+
+.. image:: ../_static/assignment_7/chile_1000m.png
+  :width: 400
+
+Visualization of chile 1000m with coarse Output:
 
 .. image:: ../_static/assignment_7/
   :width: 400
