@@ -273,6 +273,6 @@ Visualization of chile 1000m without coarse Output:
 
 Visualization of chile 1000m with coarse Output:
 
-.. image:: ../_static/assignment_7/
+.. image:: ../_static/assignment_7/chile_1000m_coarse.png
   :width: 400
 
