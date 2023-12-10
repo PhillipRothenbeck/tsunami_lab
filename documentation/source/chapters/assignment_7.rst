@@ -42,11 +42,6 @@ We have opted for a variable amount of Checkpoints, which can be changed in the 
 
 The time interval between checkpoints is calculated by: :math:`\text{simTime}` % :math:`\frac{\text{endTime}}{n_\text{Checkpoints}}`
 
-.. code-block:: c++
-
-    Berechnung in code einfügen bitte
-
-
 There is no writeCheckpoint function or whatsoever. The :code:`write` function can be called with or without parameters, which determines how it is used. 
 
 Each time a checkpoint is set, the function is called with parameters and in the end, when the solution file is to be written, no parameters are used.
@@ -160,41 +155,106 @@ We do not delete old checkpoint files using the code, as this is eventually done
 
 picture of Checkpoint files:
 
-.. image:: ../_static/assignment_7/
+.. image:: ../_static/assignment_7/checkpoints.png
   :width: 400
 
 
 Coarse Output
 -------------
 
-To obtain a coarse output, several cells in a :math:`k \times k` square must be combined into one cell. This works by iterating over the grid with a :math:`k \times k` filter (similar to a blur filter in image processing).
-But it raises the question of what happens to cells that do not exist because they are outside the domain. 
-If :math:`k = 5` then there are not enough ghost cells at the edge to combine the cells. In this case ... 
+To obtain a coarse output, several cells in a square must be combined into one cell. This works by iterating over the grid and taking every :math:`k \text{'th}` cell and using a :math:`2k-1 \times 2k-1` filter (similar to a blur filter in image processing).
+The value of the cells is being divided by the number of cells in the square, typically :math:`(2k-1)^2` , and added together.
+But it raises the question of what happens to cells that do not exist because they are outside the domain. If :math:`k = 5` then there are not enough ghost cells at the edge to combine the cells.
+In this case cells outside of the domain are ignored and the value of each cells is divided by :math:`(2k-1)^2 - n_\text{ignored cells}`.
 
 .. code-block:: c++
 
-    Implementation of coarse output
+        // coarse output
+        t_idx l_idx = 0;
+        t_real *l_dataX = new tsunami_lab::t_real[m_nxCoarse];
+        for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
+            l_dataX[l_idx] = m_dataX[l_ix];
+            l_idx += 1;
+        }
+        l_nc_err = nc_put_var_float(m_ncId, m_varXId, l_dataX);
+        delete[] l_dataX;
+
+        l_idx = 0;
+        t_real *l_dataY = new tsunami_lab::t_real[m_nyCoarse];
+        for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
+            l_dataY[l_idx] = m_dataY[l_iy];
+            l_idx += 1;
+        }
+        l_nc_err += nc_put_var_float(m_ncId, m_varYId, l_dataY);
+        delete[] l_dataY;
+
+        l_idx = 0;
+        t_real *l_dataB = new tsunami_lab::t_real[m_nxyCoarse];
+        for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
+            for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
+                // average over neighbors
+                l_dataB[l_idx] = m_dataB[l_iy * m_nx + l_ix];
+                t_idx l_neighborCount = 1;
+                for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
+                    for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
+                        int l_idxX = l_ix + l_offsetX;
+                        int l_idxY = l_iy + l_offsetY;
+                        if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
+                            l_dataB[l_idx] += m_dataB[l_idxY * m_nx + l_idxX];
+                            l_neighborCount++;
+                        }
+                    }
+                }
+                l_dataB[l_idx] /= l_neighborCount;
+                l_idx += 1;
+            }
+        }
+        l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, l_dataB);
+        delete[] l_dataB;
+
+        l_idx = 0;
+        t_real *l_height = new tsunami_lab::t_real[m_nxyCoarse];
+        t_real *l_momentumX = new tsunami_lab::t_real[m_nxyCoarse];
+        t_real *l_momentumY = new tsunami_lab::t_real[m_nxyCoarse];
+        for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
+            for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
+                // average over neighbors
+                l_height[l_idx] = m_height[l_iy * m_nx + l_ix];
+                l_momentumY[l_idx] = m_momentumY[l_iy * m_nx + l_ix];
+                l_momentumY[l_idx] = m_momentumY[l_iy * m_nx + l_ix];
+                t_idx l_neighborCount = 1;
+                for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
+                    for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
+                        int l_idxX = l_ix + l_offsetX;
+                        int l_idxY = l_iy + l_offsetY;
+                        if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
+                            l_height[l_idx] += m_height[l_idxY * m_nx + l_idxX];
+                            l_momentumX[l_idx] += m_momentumX[l_idxY * m_nx + l_idxX];
+                            l_momentumY[l_idx] += m_momentumY[l_idxY * m_nx + l_idxX];
+                            l_neighborCount++;
+                        }
+                    }
+                }
+                l_height[l_idx] /= l_neighborCount;
+                l_momentumX[l_idx] /= l_neighborCount;
+                l_momentumY[l_idx] /= l_neighborCount;
+                l_idx += 1;
+            }
+        }
+
 
 Simulation of 2011 Tohoku with coarse Output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Simulation of the 2011 Tohoku M 9.1 Tsunami Event is started with a grid size of 50m and a coarse Output modifer :math:`k` of ...
+As time was short at the end, we simulated chile at 1000m grid size. One time with a coarse output modifire of :math:`k = 20` and one time without to show the difference.
 
-.. code-block:: c++
+Visualization of chile 1000m with coarse Output:
 
-    Tohoku config file bitte danke
+.. image:: ../_static/assignment_7/
+  :width: 400
 
+Visualization of chile 1000m without coarse Output:
 
-Visualization of Tohoku 2011
+.. image:: ../_static/assignment_7/
+  :width: 400
 
-.. video:: ../_static/assignment_7/
-  :autoplay:
-  :loop:
-  :height: 300
-  :width: 650
-
-
-Individual Member Contributions
---------------------------------
-
-This week LeChuck did all the work, he deserves most of the credit.
