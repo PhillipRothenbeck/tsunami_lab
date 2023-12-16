@@ -121,7 +121,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     tsunami_lab::t_idx l_frame = 0;
     tsunami_lab::t_real l_endTime = i_simConfig.getEndSimTime();
     tsunami_lab::t_real l_simTime = 0;
-    if (i_simConfig.useCheckpoint()) {
+    if (i_simConfig.useCheckPoint()) {
         l_frame = i_simConfig.getCurrentFrame();
         l_simTime = i_simConfig.getStartSimTime();
     }
@@ -197,7 +197,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
                                                            l_path);
         l_timer->printTime("Create Writer Object");
 
-        if (i_simConfig.useCheckpoint() && instanceof <tsunami_lab::setups::CheckPoint>(i_setup)) {
+        if (i_simConfig.useCheckPoint() && instanceof <tsunami_lab::setups::CheckPoint>(i_setup)) {
             tsunami_lab::setups::CheckPoint *l_checkpoint = (tsunami_lab::setups::CheckPoint *)i_setup;
             for (t_idx l_i = 0; l_i < l_frame; l_i++) {
                 l_writer->store(l_checkpoint->getSimTimeData(l_i),
@@ -210,25 +210,24 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
         }
 
         // iterate over time
-		  l_timer->start();
+		  t_real l_checkPointTime = l_endTime / i_simConfig.getCheckPointCount();
+		  std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
+		  t_idx l_checkPoints = l_simTime/l_checkPointTime;
         while (l_simTime < l_endTime) {
             if (l_timeStep % 25 == 0) {
                 std::cout << "  simulation time / #time steps / #step: "
                           << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
 
-					 l_timer->printTime("Last 25 Time Steps");
                 l_writer->store(l_simTime,
                                 l_frame,
                                 l_waveProp->getHeight(),
                                 l_waveProp->getMomentumX(),
                                 l_waveProp->getMomentumY());
-                l_timer->printTime("Store Data");
 
-                if (i_simConfig.useCheckpoint() && l_frame % 4 == 0) {
-                    l_timer->start();
+                if (i_simConfig.useCheckPoint() && l_simTime > l_checkPointTime * l_checkPoints) {
                     std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
                     l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
-                    l_timer->printTime("Save Checkpoint");
+						  l_checkPoints++;
                 }
                 l_frame++;
             }
@@ -239,9 +238,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
             l_simTime += l_dt;
         }
 
-        l_timer->start();
         l_writer->write();
-        l_timer->printTime("Write Output");
 
         // free memory
         std::cout << "finished time loop" << std::endl;
