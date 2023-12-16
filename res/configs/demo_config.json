@@ -9,5 +9,6 @@
     "simTime": 5.0,
     "boundaryCond": "OR",
     "solver": "Roe",
-    "setup": "DamBreak"
+    "setup": "DamBreak",
+	 "checkPoints": 2
 }

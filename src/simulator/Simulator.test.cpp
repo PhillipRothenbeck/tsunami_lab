@@ -21,6 +21,7 @@ TEST_CASE("Test the simulation running method.", "[Simulator]") {
     tsunami_lab::configs::SimConfig l_config = tsunami_lab::configs::SimConfig(1,
                                                                                "simulator",
 																										 false,
+																										 0,
                                                                                50,
                                                                                1,
                                                                                10,

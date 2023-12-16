@@ -29,6 +29,9 @@ class tsunami_lab::configs::SimConfig {
     //! if checkpoints should be used
     bool m_useCheckpoint;
 
+    //! number of checkpoints to be used
+    t_idx m_checkPointCount;
+
     //! number of cells in x-direction
     tsunami_lab::t_idx m_nx = 1;
 
@@ -70,7 +73,8 @@ class tsunami_lab::configs::SimConfig {
      *
      * @param i_dimension dimension of the simulation.
      * @param i_configName name of config file.
-     * @param i_useCheckpoint if checkpoints should be used.
+     * @param i_useCheckPoint if checkpoints should be used.
+     * @param i_checkPointCount number of checkpoints to create if useCheckPoint is true.
      * @param i_nx number of cells in x-direction.
      * @param i_ny number of cells in y-direction.
      * @param i_xLen length of the simulation in x-direction in meters.
@@ -84,7 +88,8 @@ class tsunami_lab::configs::SimConfig {
      */
     SimConfig(tsunami_lab::t_idx i_dimension,
               std::string i_configName,
-              bool i_useCheckpoint,
+              bool i_useCheckPoint,
+              t_idx i_checkPointCount,
               tsunami_lab::t_idx i_nx,
               tsunami_lab::t_idx i_ny,
               tsunami_lab::t_real i_xLen,
@@ -212,8 +217,17 @@ class tsunami_lab::configs::SimConfig {
      * @brief Gets boolean value, that shows if a checkpoint file should be used.
      *
      */
-    bool useCheckpoint() {
+    bool useCheckPoint() {
         return m_useCheckpoint;
+    }
+
+	 /**
+	  * @brief Gets number of checkpoints.
+	  * 
+	  * @return number of checkpoints.
+	  */
+    t_idx getCheckPointCount() {
+        return m_checkPointCount;
     }
 };
 

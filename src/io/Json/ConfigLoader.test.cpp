@@ -23,7 +23,7 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
                                                     l_hStar,
                                                     l_simConfig);
 
-    REQUIRE(err == 1);
+    REQUIRE(err == 0);
     REQUIRE(l_simConfig.getDimension() == 2);
     REQUIRE(l_simConfig.getXCells() == 500);
     REQUIRE(l_simConfig.getYCells() == 500);
@@ -35,6 +35,7 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
     REQUIRE(l_simConfig.getBoundaryCondition()[0] == tsunami_lab::OUTFLOW);
     REQUIRE(l_simConfig.getBoundaryCondition()[1] == tsunami_lab::REFLECTING);
     REQUIRE(l_simConfig.isRoeSolver());
+    REQUIRE(l_simConfig.getCheckPointCount() == 2);
     REQUIRE(l_hStar == -1);
     delete l_setups;
 }

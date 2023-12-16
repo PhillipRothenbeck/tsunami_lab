@@ -31,7 +31,7 @@
 using json = nlohmann::json;
 
 tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_configName,
-                                                             bool i_useCheckpoint,
+                                                             bool i_useCheckPoint,
                                                              tsunami_lab::setups::Setup *&o_setup,
                                                              tsunami_lab::t_real &o_hStar,
                                                              tsunami_lab::configs::SimConfig &o_simConfig) {
@@ -40,7 +40,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     std::ifstream l_file(l_path);
     if (l_file.fail()) {
         std::cerr << "failed to read " << l_path << std::endl;
-        return 0;
+        return EXIT_FAILURE;
     }
 
     // read JSON config file
@@ -146,12 +146,21 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
             l_useRoeSolver = false;
         } else {
             std::cout << "unknown solver was entered" << std::endl;
-            return 0;
+            return EXIT_FAILURE;
         }
 
     } else {
         std::cout << "solver takes on default value" << std::endl;
         l_useRoeSolver = false;
+    }
+
+    // factor for coarse output
+    tsunami_lab::t_idx l_checkPointCount;
+    if (l_configFile.contains("checkPoints")) {
+        l_checkPointCount = l_configFile.at("checkPoints");
+    } else {
+        std::cout << "checkPointCount takes on default value" << std::endl;
+        l_checkPointCount = 5;
     }
 
     // factor for coarse output
@@ -161,7 +170,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
 
         if (l_coarseFactor < 1) {
             std::cout << "factor for coarse input can't be smaller than 1" << std::endl;
-            return 0;
+            return EXIT_FAILURE;
         }
     } else {
         std::cout << "coarseFactor takes on default value" << std::endl;
@@ -199,7 +208,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     std::string l_checkPointPath = "out/" + l_configName + "_checkpoint.nc";
     std::ifstream f(l_checkPointPath.c_str());
     t_idx l_startFrame = 0;
-    if (i_useCheckpoint && f.good()) {
+    if (i_useCheckPoint && f.good()) {
         std::cout << "Reading out/" + l_configName + "_checkpoint.nc" << std::endl;
         t_real *l_height;
         t_real *l_momentumX;
@@ -270,7 +279,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
 
             if (l_stream.fail()) {
                 std::cout << "failed to read /res/dem.csv" << std::endl;
-                return 0;
+                return EXIT_FAILURE;
             } else {
                 std::cout << "finished reading /res/dem.csv" << std::endl;
             }
@@ -388,12 +397,13 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
         }
     } else {
         std::cout << "unknown setup was entered" << std::endl;
-        return 0;
+        return EXIT_FAILURE;
     }
 
     o_simConfig = tsunami_lab::configs::SimConfig(l_dimension,
                                                   l_configName,
-																  i_useCheckpoint,
+                                                  i_useCheckPoint,
+																  l_checkPointCount,
                                                   l_nx,
                                                   l_ny,
                                                   l_xLen,
@@ -401,8 +411,9 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
                                                   l_endSimTime,
                                                   l_startSimTime,
                                                   l_startFrame,
-																  l_coarseFactor,
+                                                  l_coarseFactor,
                                                   l_boundaryCond,
                                                   l_useRoeSolver);
-    return 1;
+
+    return 0;
 }

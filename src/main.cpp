@@ -13,6 +13,7 @@
 #include "configs/SimConfig.h"
 #include "io/Json/ConfigLoader.h"
 #include "simulator/Simulator.h"
+#include "timer.h"
 
 int main(int i_argc, char *i_argv[]) {
     std::cout << "####################################" << std::endl;
@@ -27,6 +28,8 @@ int main(int i_argc, char *i_argv[]) {
         return EXIT_FAILURE;
     }
 
+    Timer *l_timer = new Timer();
+
     std::string l_configName = std::string(i_argv[1]);
 
     bool l_useCheckpoint = false;
@@ -38,15 +41,19 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::t_real l_hStar = -1;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
 
+    l_timer->start();
     // load parameters from runtimeConfig.json
     tsunami_lab::t_idx err = tsunami_lab::io::ConfigLoader::loadConfig(l_configName,
                                                                        l_useCheckpoint,
                                                                        l_setups,
                                                                        l_hStar,
                                                                        l_simConfig);
+    l_timer->printTime("Loading Config ");
 
-    if (err == 0) {
+    if (err != 0) {
         std::cout << "failed to read: " << l_configName << std::endl;
+        delete l_setups;
+        delete l_timer;
         return EXIT_FAILURE;
     }
 
@@ -54,6 +61,7 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::simulator::runSimulation(l_setups, l_hStar, l_simConfig);
 
     delete l_setups;
+    delete l_timer;
     std::cout << "finished, exiting" << std::endl;
     return EXIT_SUCCESS;
 }
