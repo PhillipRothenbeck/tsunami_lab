@@ -45,8 +45,9 @@ int main(int i_argc, char *i_argv[]) {
                                                                        l_hStar,
                                                                        l_simConfig);
 
-    if (err == 0) {
+    if (err != 0) {
         std::cout << "failed to read: " << l_configName << std::endl;
+        delete l_setups;
         return EXIT_FAILURE;
     }
 

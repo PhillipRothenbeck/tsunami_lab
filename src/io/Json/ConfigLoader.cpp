@@ -40,7 +40,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     std::ifstream l_file(l_path);
     if (l_file.fail()) {
         std::cerr << "failed to read " << l_path << std::endl;
-        return 0;
+        return EXIT_FAILURE;
     }
 
     // read JSON config file
@@ -146,7 +146,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
             l_useRoeSolver = false;
         } else {
             std::cout << "unknown solver was entered" << std::endl;
-            return 0;
+            return EXIT_FAILURE;
         }
 
     } else {
@@ -161,7 +161,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
 
         if (l_coarseFactor < 1) {
             std::cout << "factor for coarse input can't be smaller than 1" << std::endl;
-            return 0;
+            return EXIT_FAILURE;
         }
     } else {
         std::cout << "coarseFactor takes on default value" << std::endl;
@@ -270,7 +270,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
 
             if (l_stream.fail()) {
                 std::cout << "failed to read /res/dem.csv" << std::endl;
-                return 0;
+                return EXIT_FAILURE;
             } else {
                 std::cout << "finished reading /res/dem.csv" << std::endl;
             }
@@ -388,12 +388,12 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
         }
     } else {
         std::cout << "unknown setup was entered" << std::endl;
-        return 0;
+        return EXIT_FAILURE;
     }
 
     o_simConfig = tsunami_lab::configs::SimConfig(l_dimension,
                                                   l_configName,
-																  i_useCheckpoint,
+                                                  i_useCheckpoint,
                                                   l_nx,
                                                   l_ny,
                                                   l_xLen,
@@ -401,8 +401,9 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
                                                   l_endSimTime,
                                                   l_startSimTime,
                                                   l_startFrame,
-																  l_coarseFactor,
+                                                  l_coarseFactor,
                                                   l_boundaryCond,
                                                   l_useRoeSolver);
-    return 1;
+
+    return 0;
 }
