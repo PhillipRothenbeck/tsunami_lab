@@ -36,9 +36,9 @@ vars.AddVariables(
 
 vars.AddVariables(
   EnumVariable( 'report',
-                'options: 0, 1',
+                'options: 0 to 5',
                 '0',
-                allowed_values=('0', '1')
+                allowed_values=('0', '1', '2', '3', '4', '5')
               )
 )
 
@@ -77,9 +77,9 @@ else:
   elif 'icpc' in env['CXX']:
     env.Append( CXXFLAGS = [ '-fast' ] )
 
-if 'icpc' in env['CXX'] and '1' in env['report']:
+if 'icpc' in env['CXX'] and '0' not in env['report']:
   
-  env.Append( CXXFLAGS = [ '-qopt-report' ] )
+  env.Append( CXXFLAGS = [ '-qopt-report=' + env['report'] ] )
 
 # add sanitizers
 if 'san' in  env['mode']:
