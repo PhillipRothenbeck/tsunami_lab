@@ -178,8 +178,8 @@ Unexpectedly, with the ofast flag, the g++ compiler generated faster code compar
 Since only the icpc compiler could be executed with the fast flag, we have no comparison with the g++ compiler. 
 It could be assumed that the g++ compiler would have become even faster, since 'fast' is a combination of 'Ofast', 'ipo', 'static' and 'xHost'.
 
-Based on these results, we decided to set our default flag for :code:`g++` to :code:`-Ofast` since it contains the :code:`O3` flag, 
-which is recommended when working with loops involving intensive floating point calculations.
+Based on these results, we decided not to set our default flag for :code:`g++` to :code:`-Ofast` since it contains the :code:`O3` flag, 
+which is recommended when working with loops involving intensive floating point calculations but generates unstable code.
 The default flag for :code:`icpc` was set to :code:`fast`.
 
 Optimization Report
