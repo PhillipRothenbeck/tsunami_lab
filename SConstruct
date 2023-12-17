@@ -34,6 +34,14 @@ vars.AddVariables(
               )
 )
 
+vars.AddVariables(
+  EnumVariable( 'report',
+                'options: 0, 1',
+                '0',
+                allowed_values=('0', '1')
+              )
+)
+
 # exit in the case of unknown variables
 if vars.UnknownVariables():
   print( "build configuration corrupted, don't know what to do with: " + str(vars.UnknownVariables().keys()) )
@@ -68,6 +76,10 @@ else:
     env.Append( CXXFLAGS = [ '-O2' ] )
   elif 'icpc' in env['CXX']:
     env.Append( CXXFLAGS = [ '-fast' ] )
+
+if 'icpc' in env['CXX'] and '1' in env['report']:
+  
+  env.Append( CXXFLAGS = [ '-qopt-report' ] )
 
 # add sanitizers
 if 'san' in  env['mode']:
