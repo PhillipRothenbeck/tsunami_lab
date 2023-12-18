@@ -77,8 +77,12 @@ else:
   elif 'icpc' in env['CXX']:
     env.Append( CXXFLAGS = [ '-fast' ] )
 
+if 'g++' in env['CXX']:
+    env.Append( CXXFLAGS = [ '-fopenmp' ] )
+elif 'icpc' in env['CXX']:
+    env.Append( CXXFLAGS = [ '-qopenmp' ] )
+
 if 'icpc' in env['CXX'] and '0' not in env['report']:
-  
   env.Append( CXXFLAGS = [ '-qopt-report=' + env['report'] ] )
 
 # add sanitizers
