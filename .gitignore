@@ -7,3 +7,5 @@
 .sconf_temp/
 config.log
 documentation/build/*
+documentation/_build/*
+_build/*

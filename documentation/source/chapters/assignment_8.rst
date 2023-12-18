@@ -295,3 +295,12 @@ NetUpdates and WaveSpeeds required roughly the same amount of CPU time as in the
 
 .. image:: ../_static/assignment_8/chile_1000m.png
   :width: 400
+
+
+Individual Phase
+----------------
+
+For our individual phase, we would like to try to optimize our solver by dividing our mesh into several smaller meshes. These smaller meshes can be simulated simultaneously on different cores to calculate the net updates faster. The challenge is to update the intersections of these smaller meshes at each time step.
+
+We hope that by parallelizing our computations, we can gain a lot of computing power. We also hope to deepen our understanding of good parallelization practices. 
+
