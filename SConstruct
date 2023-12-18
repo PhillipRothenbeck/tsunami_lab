@@ -73,12 +73,13 @@ if 'debug' in env['mode']:
   env.Append( CXXFLAGS = [ '-O0' ] )
 else:
   if 'g++' in env['CXX']:
-    env.Append( CXXFLAGS = [ '-O2' ] )
+    env.Append( CXXFLAGS = [ '-O2',
+                             '-fopenmp' ] )
   elif 'icpc' in env['CXX']:
-    env.Append( CXXFLAGS = [ '-fast' ] )
+    env.Append( CXXFLAGS = [ '-fast',
+                             '-qopenmp' ] )
 
 if 'icpc' in env['CXX'] and '0' not in env['report']:
-  
   env.Append( CXXFLAGS = [ '-qopt-report=' + env['report'] ] )
 
 # add sanitizers
