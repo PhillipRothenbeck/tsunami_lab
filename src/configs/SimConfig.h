@@ -11,6 +11,7 @@
 #include <string>
 
 #include "../constants.h"
+#include "FlagConfig.h"
 
 namespace tsunami_lab {
     namespace configs {
@@ -26,8 +27,8 @@ class tsunami_lab::configs::SimConfig {
     //! config file name
     std::string m_configName;
 
-    //! if checkpoints should be used
-    bool m_useCheckpoint;
+    //! flag config
+    tsunami_lab::configs::FlagConfig m_flagConfig;
 
     //! number of checkpoints to be used
     t_idx m_checkPointCount;
@@ -73,7 +74,7 @@ class tsunami_lab::configs::SimConfig {
      *
      * @param i_dimension dimension of the simulation.
      * @param i_configName name of config file.
-     * @param i_useCheckPoint if checkpoints should be used.
+     * @param i_flagConfig flag configurations.
      * @param i_checkPointCount number of checkpoints to create if useCheckPoint is true.
      * @param i_nx number of cells in x-direction.
      * @param i_ny number of cells in y-direction.
@@ -88,7 +89,7 @@ class tsunami_lab::configs::SimConfig {
      */
     SimConfig(tsunami_lab::t_idx i_dimension,
               std::string i_configName,
-              bool i_useCheckPoint,
+              tsunami_lab::configs::FlagConfig i_flagConfig,
               t_idx i_checkPointCount,
               tsunami_lab::t_idx i_nx,
               tsunami_lab::t_idx i_ny,
@@ -121,6 +122,16 @@ class tsunami_lab::configs::SimConfig {
      */
     std::string getConfigName() {
         return m_configName;
+    }
+
+    /**
+     * @brief Gets the flag configuration class.
+	  * 
+     * @return flag configuration.
+	  * 
+     */
+    tsunami_lab::configs::FlagConfig getFlagConfig() {
+        return m_flagConfig;
     }
 
     /**
@@ -211,14 +222,6 @@ class tsunami_lab::configs::SimConfig {
      */
     bool isRoeSolver() {
         return m_isRoeSolver;
-    }
-
-    /**
-     * @brief Gets boolean value, that shows if a checkpoint file should be used.
-     *
-     */
-    bool useCheckPoint() {
-        return m_useCheckpoint;
     }
 
 	 /**

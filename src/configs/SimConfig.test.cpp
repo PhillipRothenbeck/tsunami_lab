@@ -23,11 +23,12 @@ TEST_CASE("Test the SimConfig data-structure.", "[SimConfig]") {
     tsunami_lab::t_real l_coarseFactor = tsunami_lab::t_real(42.0);
     tsunami_lab::e_boundary l_boundaryCondition[4] = {tsunami_lab::OUTFLOW, tsunami_lab::REFLECTING, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW};
     bool l_isRoeSolver = true;
+    tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
 
     tsunami_lab::configs::SimConfig l_config = tsunami_lab::configs::SimConfig(l_dimension,
                                                                                "sim_config",
-                                                                               false,
-																										 0,
+                                                                               l_flagConfig,
+                                                                               0,
                                                                                l_nx,
                                                                                l_ny,
                                                                                l_xLen,

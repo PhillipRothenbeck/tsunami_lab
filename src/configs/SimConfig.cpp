@@ -12,7 +12,7 @@ tsunami_lab::configs::SimConfig::SimConfig() {
 
 tsunami_lab::configs::SimConfig::SimConfig(tsunami_lab::t_idx i_dimension,
                                            std::string i_configName,
-														 bool i_useCheckPoint,
+														 tsunami_lab::configs::FlagConfig i_flagConfig,
 														 t_idx i_checkPointCount,
                                            tsunami_lab::t_idx i_nx,
                                            tsunami_lab::t_idx i_ny,
@@ -26,7 +26,7 @@ tsunami_lab::configs::SimConfig::SimConfig(tsunami_lab::t_idx i_dimension,
                                            bool i_isRoeSolver) {
     m_dimension = i_dimension;
 	 m_configName = i_configName;
-	 m_useCheckpoint = i_useCheckPoint;
+	 m_flagConfig = i_flagConfig;
 	 m_checkPointCount = i_checkPointCount;
     m_nx = i_nx;
     m_ny = i_ny;

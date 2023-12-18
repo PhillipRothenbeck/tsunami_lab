@@ -10,6 +10,7 @@
 #include <iostream>
 #include <limits>
 
+#include "configs/FlagConfig.h"
 #include "configs/SimConfig.h"
 #include "io/Json/ConfigLoader.h"
 #include "simulator/Simulator.h"
@@ -32,23 +33,31 @@ int main(int i_argc, char *i_argv[]) {
 
     std::string l_configName = std::string(i_argv[1]);
 
-    bool l_useCheckpoint = false;
-    if (i_argc == 3 && std::string(i_argv[2]) == "-c") {
-        l_useCheckpoint = true;
+    tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
+    if (i_argc > 2) {
+        for (int l_arguments = 1; l_arguments < i_argc; l_arguments++) {
+            if (std::string(i_argv[l_arguments]).compare("-c") == 0) {
+                l_flagConfig.setUseCheckPoint(true);
+            } else if (std::string(i_argv[l_arguments]).compare("-t") == 0) {
+                l_flagConfig.setUseTiming(true);
+            } else if (std::string(i_argv[l_arguments]).compare("-nio") == 0) {
+					l_flagConfig.setUseIO(false);
+				}
+        }
     }
 
     tsunami_lab::setups::Setup *l_setups = nullptr;
     tsunami_lab::t_real l_hStar = -1;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
 
-    l_timer->start();
+    if (l_flagConfig.useTiming()) l_timer->start();
     // load parameters from runtimeConfig.json
     tsunami_lab::t_idx err = tsunami_lab::io::ConfigLoader::loadConfig(l_configName,
-                                                                       l_useCheckpoint,
+                                                                       l_flagConfig,
                                                                        l_setups,
                                                                        l_hStar,
                                                                        l_simConfig);
-    l_timer->printTime("Loading Config ");
+	 if (l_flagConfig.useTiming()) l_timer->printTime("Loading Config ");
 
     if (err != 0) {
         std::cout << "failed to read: " << l_configName << std::endl;

@@ -15,10 +15,11 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
     tsunami_lab::setups::Setup *l_setups = nullptr;
     tsunami_lab::t_real l_hStar = -1;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
+    tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
 
     tsunami_lab::t_idx err;
     err = tsunami_lab::io::ConfigLoader::loadConfig(l_path,
-                                                    false,
+                                                    l_flagConfig,
                                                     l_setups,
                                                     l_hStar,
                                                     l_simConfig);
