@@ -304,3 +304,4 @@ For our individual phase, we would like to try to optimize our solver by dividin
 
 We hope that by parallelizing our computations, we can gain a lot of computing power. We also hope to deepen our understanding of good parallelization practices. 
 
+As a second option, we would like to improve our solver by implementing adaptive mesh refinement to improve the resolution in areas of interest. For this we can use the paper *Adaptive Mesh Refinement Using Wave-Propagation Algorithms for Hyperbolic Systems* by Marsha J. Berger and Randall J. LeVeque.
