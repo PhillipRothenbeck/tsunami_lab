@@ -7,49 +7,99 @@ Further information is available from: https://scalable.uni-jena.de/opt/tsunami/
 Our Website with the project report is available via Github pages: https://philliprothenbeck.github.io/tsunami_lab/
 
 ### Requirements
-- up-to-date version of the building tool `SCons`
-- C++ with standard 11
+- Python3
+- C++11 (or higher)
+- SCons
+- Doxygen
+- git
+
 
 ### Setup Project
 
-After cloning the project enter the following into the terminal for /tsunami_lab/:
+Clone the project and initate/update submodules:
 ```
+$ git clone https://github.com/PhillipRothenbeck/tsunami_lab.git
+$ cd tsunami_lab
 $ git submodule init
 $ git submodule update 
 ```
 
 ### Build the Project
 
-Enter the following into the terminal, when being in /tsunami_lab/:
+The primary building command is:
 
 ```
-$ scons <build-mode>
+$ scons <mode> <CXX>
 ```
 
-#### Options for `<build-mode>`
+But there are different flags you can specify to customize the build.
+If no flag is set, the respective default value is used.
+
+#### Options for `<mode>`
+
+The `mode` flag can be used to specify the mode in which the project is compiled. 
+Depending on the mode, there may be advantages and disadvantages (e.g. easier debugging, but overall much slower).
+If no `mode` flag is used, the default value is `mode=release`.
+
 - `release`: build in release mode, default value
 - `release+san`: build in release mode and activate sanitizers
 - `debug`: build in debug mode
 - `debug+san`: build in debug mode and avtivate sanitizers
+
+#### Options for `<CXX>`
+
+The `CXX` flag determines which compiler is used. 
+If not further defined, the default value is `CXX=g++`.
+
+- `g++`: GNU C++ Compiler.
+- `icpc`: Intel C++ Compiler.
+
+Example with debug mode and intel Compiler:
+
+```
+$ scons mode=debug CXX=icpc
+```
 
 ### Run the Code
 Run unit tests from /tsunami_lab/ with:
 ```
 $ ./build/tests
 ```
-Run program from /tsunami_lab/ with:
+Run simulation from /tsunami_lab/ with:
 ```
-$ ./build/tsunami_lab/ <scenario_mode> <n_cells_x> <solver>
+$ ./build/tsunami_lab/ <config_file>.json
 ```
-#### Options for `<scenario_mode>`
-Decides which setup is chosen
-- `DamBreak`: loads a dam break setup
-- `Sanitize1d`: loads data from a middle state file into a custom setup and checks if the calculated middle states are correct.
-  The repository comes only with a dummy file `dummy_middle_states.csv` that contains 10 cases. The file `middle_states.csv` has to be placed manually into the folder `tsunami_lab/res/`.
+The `config_file.json` argument is used to pass the name of the JSON config file on to the program. 
+The config needs to be located in the /tsunami_lab/res/configs/ directory.
 
-#### Options for `<n_cells_x>`
-Decides how many cells in the x direction are to be used in the program. Need to be an positive `int` value.
+#### Structure of a config file
 
-#### Options for `<solver>`
-- `-r`: uses the roe solver
-- `-f`: uses the f-wave solver, default value
+Each argument in the following list can be in a 'config file', but does not have to be. 
+If an argument does not appear, the respective default value is used. 
+Furthermore, the arguments are not bound to any order, i.e. they can be interchanged. 
+
+**List of arguments:** 
+
+- :code:`dimension`: integer, that indicates the dimensions of a simulation
+
+- :code:`nx`: integer, that defines the number of cells in x-direction
+
+- :code:`ny`: integer, that defines the number of cells in y-direction
+
+- :code:`xLen`: float, that defines the length in x-direction 
+
+- :code:`yLen`: float, that defines the length in y-direction 
+
+- :code:`epicenterOffsetX`: float, that defines the Offset of the computational domain in x-direction
+
+- :code:`epicenterOffsetY`: float, that defines the Offset of the computational domain in y-direction
+
+- :code:`bathymetryFileName`: string, that defines the name of the bathymetry input file
+
+- :code:`displacementFileName`: string, that defines the name of the displacement input file
+
+- :code:`simTime`: float, duration of a simulation (not wall time)
+
+- :code:`boundaryCond`: string, that defines the boundary conditions (two characters in one dimension, four in two dimensions)
+
+- :code:`setup`: string, that defines the used setup
