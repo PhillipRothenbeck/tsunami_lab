@@ -3,13 +3,8 @@
 User Documentation
 ==================
 
-.. _ch:introduction:
-
-introduction
-------------
-
-Welcome to the Tsunami Lab Project! This user documentation will guide you through the process of downloading the project's source code from GitHub 
-and compiling it so that you can start working with the software.
+Welcome to the Tsunami Lab project! 
+This quick start guide will show you how to set up and use the tsunami simulator.
 
 .. _ch:Getting_Started:
 
@@ -18,20 +13,20 @@ Getting Started
 
 Prerequisites
 ^^^^^^^^^^^^^
-Before you can begin, ensure that you have the following prerequisites installed on your system:
+Before you can begin, ensure that you have the following prerequisites installed and set up on your system:
 
 * Python3
-* C++ (Version 11 or later)
+* C++11 (or higher)
 * SCons
-* CMake
 * Doxygen
 * git
 
-Downloading the Code
-^^^^^^^^^^^^^^^^^^^^
+Downloading the Project
+^^^^^^^^^^^^^^^^^^^^^^^
+
 #. Open your terminal or command prompt.
 
-#. Change to the directory where you want to store the project.
+#. Change to the directory in which the project is to be saved.
 
 #. Run the following command to clone the project repository from GitHub:
 
@@ -39,8 +34,7 @@ Downloading the Code
         
         git clone https://github.com/PhillipRothenbeck/tsunami_lab.git
 
-#. Navigate into the directory
-#. Download all submodules
+#. Download and Update all submodules
 
     .. code-block:: bash
         
@@ -48,10 +42,6 @@ Downloading the Code
         git submodules init
         git submodules update.
 
-.. _ch:Compiling_the_Code:
-
-Compiling the code
-------------------
 
 Compiling Doxygen
 ^^^^^^^^^^^^^^^^^
@@ -72,36 +62,53 @@ Compiling Doxygen
 
         file:///path/to/tsunami-lab-project/_build/html/index.html
 
+
 Compiling the project
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
+
 To compile the Tsunami Lab Project, you have various options and flags to choose from. 
-The primary compilation command is scons, and you can specify flags to customize the build. Here are the available flags:
-mode (Optional):
+The primary compilation command is :code:`scons`, and you can specify different flags to customize the build.
+If no flag is set, the respective default value is used.
 
-Use scons without specifying the mode flag to build with default settings.
-You can use one of the following modes:
+**mode:**
 
-#. release: Optimized release mode.
-#. release+san: Release mode with sanitizers.
-#. debug: Debug mode.
-#. debug+san: Debug mode with sanitizers.
+The :code:`mode` flag determines the mode in which the project is compiled. 
+Depending on the mode, there may be advantages and disadvantages (e.g. easier debugging, but overall much slower).
 
-To compile the project, navigate to the project's root directory and run the following command:
+If no :code:`mode` flag is used, the default value is :code:`mode=release`.
+
+#. :code:`release`: Optimized release mode.
+#. :code:`release+san`: Release mode with sanitizers.
+#. :code:`debug`: Debug mode.
+#. :code:`debug+san`: Debug mode with sanitizers.
+
+**CXX:**
+
+The :code:`CXX` flag can be used to specify which compiler is used. 
+If not further defined, the default value is :code:`CXX=g++`.
+
+#. :code:`g++`: GNU C++ Compiler.
+#. :code:`icpc`: Intel C++ Compiler.
+
+To compile the project with default values, navigate to the project's root directory and run the following command:
 
 .. code-block::
 
     scons
 
-To compile with a specific mode, use the mode flag as follows:
+
+To compile the project with a specific mode and compiler, use the mode/CXX flag as follows:
 
 .. code-block::
  
-    scons mode=release
+    scons mode=release CXX=g++
+
 
 .. _ch:Running_the_project:
 
 Running the project
 -------------------
+
 Make sure that the current terminal is located in the /tsunami_lab/ directory.
 
 To execute the test files, use the following command:
@@ -114,46 +121,54 @@ To execute the project, use the following command with the appropriate flags:
 
 .. code-block::
 
-    ./build/tsunami_lab <config_file_name.json>
+    ./build/tsunami_lab <config_file.json>
 
-The ``<config_file_name.json>`` argument is used to pass the name of the JSON config 
+The :code:`config_file.json` argument is used to pass the name of the JSON config 
 file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
 directory.
 
 Structure of a config file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**List of arguments:**
+**List of arguments:** 
 
-- "dimension": integer, that indicates the dimensions of a simulation
+- :code:`dimension`: integer, that indicates the dimensions of a simulation
 
-- "nx": integer, that decides the number of cells in x-direction
+- :code:`nx`: integer, that defines the number of cells in x-direction
 
-- "ny": integer, that decides the number of cells in y-direction
+- :code:`ny`: integer, that defines the number of cells in y-direction
 
-- "xLen": float, that decides the length in x-direction 
+- :code:`xLen`: float, that defines the length in x-direction 
 
-- "yLen": float, that decides the length in y-direction 
+- :code:`yLen`: float, that defines the length in y-direction 
 
-- "thresholdX": float, that decides the changing point in x-direction for a setup (ex.: dam location)
+- :code:`epicenterOffsetX`: float, that defines the Offset of the computational domain in x-direction
 
-- "thresholdY": float, that decides the changing point in y-direction for a setup
+- :code:`epicenterOffsetY`: float, that defines the Offset of the computational domain in y-direction
 
-- "simTime": float, time length of a simulation
+- :code:`bathymetryFileName`: string, that defines the name of the bathymetry input file
 
-- "boundaryCond": string, that decides the boundary conditions
+- :code:`displacementFileName`: string, that defines the name of the displacement input file
 
-Options: 
-1d: "OO", "RR", "RO", "OR"; 
-2d: "OOOO", "ROOO", "OROO", "OORO" (...) 
+- :code:`simTime`: float, duration of a simulation (not wall time)
+
+- :code:`boundaryCond`: string, that defines the boundary conditions
+
+There are some differences between one and two dimensional simulations:
+
+* 1d: "OO", "RR", "RO", "OR"; 
+* 2d: "OOOO", "ROOO", "OROO", "OORO" (...) 
+
 (each letter represents a direction, in order: East, North, West, South)
 if "OO" is entered for 2d, it is filled with "OOOO" as the default value ("RR" = "RROO")
 
-- "setup": string, that decides the used setup
+- :code:`setup`: string, that defines the used setup
 
-Options: 
-1d: "DamBreak", "RareRare", "ShockShock", "SubcriticalFlow", "SupercriticalFlow", "TsunamiEvent", "Sanitize", "CustomSetup"; 
-2d: "DamBreak"
+Depending on the dimensionality, different setups can be used:
+
+* 1d: DamBreak, RareRare, ShockShock, SubciriticalFlow, SupercriticalFlow, TunsamiEvent, Sanitize, CustomSetup
+
+* 2d: DamBreak, ArtificialTsunamiEvent, TsunamiEvent
 
 
 .. _ch:Troubleshooting:
@@ -183,7 +198,10 @@ Contact Information
 
 If you are unable to resolve your issue or face any other difficulties not mentioned here, please feel free to contact the Tsunami Lab Project maintainers for assistance. You can reach out to us at the following email addresses:
 
-* Bohdan Babii: bohdan.babii@uni-jena.de
 * Phillip Rothenbeck: phillip.rothenbeck@uni-jena.de
+
+* Marek Sommerfeld: marek.sommerfeld@uni-jena.de
+
+* Moritz Rätz: moritz.raetz@uni-jena.de
 
 We are here to help you with any questions or problems you may encounter while using the Tsunami Lab Project. Please don't hesitate to reach out, and we will do our best to assist you.

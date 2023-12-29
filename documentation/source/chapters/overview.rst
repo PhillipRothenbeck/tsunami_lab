@@ -7,6 +7,8 @@ Our primary goal is to provide efficient tools for studying and comprehending ts
 and their potential impacts. 
 For any questions or inquiries, you can contact us via email:
 
-**Phillip Rothenbeck:**	phillip.rothenbeck@uni-jena.de
+**Phillip Rothenbeck:** phillip.rothenbeck@uni-jena.de
+
 **Marek Sommerfeld:**	marek.sommerfeld@uni-jena.de
-**Moritz Rätz:**	moritz.raetz@uni-jena.de
+
+**Moritz Rätz:**	    moritz.raetz@uni-jena.de
