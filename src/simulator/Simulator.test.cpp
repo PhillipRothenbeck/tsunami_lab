@@ -18,9 +18,10 @@
 
 TEST_CASE("Test the simulation running method.", "[Simulator]") {
     tsunami_lab::e_boundary l_boundary[4] = {tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW};
+	 tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
     tsunami_lab::configs::SimConfig l_config = tsunami_lab::configs::SimConfig(1,
                                                                                "simulator",
-																										 false,
+																										 l_flagConfig,
 																										 0,
                                                                                50,
                                                                                1,

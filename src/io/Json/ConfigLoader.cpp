@@ -31,7 +31,7 @@
 using json = nlohmann::json;
 
 tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_configName,
-                                                             bool i_useCheckPoint,
+                                                             tsunami_lab::configs::FlagConfig i_flagConfig,
                                                              tsunami_lab::setups::Setup *&o_setup,
                                                              tsunami_lab::t_real &o_hStar,
                                                              tsunami_lab::configs::SimConfig &o_simConfig) {
@@ -208,7 +208,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     std::string l_checkPointPath = "out/" + l_configName + "_checkpoint.nc";
     std::ifstream f(l_checkPointPath.c_str());
     t_idx l_startFrame = 0;
-    if (i_useCheckPoint && f.good()) {
+    if (i_flagConfig.useCheckPoint() && f.good()) {
         std::cout << "Reading out/" + l_configName + "_checkpoint.nc" << std::endl;
         t_real *l_height;
         t_real *l_momentumX;
@@ -402,7 +402,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
 
     o_simConfig = tsunami_lab::configs::SimConfig(l_dimension,
                                                   l_configName,
-                                                  i_useCheckPoint,
+                                                  i_flagConfig,
 																  l_checkPointCount,
                                                   l_nx,
                                                   l_ny,

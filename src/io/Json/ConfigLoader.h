@@ -11,6 +11,7 @@
 #include <string>
 
 #include "../../configs/SimConfig.h"
+#include "../../configs/FlagConfig.h"
 #include "../../constants.h"
 #include "../../setups/Setup.h"
 
@@ -23,7 +24,7 @@ namespace tsunami_lab {
 class tsunami_lab::io::ConfigLoader {
    public:
     static tsunami_lab::t_idx loadConfig(std::string i_path,
-                                         bool i_useCheckpoint,
+                                         tsunami_lab::configs::FlagConfig i_flagConfig,
                                          tsunami_lab::setups::Setup *&i_setup,
                                          tsunami_lab::t_real &i_hStar,
                                          tsunami_lab::configs::SimConfig &i_simConfig);
