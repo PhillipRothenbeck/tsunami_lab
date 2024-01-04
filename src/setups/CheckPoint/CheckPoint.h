@@ -42,10 +42,10 @@ class tsunami_lab::setups::CheckPoint : public Setup {
      * @param i_simLenY length of simulation in y direction.
      * @param i_damLimit limit of the dam.
      **/
-    CheckPoint(t_real i_nx,
-               t_real i_ny,
-               t_idx i_dimX,
-               t_idx i_dimY,
+    CheckPoint(t_real i_dimX,
+               t_real i_dimY,
+               t_idx i_nx,
+               t_idx i_ny,
                t_idx i_frame,
                t_real *i_height,
                t_real *i_momentumX,

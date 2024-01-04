@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 tsunami_lab::setups::ArtificialTsunami2d::ArtificialTsunami2d(t_real i_simLenX,
                                                               t_real i_simLenY) {
@@ -57,7 +56,6 @@ tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getBathymetry(t_re
         t_real l_fx = std::sin(((i_x / 500) + 1) * C_PI);
         t_real l_gy = (-std::pow((i_y / 500), 2)) + 1;
         l_dxy = 5 * l_fx * l_gy;
-        // std::cout < < < < ", " < < < < ", " << l_isInDomainX << "/" << l_isInDomainY << std::endl;
     }
 
     if (m_bIn < 0) {

@@ -50,12 +50,13 @@ l_tests = [ 'tests.cpp',
             'setups/SupercriticalFlow1d/SupercriticalFlow1d.test.cpp',
             'setups/TsunamiEvent1d/TsunamiEvent1d.test.cpp',
             'setups/TsunamiEvent2d/TsunamiEvent2d.test.cpp',
-            # 'setups/ArtificialTsunami2d/ArtificialTsunami2d.test.cpp',
+            'setups/ArtificialTsunami2d/ArtificialTsunami2d.test.cpp',
+            'setups/CheckPoint/CheckPoint.test.cpp',
             'configs/SimConfig.test.cpp',
             'io/Json/ConfigLoader.test.cpp',
             'io/NetCDF/NetCDF.test.cpp',
             'io/Csv/Csv.test.cpp',
-            ]
+          ]
 
 for l_te in l_tests:
   env.tests.append( env.Object( l_te ) )
