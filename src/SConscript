@@ -58,8 +58,6 @@ l_tests = [ 'tests.cpp',
             'io/Csv/Csv.test.cpp',
           ]
 
-print("HI")
-
 for l_te in l_tests:
   env.tests.append( env.Object( l_te ) )
 
