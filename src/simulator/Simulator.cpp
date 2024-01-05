@@ -241,9 +241,10 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
             l_simTime += l_dt;
         }
         if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
         if (i_simConfig.getFlagConfig().useIO())
             l_writer->write();
-
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
         // free memory
         std::cout << "finished time loop" << std::endl;
         std::cout << "freeing memory" << std::endl;
