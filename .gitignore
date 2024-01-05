@@ -5,6 +5,7 @@
 /.idea/
 /out/
 /.sconf_temp/
+/vtune_out/
 
 # files
 *.dblite
