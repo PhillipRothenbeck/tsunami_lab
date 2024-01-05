@@ -9,6 +9,8 @@
 
 #include "NetCDF.h"
 
+#include <omp.h>
+
 #include <iostream>
 
 int tsunami_lab::io::NetCDF::read(std::string i_nameBathymetry,
@@ -291,25 +293,24 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
         l_nc_err += nc_put_var_float(m_ncId, m_varMomentumYId, m_momentumY);
     } else {
         // coarse output
-        t_idx l_idx = 0;
         t_real *l_dataX = new tsunami_lab::t_real[m_nxCoarse];
-        for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
+#pragma omp parallel for
+        for (t_idx l_idx = 0; l_idx < m_nx / m_coarseFactor; l_idx++) {
+            t_idx l_ix = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
             l_dataX[l_idx] = m_dataX[l_ix];
-            l_idx += 1;
         }
         l_nc_err = nc_put_var_float(m_ncId, m_varXId, l_dataX);
         delete[] l_dataX;
 
-        l_idx = 0;
         t_real *l_dataY = new tsunami_lab::t_real[m_nyCoarse];
-        for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
+        // #pragma omp parallel for
+        for (t_idx l_iy = m_coarseFactor - 1, l_idx = 0; l_iy < m_ny; l_iy += m_coarseFactor, l_idx++) {
             l_dataY[l_idx] = m_dataY[l_iy];
-            l_idx += 1;
         }
         l_nc_err += nc_put_var_float(m_ncId, m_varYId, l_dataY);
         delete[] l_dataY;
 
-        l_idx = 0;
+        int l_idx = 0;
         t_real *l_dataB = new tsunami_lab::t_real[m_nxyCoarse];
         for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
             for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
@@ -445,8 +446,8 @@ int tsunami_lab::io::NetCDF::readCheckpoint(std::string i_checkPoinPath,
         return 1;
     }
 
-	 std::cout << "timedim: " << l_timeDim << std::endl;
-	 std::cout << l_xDim << " | " << l_yDim << " | " << l_timeDim << std::endl;
+    std::cout << "timedim: " << l_timeDim << std::endl;
+    std::cout << l_xDim << " | " << l_yDim << " | " << l_timeDim << std::endl;
 
     o_time = new tsunami_lab::t_real[l_timeDim];
     o_height = new tsunami_lab::t_real[l_xDim * l_yDim * l_timeDim];
