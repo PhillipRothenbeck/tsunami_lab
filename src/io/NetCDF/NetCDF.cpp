@@ -11,6 +11,7 @@
 
 #include <omp.h>
 
+#include <cmath>
 #include <iostream>
 
 int tsunami_lab::io::NetCDF::read(std::string i_nameBathymetry,
@@ -295,7 +296,7 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
         // coarse output
         t_real *l_dataX = new tsunami_lab::t_real[m_nxCoarse];
 #pragma omp parallel for
-        for (t_idx l_idx = 0; l_idx < m_nx / m_coarseFactor; l_idx++) {
+        for (t_idx l_idx = 0; l_idx < m_nxCoarse; l_idx++) {
             t_idx l_ix = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
             l_dataX[l_idx] = m_dataX[l_ix];
         }
@@ -303,73 +304,71 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
         delete[] l_dataX;
 
         t_real *l_dataY = new tsunami_lab::t_real[m_nyCoarse];
-        // #pragma omp parallel for
-        for (t_idx l_iy = m_coarseFactor - 1, l_idx = 0; l_iy < m_ny; l_iy += m_coarseFactor, l_idx++) {
+#pragma omp parallel for
+        for (t_idx l_idx = 0; l_idx < m_nyCoarse; l_idx++) {
+            t_idx l_iy = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
             l_dataY[l_idx] = m_dataY[l_iy];
         }
         l_nc_err += nc_put_var_float(m_ncId, m_varYId, l_dataY);
         delete[] l_dataY;
 
-        int l_idx = 0;
         t_real *l_dataB = new tsunami_lab::t_real[m_nxyCoarse];
-        for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
-            for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
-                // average over neighbors
-                l_dataB[l_idx] = m_dataB[l_iy * m_nx + l_ix];
-                t_idx l_neighborCount = 1;
-                if (m_coarseFactor != 1) {
-                    for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
-                        for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
-                            int l_idxX = l_ix + l_offsetX;
-                            int l_idxY = l_iy + l_offsetY;
-                            if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
-                                l_dataB[l_idx] += m_dataB[l_idxY * m_nx + l_idxX];
-                                l_neighborCount++;
-                            }
+#pragma omp parallel for
+        for (t_idx l_idx = 0; l_idx < m_nxyCoarse; l_idx++) {
+            t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
+            t_idx l_iy = m_coarseFactor * (t_idx)std::floor(l_idx / m_nxCoarse) + m_coarseFactor - 1;
+            // average over neighbors
+            l_dataB[l_idx] = m_dataB[l_iy * m_nx + l_ix];
+            t_idx l_neighborCount = 1;
+            if (m_coarseFactor != 1) {
+                for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
+                    for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
+                        int l_idxX = l_ix + l_offsetX;
+                        int l_idxY = l_iy + l_offsetY;
+                        if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
+                            l_dataB[l_idx] += m_dataB[l_idxY * m_nx + l_idxX];
+                            l_neighborCount++;
                         }
                     }
                 }
-                l_dataB[l_idx] /= l_neighborCount;
-                l_idx += 1;
             }
+            l_dataB[l_idx] /= l_neighborCount;
         }
         l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, l_dataB);
         delete[] l_dataB;
 
-        l_idx = 0;
         t_real *l_height = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
         t_real *l_momentumX = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
         t_real *l_momentumY = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
-        for (t_idx l_frame = 0; l_frame < m_frameCount; l_frame++) {
-            for (t_idx l_iy = m_coarseFactor - 1; l_iy < m_ny; l_iy += m_coarseFactor) {
-                for (t_idx l_ix = m_coarseFactor - 1; l_ix < m_nx; l_ix += m_coarseFactor) {
-                    // average over neighbors
-                    t_idx l_framedIdx = (l_iy * m_nx + l_ix) + m_nxy * l_frame;
-                    l_height[l_idx] = m_height[l_framedIdx];
-                    l_momentumX[l_idx] = m_momentumX[l_framedIdx];
-                    l_momentumY[l_idx] = m_momentumY[l_framedIdx];
-                    t_idx l_neighborCount = 1;
-                    if (m_coarseFactor != 1) {
-                        for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
-                            for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
-                                int l_idxX = l_ix + l_offsetX;
-                                int l_idxY = l_iy + l_offsetY;
-                                if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
-                                    t_idx l_framedIdxOffset = (l_idxY * m_nx + l_idxX) + m_nxy * l_frame;
-                                    l_height[l_idx] += m_height[l_framedIdxOffset];
-                                    l_momentumX[l_idx] += m_momentumX[l_framedIdxOffset];
-                                    l_momentumY[l_idx] += m_momentumY[l_framedIdxOffset];
-                                    l_neighborCount++;
-                                }
-                            }
+#pragma omp parallel for
+        for (t_idx l_idx = 0; l_idx < m_nxyCoarse * m_frameCount; l_idx++) {
+            // average over neighbors
+            t_idx l_frame = std::floor(l_idx / m_nxyCoarse);
+            t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
+            t_idx l_iy = m_coarseFactor * (t_idx)std::floor((l_idx % m_nxyCoarse) / m_nxCoarse) + m_coarseFactor - 1;
+            t_idx l_framedIdx = (l_iy * m_nx + l_ix) + m_nxy * l_frame;
+            l_height[l_idx] = m_height[l_framedIdx];
+            l_momentumX[l_idx] = m_momentumX[l_framedIdx];
+            l_momentumY[l_idx] = m_momentumY[l_framedIdx];
+            t_idx l_neighborCount = 1;
+            if (m_coarseFactor != 1) {
+                for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
+                    for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
+                        int l_idxX = l_ix + l_offsetX;
+                        int l_idxY = l_iy + l_offsetY;
+                        if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
+                            t_idx l_framedIdxOffset = (l_idxY * m_nx + l_idxX) + m_nxy * l_frame;
+                            l_height[l_idx] += m_height[l_framedIdxOffset];
+                            l_momentumX[l_idx] += m_momentumX[l_framedIdxOffset];
+                            l_momentumY[l_idx] += m_momentumY[l_framedIdxOffset];
+                            l_neighborCount++;
                         }
                     }
-                    l_height[l_idx] /= l_neighborCount;
-                    l_momentumX[l_idx] /= l_neighborCount;
-                    l_momentumY[l_idx] /= l_neighborCount;
-                    l_idx += 1;
                 }
             }
+            l_height[l_idx] /= l_neighborCount;
+            l_momentumX[l_idx] /= l_neighborCount;
+            l_momentumY[l_idx] /= l_neighborCount;
         }
         l_nc_err += nc_put_var_float(m_ncId, m_varHeightId, l_height);
         l_nc_err += nc_put_var_float(m_ncId, m_varMomentumXId, l_momentumX);
