@@ -5,6 +5,8 @@
 /.idea/
 /out/
 /.sconf_temp/
+*hs/
+*tr/
 
 # files
 *.dblite
