@@ -54,7 +54,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     tsunami_lab::t_real l_hMax = std::numeric_limits<tsunami_lab::t_real>::lowest();
 
     // set up solver
-#pragma omp parallel for collapse(2) schedule(static, 8)
+#pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
     for (tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
         for (tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
             tsunami_lab::t_real l_y = l_cy * l_dy;
@@ -64,7 +64,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
             tsunami_lab::t_real l_h = i_setup->getHeight(l_x,
                                                          l_y);
 
-            l_hMax = std::max(l_h, l_hMax);
+            l_hMax = l_hMax < l_h ? l_h : l_hMax;
 
             tsunami_lab::t_real l_hu = i_setup->getMomentumX(l_x,
                                                              l_y);
