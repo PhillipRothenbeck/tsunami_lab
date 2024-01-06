@@ -79,8 +79,10 @@ else:
 
 if 'g++' in env['CXX']:
     env.Append( CXXFLAGS = [ '-fopenmp' ] )
+    env.Append( LINKFLAGS = [ '-fopenmp' ] )
 elif 'icpc' in env['CXX']:
     env.Append( CXXFLAGS = [ '-qopenmp' ] )
+    env.Append( LINKFLAGS = [ '-qopenmp' ] )
 
 if 'icpc' in env['CXX'] and '0' not in env['report']:
   env.Append( CXXFLAGS = [ '-qopt-report=' + env['report'] ] )
