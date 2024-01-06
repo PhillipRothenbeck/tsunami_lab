@@ -295,7 +295,7 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
     } else {
         // coarse output
         t_real *l_dataX = new tsunami_lab::t_real[m_nxCoarse];
-#pragma omp parallel for
+#pragma omp parallel for schedule(static, 16)
         for (t_idx l_idx = 0; l_idx < m_nxCoarse; l_idx++) {
             t_idx l_ix = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
             l_dataX[l_idx] = m_dataX[l_ix];
@@ -304,7 +304,7 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
         delete[] l_dataX;
 
         t_real *l_dataY = new tsunami_lab::t_real[m_nyCoarse];
-#pragma omp parallel for
+#pragma omp parallel for schedule(static, 16)
         for (t_idx l_idx = 0; l_idx < m_nyCoarse; l_idx++) {
             t_idx l_iy = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
             l_dataY[l_idx] = m_dataY[l_iy];
@@ -313,7 +313,7 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
         delete[] l_dataY;
 
         t_real *l_dataB = new tsunami_lab::t_real[m_nxyCoarse];
-#pragma omp parallel for
+#pragma omp parallel for schedule(static, 8)
         for (t_idx l_idx = 0; l_idx < m_nxyCoarse; l_idx++) {
             t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
             t_idx l_iy = m_coarseFactor * (t_idx)std::floor(l_idx / m_nxCoarse) + m_coarseFactor - 1;
@@ -340,7 +340,7 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
         t_real *l_height = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
         t_real *l_momentumX = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
         t_real *l_momentumY = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
-#pragma omp parallel for
+#pragma omp parallel for schedule(static, 16)
         for (t_idx l_idx = 0; l_idx < m_nxyCoarse * m_frameCount; l_idx++) {
             // average over neighbors
             t_idx l_frame = std::floor(l_idx / m_nxyCoarse);
