@@ -66,6 +66,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     t_real *l_hvStar = new t_real[m_nCellsAll];
 
     // init cell (Star) quantities
+#pragma omp parallel for collapse(2) schedule(static, 32)
     for (t_idx l_ceY = 0; l_ceY < m_nCellsY + 2; l_ceY++) {
         for (t_idx l_ceX = 0; l_ceX < m_nCellsX + 2; l_ceX++) {
             t_idx l_idx = getIndex(l_ceX, l_ceY);
@@ -76,6 +77,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     }
 
     // iterate over edges in x-direction for every row and update with Riemann solutions (x-sweep)
+#pragma omp parallel for collapse(2) shared(l_hStar, l_huStar)
     for (t_idx l_edY = 0; l_edY < m_nCellsY + 2; l_edY++) {
         for (t_idx l_edX = 0; l_edX < m_nCellsX + 1; l_edX++) {
             // determine left and right cell-id
@@ -95,15 +97,20 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
                                        l_netUpdates[1]);
 
             // update the cells' quantities
+#pragma omp atomic update
             l_hStar[l_ceL] -= i_scalingX * l_netUpdates[0][0];
+#pragma omp atomic update
             l_huStar[l_ceL] -= i_scalingX * l_netUpdates[0][1];
 
+#pragma omp atomic update
             l_hStar[l_ceR] -= i_scalingX * l_netUpdates[1][0];
+#pragma omp atomic update
             l_huStar[l_ceR] -= i_scalingX * l_netUpdates[1][1];
         }
     }
 
     // init new cell quantities
+#pragma omp parallel for collapse(2) schedule(static, 32)
     for (t_idx l_ceY = 1; l_ceY < m_nCellsY + 1; l_ceY++) {
         for (t_idx l_ceX = 1; l_ceX < m_nCellsX + 1; l_ceX++) {
             t_idx l_idx = getIndex(l_ceX, l_ceY);
@@ -114,6 +121,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     }
 
     // iterate over edges in y-direction for every column and update with Riemann solutions (y-sweep)
+#pragma omp parallel for collapse(2) shared(l_hNew, l_hvNew)
     for (t_idx l_edX = 1; l_edX < m_nCellsX + 1; l_edX++) {
         for (t_idx l_edY = 0; l_edY < m_nCellsY + 1; l_edY++) {
             // determine upper and lower cell-id
@@ -133,10 +141,14 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
                                        l_netUpdates[1]);
 
             // update the cells' quantities
+#pragma omp atomic update
             l_hNew[l_ceU] -= i_scalingY * l_netUpdates[0][0];
+#pragma omp atomic update
             l_hvNew[l_ceU] -= i_scalingY * l_netUpdates[0][1];
 
+#pragma omp atomic update
             l_hNew[l_ceD] -= i_scalingY * l_netUpdates[1][0];
+#pragma omp atomic update
             l_hvNew[l_ceD] -= i_scalingY * l_netUpdates[1][1];
         }
     }
