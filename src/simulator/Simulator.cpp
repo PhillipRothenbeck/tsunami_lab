@@ -7,6 +7,8 @@
 
 #include "Simulator.h"
 
+#include <omp.h>
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -52,10 +54,10 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     tsunami_lab::t_real l_hMax = std::numeric_limits<tsunami_lab::t_real>::lowest();
 
     // set up solver
+#pragma omp parallel for collapse(2) schedule(static, 32)
     for (tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
-        tsunami_lab::t_real l_y = l_cy * l_dy;
-
         for (tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
+            tsunami_lab::t_real l_y = l_cy * l_dy;
             tsunami_lab::t_real l_x = l_cx * l_dx;
 
             // get initial values of the setup
