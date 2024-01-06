@@ -11,5 +11,5 @@
     "simTime": 44300,
     "boundaryCond": "OO",
     "setup": "TsunamiEvent",
-    "coarseFactor": 100
+    "coarseFactor": 50
 }
