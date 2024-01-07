@@ -488,7 +488,8 @@ Hotspots
 
 It can make sense to spawn more threads than cores if the distributed workload of the cores is unbalanced.
 
-It is better to parallelize the outer loop than the inner loop. In our case, it is about 1.9 times faster. (Since it was tested on a system with far fewer cores than ARA, the actual factor is likely to be much higher.)
+| It is better to parallelize the outer loop than the inner loop. In our case, it is about 1.9 times faster. (Since it was tested on a system with a lower core count than ARA, the actual factor is likely to be much higher.)
+| OpenMP's parallelization is executed n times in the inner for-loop, where n is the length of the outer for-loop, but only once in the outer loop. OpenMP must therefore ensure that the workload is balanced and distributed across the cores n-1 times more frequently in the case of the inner loop. This results in many more threads, which increases the thread management costs.
 
 We have tried different scheduling variants and stuck with one that worked best for us. (We decided on the fastest scheduling for each individual pragma.) 
 Pinning, on the other hand, didn't make much of a difference to us, which is why we didn't give it any further attention.
