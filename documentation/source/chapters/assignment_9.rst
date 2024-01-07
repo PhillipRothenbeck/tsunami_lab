@@ -486,7 +486,7 @@ Hotspots
   :width: 400
 
 
-It can make sense to spawn more threads than cores if the utilization of the cores is unbalanced.
+It can make sense to spawn more threads than cores if the distributed workload of the cores is unbalanced.
 
 It is better to parallelize the outer loop than the inner loop. In our case, it is about 1.9 times faster. (Since it was tested on a system with far fewer cores than ARA, the actual factor is likely to be much higher.)
 
