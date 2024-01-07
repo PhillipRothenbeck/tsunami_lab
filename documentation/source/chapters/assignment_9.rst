@@ -65,37 +65,6 @@ code before parallelization:
         for (tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
             tsunami_lab::t_real l_x = l_cx * l_dx;
 
-            // get initial values of the setup
-            tsunami_lab::t_real l_h = i_setup->getHeight(l_x,
-                                                         l_y);
-
-            l_hMax = std::max(l_h, l_hMax);
-
-            tsunami_lab::t_real l_hu = i_setup->getMomentumX(l_x,
-                                                             l_y);
-            tsunami_lab::t_real l_hv = i_setup->getMomentumY(l_x,
-                                                             l_y);
-            tsunami_lab::t_real l_b = i_setup->getBathymetry(l_x,
-                                                             l_y);
-
-            // set initial values in wave propagation solver
-            l_waveProp->setHeight(l_cx,
-                                  l_cy,
-                                  l_h);
-
-            l_waveProp->setMomentumX(l_cx,
-                                     l_cy,
-                                     l_hu);
-
-            l_waveProp->setMomentumY(l_cx,
-                                     l_cy,
-                                     l_hv);
-
-            l_waveProp->setBathymetry(l_cx,
-                                      l_cy,
-                                      l_b);
-        }
-    }
 
 code after parallelization:
 
@@ -108,37 +77,6 @@ code after parallelization:
                 tsunami_lab::t_real l_y = l_cy * l_dy;
                 tsunami_lab::t_real l_x = l_cx * l_dx;
 
-                // get initial values of the setup
-                tsunami_lab::t_real l_h = i_setup->getHeight(l_x,
-                                                            l_y);
-
-                l_hMax = l_hMax < l_h ? l_h : l_hMax;
-
-                tsunami_lab::t_real l_hu = i_setup->getMomentumX(l_x,
-                                                                l_y);
-                tsunami_lab::t_real l_hv = i_setup->getMomentumY(l_x,
-                                                                l_y);
-                tsunami_lab::t_real l_b = i_setup->getBathymetry(l_x,
-                                                                l_y);
-
-                // set initial values in wave propagation solver
-                l_waveProp->setHeight(l_cx,
-                                    l_cy,
-                                    l_h);
-
-                l_waveProp->setMomentumX(l_cx,
-                                        l_cy,
-                                        l_hu);
-
-                l_waveProp->setMomentumY(l_cx,
-                                        l_cy,
-                                        l_hv);
-
-                l_waveProp->setBathymetry(l_cx,
-                                        l_cy,
-                                        l_b);
-            }
-        }
 
 Speedup :math:`S_p` with :math:`T_1 = 2078.36s` and :math:`T_p = 37.2162s` for :math:`p = 72` cores: 
 
