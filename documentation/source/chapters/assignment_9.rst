@@ -30,12 +30,6 @@ chile_10000mCoarse.json config file:
         "coarseFactor": 50
     }
 
-Furhtermore, the following batch script was used:
-
-.. code-block:: c++
-
-    batch script
-
 
 Enabled OpenMP support for GNU and Intel compilers in Sconstruct:
 
