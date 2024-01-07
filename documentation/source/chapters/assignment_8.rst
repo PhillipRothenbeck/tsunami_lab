@@ -1,7 +1,7 @@
 .. _ch:Task_8:
 
-Week Report 8
-=============
+Weekly Report 8
+===============
 
 Migration to ARA
 ----------------
