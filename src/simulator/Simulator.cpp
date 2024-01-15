@@ -8,7 +8,7 @@
 #include "Simulator.h"
 
 #include <omp.h>
-
+#include <mpi.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -24,6 +24,57 @@
 template <typename Base, typename T>
 inline bool instanceof (const T *ptr) {
     return dynamic_cast<const Base *>(ptr) != nullptr;
+}
+
+void tsunami_lab::simulator::initParallelData(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData) {
+    t_idx l_localNX, l_localNY;
+    t_idx l_worldSize;
+    t_idx l_dimension[0, 0];
+    t_idx l_period[0, 0]; //logical array for cart_create
+
+    // get number of processes in Communicator and rank of each process
+    MPI_Comm_size(MPI_COMM_WORLD, &l_worldSize);
+    // MPI_Comm_rank(MPI_COMM_WORLD, &l_rank);
+
+    // get number of subgrids (depending on number of total processes) in each dimension
+    MPI_Dims_create(l_worldSize, 2, l_dimension);
+
+    // calculate size of local domain in subgrid / process
+    l_localNX = i_globalNX / dimension[0];
+    l_localNY = i_globalNY / dimension[1];
+
+    // can the global domain be divided evenly between the subgrids/processes?
+    if (l_localNX * dimension[0] != i_globalNX) {
+        std::cerr << "No even division between subgrids in x-direction possible. " << l_localNX << " x " << dimension[0] << " != " << i_globalNX << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, -2);
+    }
+    if (l_localNY * dimension[1] != i_globalNY) {
+        std::cerr << "No even division between subgrids in x-direction possible. " << l_localNY << " x " << dimension[1] << " != " << i_globalNY << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, -2);
+    }
+
+    // create topolgy through cartesian communicator and cartesian shifts
+    MPI_Cart_create(MPI_COMM_WORLD, 2, dimension, period, 1, &o_parallelData->communicator);
+    // MPI_coords wenn man will
+    MPI_Cart_shift(o_parallelData->communicator, 0, 1, &o_parallelData->up, &o_parallelData->down);
+    MPI_Cart_shift(o_parallelData->communicator, 1, 1, &o_parallelData->left, &o_parallelData->right);
+
+    MPI_Comm_size(o_parallelData->communicator, &o_parallelData->size);
+    MPI_Comm_rank(o_parallelData->communicator, &o_parallelData->rank);
+
+    // logging / informative cout
+    if (o_parallelData->rank == 0) {
+        std::cout << "Domain Decomposition: " << dims[0] << " | " << dims[1] << "\n Local Domain Size: " << l_localNX << " | " << l_localNY << std::endl;
+    }
+
+    // Communication Datatypes
+    // hier bitte aufpassen welceher Datatype was ist (Column Major vs Row Major)
+    //MPI_Type_vector(l_localNY + 2, 1, l_localNX + 2, MPI_DOUBLE, &o_parallelData->row);
+    //MPI_Type_commit(&o_parallelData->row);
+    
+    //MPI_Type_contiguous(l_localNX, MPI_DOUBLE, &o_parallelData->column);
+    //MPI_Type_commit(&o_parallelData->column);
+
 }
 
 void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
