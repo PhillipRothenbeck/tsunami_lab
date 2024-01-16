@@ -16,7 +16,6 @@
 
 #include "../io/Csv/Csv.h"
 #include "../io/NetCDF/NetCDF.h"
-#include "../patches/1d/WavePropagation1d.h"
 #include "../patches/2d/WavePropagation2d.h"
 #include "../setups/CheckPoint/CheckPoint.h"
 #include "../timer.h"
@@ -41,13 +40,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
 
     // construct solver
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-    patches::WavePropagation *l_waveProp;
-
-    if (i_simConfig.getDimension() == 1) {
-        l_waveProp = new patches::WavePropagation1d(l_nx, i_simConfig.isRoeSolver());
-    } else {
-        l_waveProp = new patches::WavePropagation2d(l_nx, l_ny);
-    }
+    patches::WavePropagation *l_waveProp = new patches::WavePropagation2d(l_nx, l_ny);
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create WaveProp Object");
 
     // maximum observed height in the setup
@@ -127,131 +120,76 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         l_frame = i_simConfig.getCurrentFrame();
         l_simTime = i_simConfig.getStartSimTime();
     }
-    if (i_simConfig.getDimension() == 1) {
-        if (i_hStar == -1) {
-            t_idx l_timeStep = 0;
-            // iterate over time
-            while (l_simTime < l_endTime) {
-                if (l_timeStep % 25 == 0) {
-                    std::cout << "  simulation time / #time steps: "
-                              << l_simTime << " / " << l_timeStep << std::endl;
+    std::string l_path = "./out/" + i_simConfig.getConfigName() + ".nc";
+    std::cout << "  writing wave field to " << l_path << std::endl;
+    t_idx l_timestepsPerFrame = 25;
+    t_idx l_timeStep = l_timestepsPerFrame * l_frame;
+    std::cout << l_timeStep << " > " << l_frame << std::endl;
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+    io::NetCDF *l_writer = new io::NetCDF(l_endTime,
+                                          l_dt,
+                                          l_timestepsPerFrame,
+                                          l_dxy,
+                                          l_nx,
+                                          l_ny,
+                                          l_waveProp->getStride(),
+                                          i_simConfig.getCoarseFactor(),
+                                          l_waveProp->getBathymetry(),
+                                          l_path);
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create Writer Object");
 
-                    std::string l_path = "./out/solution_" + std::to_string(l_frame) + ".csv";
-                    std::cout << "  writing wave field to " << l_path << std::endl;
-
-                    std::ofstream l_file;
-                    l_file.open(l_path);
-
-                    io::Csv::write(l_dxy,
-                                   l_nx,
-                                   1,
-                                   1,
-                                   l_waveProp->getHeight(),
-                                   l_waveProp->getMomentumX(),
-                                   nullptr,
-                                   l_waveProp->getBathymetry(),
-                                   l_file);
-                    l_file.close();
-                    l_frame++;
-                }
-
-                l_waveProp->setGhostCells(i_simConfig.getBoundaryCondition());
-                l_waveProp->timeStep(l_scalingX, 0);
-
-                l_timeStep++;
-                l_simTime += l_dt;
-            }
-        } else {
-            t_idx l_number_of_time_steps = 100;
-            bool l_is_correct_middle_state = false;
-            for (t_idx l_timeStep = 0; l_timeStep < l_number_of_time_steps; l_timeStep++) {
-                e_boundary l_boundary[4] = {OUTFLOW, OUTFLOW, OUTFLOW, OUTFLOW};
-                l_waveProp->setGhostCells(l_boundary);
-                l_waveProp->timeStep(l_scalingX, 0);
-
-                t_real l_middle_state = l_waveProp->getHeight()[t_idx(5.0)];
-                if (abs(l_middle_state - i_hStar) < 4.20) {
-                    l_is_correct_middle_state = true;
-                }
-            }
-            if (l_is_correct_middle_state) {
-                std::cout << "middle state was calculated: true" << std::endl;
-            } else {
-                std::cout << "middle state was calculated: false" << std::endl;
-            }
+    if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <setups::CheckPoint>(i_setup)) {
+        setups::CheckPoint *l_checkpoint = (setups::CheckPoint *)i_setup;
+        for (t_idx l_i = 0; l_i < l_frame; l_i++) {
+            l_writer->store(l_checkpoint->getSimTimeData(l_i),
+                            l_i,
+                            l_checkpoint->getHeightData(l_i),
+                            l_checkpoint->getMomentumXData(l_i),
+                            l_checkpoint->getMomentumYData(l_i));
         }
-    } else {
-        std::string l_path = "./out/" + i_simConfig.getConfigName() + ".nc";
-        std::cout << "  writing wave field to " << l_path << std::endl;
-        t_idx l_timestepsPerFrame = 25;
-        t_idx l_timeStep = l_timestepsPerFrame * l_frame;
-        std::cout << l_timeStep << " > " << l_frame << std::endl;
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-        io::NetCDF *l_writer = new io::NetCDF(l_endTime,
-                                              l_dt,
-                                              l_timestepsPerFrame,
-                                              l_dxy,
-                                              l_nx,
-                                              l_ny,
-                                              l_waveProp->getStride(),
-                                              i_simConfig.getCoarseFactor(),
-                                              l_waveProp->getBathymetry(),
-                                              l_path);
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create Writer Object");
-
-        if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <setups::CheckPoint>(i_setup)) {
-            setups::CheckPoint *l_checkpoint = (setups::CheckPoint *)i_setup;
-            for (t_idx l_i = 0; l_i < l_frame; l_i++) {
-                l_writer->store(l_checkpoint->getSimTimeData(l_i),
-                                l_i,
-                                l_checkpoint->getHeightData(l_i),
-                                l_checkpoint->getMomentumXData(l_i),
-                                l_checkpoint->getMomentumYData(l_i));
-            }
-            if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Load Checkpoint");
-        }
-
-        // iterate over time
-        t_real l_checkPointTime = l_endTime / i_simConfig.getCheckPointCount();
-        std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
-        t_idx l_checkPoints = l_simTime / l_checkPointTime;
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-        while (l_simTime < l_endTime) {
-            if (l_timeStep % 25 == 0) {
-                std::cout << "  simulation time / #time steps / #step: "
-                          << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
-
-                if (i_simConfig.getFlagConfig().useIO()) {
-                    l_writer->store(l_simTime,
-                                    l_frame,
-                                    l_waveProp->getHeight(),
-                                    l_waveProp->getMomentumX(),
-                                    l_waveProp->getMomentumY());
-                }
-
-                if (i_simConfig.getFlagConfig().useCheckPoint() && l_simTime > l_checkPointTime * l_checkPoints) {
-                    std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
-                    l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
-                    l_checkPoints++;
-                }
-                l_frame++;
-            }
-            l_waveProp->setGhostCells(i_simConfig.getBoundaryCondition());
-            l_waveProp->timeStep(l_scalingX, l_scalingY);
-
-            l_timeStep++;
-            l_simTime += l_dt;
-        }
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-        if (i_simConfig.getFlagConfig().useIO())
-            l_writer->write();
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
-        // free memory
-        std::cout << "finished time loop" << std::endl;
-        std::cout << "freeing memory" << std::endl;
-        delete l_writer;
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Load Checkpoint");
     }
+
+    // iterate over time
+    t_real l_checkPointTime = l_endTime / i_simConfig.getCheckPointCount();
+    std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
+    t_idx l_checkPoints = l_simTime / l_checkPointTime;
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+    while (l_simTime < l_endTime) {
+        if (l_timeStep % 25 == 0) {
+            std::cout << "  simulation time / #time steps / #step: "
+                      << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
+
+            if (i_simConfig.getFlagConfig().useIO()) {
+                l_writer->store(l_simTime,
+                                l_frame,
+                                l_waveProp->getHeight(),
+                                l_waveProp->getMomentumX(),
+                                l_waveProp->getMomentumY());
+            }
+
+            if (i_simConfig.getFlagConfig().useCheckPoint() && l_simTime > l_checkPointTime * l_checkPoints) {
+                std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
+                l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
+                l_checkPoints++;
+            }
+            l_frame++;
+        }
+        l_waveProp->setGhostCells(i_simConfig.getBoundaryCondition());
+        l_waveProp->timeStep(l_scalingX, l_scalingY);
+
+        l_timeStep++;
+        l_simTime += l_dt;
+    }
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+    if (i_simConfig.getFlagConfig().useIO())
+        l_writer->write();
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
+    // free memory
+    std::cout << "finished time loop" << std::endl;
+    std::cout << "freeing memory" << std::endl;
+    delete l_writer;
     delete l_waveProp;
     delete l_timer;
 }

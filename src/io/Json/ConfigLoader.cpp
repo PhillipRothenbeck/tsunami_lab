@@ -37,12 +37,6 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     // read JSON config file
     json l_configFile = json::parse(l_file);
 
-    // set simulation dimension
-    tsunami_lab::t_idx l_dimension = 1;
-    if (l_configFile.contains("dimension")) {
-        l_dimension = l_configFile.at("dimension");
-    }
-
     // set number of cells in x-direction
     tsunami_lab::t_idx l_nx = 50;
     if (l_configFile.contains("nx")) {
@@ -221,8 +215,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
         return EXIT_FAILURE;
     }
 
-    o_simConfig = tsunami_lab::configs::SimConfig(l_dimension,
-                                                  l_configName,
+    o_simConfig = tsunami_lab::configs::SimConfig(l_configName,
                                                   i_flagConfig,
                                                   l_checkPointCount,
                                                   l_nx,
