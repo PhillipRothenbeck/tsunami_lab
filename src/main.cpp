@@ -47,7 +47,6 @@ int main(int i_argc, char *i_argv[]) {
     }
 
     tsunami_lab::setups::Setup *l_setups = nullptr;
-    tsunami_lab::t_real l_hStar = -1;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
 
     if (l_flagConfig.useTiming()) l_timer->start();
@@ -55,7 +54,6 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::t_idx err = tsunami_lab::io::ConfigLoader::loadConfig(l_configName,
                                                                        l_flagConfig,
                                                                        l_setups,
-                                                                       l_hStar,
                                                                        l_simConfig);
 	 if (l_flagConfig.useTiming()) l_timer->printTime("Loading Config ");
 
@@ -67,7 +65,7 @@ int main(int i_argc, char *i_argv[]) {
     }
 
     // start simulation from config
-    tsunami_lab::simulator::runSimulation(l_setups, l_hStar, l_simConfig);
+    tsunami_lab::simulator::runSimulation(l_setups, l_simConfig);
 
     delete l_setups;
     delete l_timer;

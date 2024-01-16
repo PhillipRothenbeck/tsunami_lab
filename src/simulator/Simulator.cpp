@@ -20,7 +20,6 @@ inline bool instanceof (const T *ptr) {
 }
 
 void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
-                                           t_real i_hStar,
                                            configs::SimConfig i_simConfig) {
     Timer *l_timer = new Timer();
 

@@ -16,7 +16,6 @@
 tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_configName,
                                                              tsunami_lab::configs::FlagConfig i_flagConfig,
                                                              tsunami_lab::setups::Setup *&o_setup,
-                                                             tsunami_lab::t_real &o_hStar,
                                                              tsunami_lab::configs::SimConfig &o_simConfig) {
     std::string l_path = "./res/configs/" + i_configName;
 

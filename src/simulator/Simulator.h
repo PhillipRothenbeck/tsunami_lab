@@ -26,7 +26,6 @@ namespace tsunami_lab {
 class tsunami_lab::simulator {
    public:
     static void runSimulation(tsunami_lab::setups::Setup *i_setup,
-                              tsunami_lab::t_real i_hStar,
                               tsunami_lab::configs::SimConfig i_simConfig);
 };
 
