@@ -26,52 +26,52 @@ inline bool instanceof (const T *ptr) {
     return dynamic_cast<const Base *>(ptr) != nullptr;
 }
 
-void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
-                                           tsunami_lab::t_real i_hStar,
-                                           tsunami_lab::configs::SimConfig i_simConfig) {
+void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
+                                           t_real i_hStar,
+                                           configs::SimConfig i_simConfig) {
     Timer *l_timer = new Timer();
 
     // define number of cells
-    tsunami_lab::t_idx l_nx = i_simConfig.getXCells();
-    tsunami_lab::t_idx l_ny = i_simConfig.getYCells();
+    t_idx l_nx = i_simConfig.getXCells();
+    t_idx l_ny = i_simConfig.getYCells();
 
     // define length of one cell
-    tsunami_lab::t_real l_dx = i_simConfig.getXLength() / l_nx;
-    tsunami_lab::t_real l_dy = i_simConfig.getYLength() / l_ny;
+    t_real l_dx = i_simConfig.getXLength() / l_nx;
+    t_real l_dy = i_simConfig.getYLength() / l_ny;
 
     // construct solver
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-    tsunami_lab::patches::WavePropagation *l_waveProp;
+    patches::WavePropagation *l_waveProp;
 
     if (i_simConfig.getDimension() == 1) {
-        l_waveProp = new tsunami_lab::patches::WavePropagation1d(l_nx, i_simConfig.isRoeSolver());
+        l_waveProp = new patches::WavePropagation1d(l_nx, i_simConfig.isRoeSolver());
     } else {
-        l_waveProp = new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny);
+        l_waveProp = new patches::WavePropagation2d(l_nx, l_ny);
     }
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create WaveProp Object");
 
     // maximum observed height in the setup
-    tsunami_lab::t_real l_hMax = std::numeric_limits<tsunami_lab::t_real>::lowest();
+    t_real l_hMax = std::numeric_limits<t_real>::lowest();
 
     // set up solver
 #pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
-    for (tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
-        for (tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
-            tsunami_lab::t_real l_y = l_cy * l_dy;
-            tsunami_lab::t_real l_x = l_cx * l_dx;
+    for (t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
+        for (t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
+            t_real l_y = l_cy * l_dy;
+            t_real l_x = l_cx * l_dx;
 
             // get initial values of the setup
-            tsunami_lab::t_real l_h = i_setup->getHeight(l_x,
-                                                         l_y);
+            t_real l_h = i_setup->getHeight(l_x,
+                                            l_y);
 
             l_hMax = l_hMax < l_h ? l_h : l_hMax;
 
-            tsunami_lab::t_real l_hu = i_setup->getMomentumX(l_x,
-                                                             l_y);
-            tsunami_lab::t_real l_hv = i_setup->getMomentumY(l_x,
-                                                             l_y);
-            tsunami_lab::t_real l_b = i_setup->getBathymetry(l_x,
-                                                             l_y);
+            t_real l_hu = i_setup->getMomentumX(l_x,
+                                                l_y);
+            t_real l_hv = i_setup->getMomentumY(l_x,
+                                                l_y);
+            t_real l_b = i_setup->getBathymetry(l_x,
+                                                l_y);
 
             // set initial values in wave propagation solver
             l_waveProp->setHeight(l_cx,
@@ -94,16 +94,16 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Caculate hMax and Init WaveProp");
 
     // derive maximum wave speed in setup; the momentum is ignored
-    tsunami_lab::t_real l_speedMax = std::sqrt(9.81 * l_hMax);
+    t_real l_speedMax = std::sqrt(9.81 * l_hMax);
 
     // check if delta x is smaller than delta y
     bool l_isXStepSmaller = (l_dx <= l_dy);
 
     // choose l_dxy as l_dx if it is smaller or l_dy if it is smaller
-    tsunami_lab::t_real l_dxy = l_dx * l_isXStepSmaller + l_dy * !l_isXStepSmaller;
+    t_real l_dxy = l_dx * l_isXStepSmaller + l_dy * !l_isXStepSmaller;
 
     // derive constant time step; changes at simulation time are ignored
-    tsunami_lab::t_real l_dt = 0.5 * l_dxy / l_speedMax;
+    t_real l_dt = 0.5 * l_dxy / l_speedMax;
 
     std::cout << l_hMax << " | " << l_speedMax << std::endl;
 
@@ -116,20 +116,20 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     std::cout << std::endl;
 
     // derive scaling for a time step
-    tsunami_lab::t_real l_scalingX = l_dt / l_dx;
-    tsunami_lab::t_real l_scalingY = l_dt / l_dy;
+    t_real l_scalingX = l_dt / l_dx;
+    t_real l_scalingY = l_dt / l_dy;
 
     // set up time and print control
-    tsunami_lab::t_idx l_frame = 0;
-    tsunami_lab::t_real l_endTime = i_simConfig.getEndSimTime();
-    tsunami_lab::t_real l_simTime = 0;
+    t_idx l_frame = 0;
+    t_real l_endTime = i_simConfig.getEndSimTime();
+    t_real l_simTime = 0;
     if (i_simConfig.getFlagConfig().useCheckPoint()) {
         l_frame = i_simConfig.getCurrentFrame();
         l_simTime = i_simConfig.getStartSimTime();
     }
     if (i_simConfig.getDimension() == 1) {
         if (i_hStar == -1) {
-            tsunami_lab::t_idx l_timeStep = 0;
+            t_idx l_timeStep = 0;
             // iterate over time
             while (l_simTime < l_endTime) {
                 if (l_timeStep % 25 == 0) {
@@ -142,15 +142,15 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
                     std::ofstream l_file;
                     l_file.open(l_path);
 
-                    tsunami_lab::io::Csv::write(l_dxy,
-                                                l_nx,
-                                                1,
-                                                1,
-                                                l_waveProp->getHeight(),
-                                                l_waveProp->getMomentumX(),
-                                                nullptr,
-                                                l_waveProp->getBathymetry(),
-                                                l_file);
+                    io::Csv::write(l_dxy,
+                                   l_nx,
+                                   1,
+                                   1,
+                                   l_waveProp->getHeight(),
+                                   l_waveProp->getMomentumX(),
+                                   nullptr,
+                                   l_waveProp->getBathymetry(),
+                                   l_file);
                     l_file.close();
                     l_frame++;
                 }
@@ -162,14 +162,14 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
                 l_simTime += l_dt;
             }
         } else {
-            tsunami_lab::t_idx l_number_of_time_steps = 100;
+            t_idx l_number_of_time_steps = 100;
             bool l_is_correct_middle_state = false;
-            for (tsunami_lab::t_idx l_timeStep = 0; l_timeStep < l_number_of_time_steps; l_timeStep++) {
+            for (t_idx l_timeStep = 0; l_timeStep < l_number_of_time_steps; l_timeStep++) {
                 e_boundary l_boundary[4] = {OUTFLOW, OUTFLOW, OUTFLOW, OUTFLOW};
                 l_waveProp->setGhostCells(l_boundary);
                 l_waveProp->timeStep(l_scalingX, 0);
 
-                tsunami_lab::t_real l_middle_state = l_waveProp->getHeight()[tsunami_lab::t_idx(5.0)];
+                t_real l_middle_state = l_waveProp->getHeight()[t_idx(5.0)];
                 if (abs(l_middle_state - i_hStar) < 4.20) {
                     l_is_correct_middle_state = true;
                 }
@@ -187,20 +187,20 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
         t_idx l_timeStep = l_timestepsPerFrame * l_frame;
         std::cout << l_timeStep << " > " << l_frame << std::endl;
         if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-        io::NetCDF *l_writer = new tsunami_lab::io::NetCDF(l_endTime,
-                                                           l_dt,
-                                                           l_timestepsPerFrame,
-                                                           l_dxy,
-                                                           l_nx,
-                                                           l_ny,
-                                                           l_waveProp->getStride(),
-                                                           i_simConfig.getCoarseFactor(),
-                                                           l_waveProp->getBathymetry(),
-                                                           l_path);
+        io::NetCDF *l_writer = new io::NetCDF(l_endTime,
+                                              l_dt,
+                                              l_timestepsPerFrame,
+                                              l_dxy,
+                                              l_nx,
+                                              l_ny,
+                                              l_waveProp->getStride(),
+                                              i_simConfig.getCoarseFactor(),
+                                              l_waveProp->getBathymetry(),
+                                              l_path);
         if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create Writer Object");
 
-        if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <tsunami_lab::setups::CheckPoint>(i_setup)) {
-            tsunami_lab::setups::CheckPoint *l_checkpoint = (tsunami_lab::setups::CheckPoint *)i_setup;
+        if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <setups::CheckPoint>(i_setup)) {
+            setups::CheckPoint *l_checkpoint = (setups::CheckPoint *)i_setup;
             for (t_idx l_i = 0; l_i < l_frame; l_i++) {
                 l_writer->store(l_checkpoint->getSimTimeData(l_i),
                                 l_i,
