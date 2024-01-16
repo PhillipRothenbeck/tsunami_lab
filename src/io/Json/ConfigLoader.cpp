@@ -38,75 +38,51 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     json l_configFile = json::parse(l_file);
 
     // set simulation dimension
-    tsunami_lab::t_idx l_dimension;
+    tsunami_lab::t_idx l_dimension = 1;
     if (l_configFile.contains("dimension")) {
         l_dimension = l_configFile.at("dimension");
-    } else {
-        std::cout << "dimension takes on default value" << std::endl;
-        l_dimension = 1;
     }
 
     // set number of cells in x-direction
-    tsunami_lab::t_idx l_nx;
+    tsunami_lab::t_idx l_nx = 50;
     if (l_configFile.contains("nx")) {
         l_nx = l_configFile.at("nx");
-    } else {
-        std::cout << "nx takes on default value" << std::endl;
-        l_nx = 50;
     }
 
     // set number of cells in y-direction
-    tsunami_lab::t_idx l_ny;
+    tsunami_lab::t_idx l_ny = 50;
     if (l_configFile.contains("ny")) {
         l_ny = l_configFile.at("ny");
-    } else {
-        std::cout << "ny takes on default value" << std::endl;
-        l_ny = 50;
     }
 
     // set length of simulation x-direction
-    tsunami_lab::t_real l_xLen;
+    tsunami_lab::t_real l_xLen = 10;
     if (l_configFile.contains("xLen")) {
         l_xLen = l_configFile.at("xLen");
-    } else {
-        std::cout << "xLen takes on default value" << std::endl;
-        l_xLen = 10.0;
     }
 
     // set length of simulation y-direction
-    tsunami_lab::t_real l_yLen;
+    tsunami_lab::t_real l_yLen = 10;
     if (l_configFile.contains("yLen")) {
         l_yLen = l_configFile.at("yLen");
-    } else {
-        std::cout << "yLen takes on default value" << std::endl;
-        l_yLen = 10.0;
     }
 
     // offset of the epicenter to the 0-point in x-direction
-    tsunami_lab::t_real l_epicenterOffsetX;
+    tsunami_lab::t_real l_epicenterOffsetX = -(l_xLen / 2);
     if (l_configFile.contains("epicenterOffsetX")) {
         l_epicenterOffsetX = l_configFile.at("epicenterOffsetX");
-    } else {
-        std::cout << "epicenterOffsetX takes on default value" << std::endl;
-        l_epicenterOffsetX = -(l_xLen / 2);
     }
 
     // offset of the epicenter to the 0-point in x-direction
-    tsunami_lab::t_real l_epicenterOffsetY;
+    tsunami_lab::t_real l_epicenterOffsetY = -(l_yLen / 2);
     if (l_configFile.contains("epicenterOffsetY")) {
         l_epicenterOffsetY = l_configFile.at("epicenterOffsetY");
-    } else {
-        std::cout << "epicenterOffsetY takes on default value" << std::endl;
-        l_epicenterOffsetY = -(l_yLen / 2);
     }
 
     // set time of simulation
-    tsunami_lab::t_real l_endSimTime;
+    tsunami_lab::t_real l_endSimTime = 1.25;
     if (l_configFile.contains("simTime")) {
         l_endSimTime = l_configFile.at("simTime");
-    } else {
-        std::cout << "simTime takes on default value" << std::endl;
-        l_endSimTime = 1.25;
     }
 
     // set start time of simulation
@@ -119,43 +95,27 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
         for (t_idx l_i = 0; l_i < l_boundary.length(); l_i++) {
             if (l_boundary[l_i] == 'R') {
                 l_boundaryCond[l_i] = REFLECTING;
-            } else {
-                l_boundaryCond[l_i] = OUTFLOW;
             }
         }
-    } else {
-        std::cout << "boundaryCond takes on default value" << std::endl;
     }
 
     // set solver
-    bool l_useRoeSolver;
+    bool l_useRoeSolver = false;
     if (l_configFile.contains("solver")) {
         std::string solver = l_configFile.at("solver");
         if (solver.compare("Roe") == 0) {
             l_useRoeSolver = true;
-        } else if (solver.compare("F-Wave") == 0) {
-            l_useRoeSolver = false;
-        } else {
-            std::cout << "unknown solver was entered" << std::endl;
-            return EXIT_FAILURE;
         }
-
-    } else {
-        std::cout << "solver takes on default value" << std::endl;
-        l_useRoeSolver = false;
     }
 
     // factor for coarse output
-    tsunami_lab::t_idx l_checkPointCount;
+    tsunami_lab::t_idx l_checkPointCount = 5;
     if (l_configFile.contains("checkPoints")) {
         l_checkPointCount = l_configFile.at("checkPoints");
-    } else {
-        std::cout << "checkPointCount takes on default value" << std::endl;
-        l_checkPointCount = 5;
     }
 
     // factor for coarse output
-    tsunami_lab::t_idx l_coarseFactor;
+    tsunami_lab::t_idx l_coarseFactor = 1;
     if (l_configFile.contains("coarseFactor")) {
         l_coarseFactor = l_configFile.at("coarseFactor");
 
@@ -163,34 +123,22 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
             std::cout << "factor for coarse input can't be smaller than 1" << std::endl;
             return EXIT_FAILURE;
         }
-    } else {
-        std::cout << "coarseFactor takes on default value" << std::endl;
-        l_coarseFactor = 1;
     }
 
     // set bathymetry and displacements file names
-    std::string l_bathymetryFileName, l_displacementsFileName;
+    std::string l_bathymetryFileName = "dummy_bathymetry.nc", l_displacementsFileName = "dummy_disp.nc";
     if (l_configFile.contains("bathymetryFileName")) {
         l_bathymetryFileName = l_configFile.at("bathymetryFileName");
-    } else {
-        std::cout << "bathymetryFileName takes on default value" << std::endl;
-        l_bathymetryFileName = "dummy_bathymetry.nc";
     }
 
     if (l_configFile.contains("displacementsFileName")) {
         l_displacementsFileName = l_configFile.at("displacementsFileName");
-    } else {
-        std::cout << "displacementsFileName takes on default value" << std::endl;
-        l_displacementsFileName = "dummy_disp.nc";
     }
 
     // set setup configuration
-    std::string l_setupName;
+    std::string l_setupName = "TsunamiEvent";
     if (l_configFile.contains("setup")) {
         l_setupName = l_configFile.at("setup");
-    } else {
-        std::cout << "setup takes on default value" << std::endl;
-        l_setupName = "DamBreak";
     }
     std::cout << "simulation setup was set to: " << l_setupName << std::endl;
 
