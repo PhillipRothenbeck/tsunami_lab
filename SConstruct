@@ -30,7 +30,7 @@ vars.AddVariables(
   EnumVariable( 'CXX',
                 'compiler options: g++, icpc',
                 'g++',
-                allowed_values=('g++', 'icpc')
+                allowed_values=('g++', 'icpc', 'mpic++')
               )
 )
 
@@ -72,12 +72,12 @@ env.Append( CXXFLAGS = [ '-g',
 if 'debug' in env['mode']:
   env.Append( CXXFLAGS = [ '-O0' ] )
 else:
-  if 'g++' in env['CXX']:
+  if 'g++' in env['CXX'] or 'mpic++' in env['CXX']:
     env.Append( CXXFLAGS = [ '-O2' ] )
   elif 'icpc' in env['CXX']:
     env.Append( CXXFLAGS = [ '-fast' ] )
 
-if 'g++' in env['CXX']:
+if 'g++' in env['CXX'] or 'mpic++' in env['CXX']:
     env.Append( CXXFLAGS = [ '-fopenmp' ] )
     env.Append( LINKFLAGS = [ '-fopenmp' ] )
 elif 'icpc' in env['CXX']:
