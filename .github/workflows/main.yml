@@ -41,25 +41,19 @@ jobs:
            run: |
               scons mode=debug+san
               ./build/tests
-              ./build/tsunami_lab small_dam_break_1d.json
-              ./build/tsunami_lab small_dam_break_2d.json
+              ./build/tsunami_lab demo_config.json
               scons mode=release+san
               ./build/tests
-              ./build/tsunami_lab dam_break_1d.json
+              ./build/tsunami_lab demo_config.json
 
          - name: Valgrind
            run: |
               scons mode=debug
               valgrind ./build/tests
-              valgrind ./build/tsunami_lab small_dam_break_1d.json
-              valgrind ./build/tsunami_lab small_dam_break_2d.json
+              valgrind ./build/tsunami_lab demo_config.json
 
          - name: Release
            run: |
               scons
               ./build/tests
-              ./build/tsunami_lab dam_break_1d.json
-              ./build/tsunami_lab rare_rare_1d.json
-              ./build/tsunami_lab shock_shock_1d.json
-              ./build/tsunami_lab subcritical_flow_1d.json
-              ./build/tsunami_lab supercritical_flow_1d.json
+              ./build/tsunami_lab demo_config.json
