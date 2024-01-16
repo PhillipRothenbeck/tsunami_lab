@@ -18,7 +18,7 @@
 #include "../io/NetCDF/NetCDF.h"
 #include "../patches/1d/WavePropagation1d.h"
 #include "../patches/2d/WavePropagation2d.h"
-#include "../setups/CheckPoint/CheckPoint.h"
+#include "../setups/CheckPot_idx/CheckPot_idx.h"
 #include "../timer.h"
 
 template <typename Base, typename T>
@@ -31,6 +31,10 @@ void tsunami_lab::simulator::initParallelData(t_idx i_globalNX, t_idx i_globalNY
     t_idx l_worldSize;
     t_idx l_dimension[0, 0];
     t_idx l_period[0, 0]; //logical array for cart_create
+    t_idx size[2] = {l_localNX + 2, l_localNY + 2};
+    t_idx subsize[2] = {l_localNX, l_localNY};
+    t_idx offset[2] = {1, 1};
+    t_idx coordinate[2];
 
     // get number of processes in Communicator and rank of each process
     MPI_Comm_size(MPI_COMM_WORLD, &l_worldSize);
@@ -67,13 +71,62 @@ void tsunami_lab::simulator::initParallelData(t_idx i_globalNX, t_idx i_globalNY
         std::cout << "Domain Decomposition: " << dims[0] << " | " << dims[1] << "\n Local Domain Size: " << l_localNX << " | " << l_localNY << std::endl;
     }
 
-    // Communication Datatypes
+    // border Datatypes init (column: left/right, row: up/down)
     // hier bitte aufpassen welceher Datatype was ist (Column Major vs Row Major)
-    //MPI_Type_vector(l_localNY + 2, 1, l_localNX + 2, MPI_DOUBLE, &o_parallelData->row);
-    //MPI_Type_commit(&o_parallelData->row);
+    MPI_Type_vector(l_localNY, 1, l_localNX + 2, MPI_DOUBLE, &o_parallelData->column);
+    MPI_Type_commit(&o_parallelData->column);
     
-    //MPI_Type_contiguous(l_localNX, MPI_DOUBLE, &o_parallelData->column);
-    //MPI_Type_commit(&o_parallelData->column);
+    MPI_Type_contiguous(l_localNX, MPI_DOUBLE, &o_parallelData->row);
+    MPI_Type_commit(&o_parallelData->row);
+
+    // text Datatype init (subarray only contains real cells, no ghostcells)
+    if (o_parallelData->rank == 0) {
+        size[0] = i_globalNX;
+        size[1] = i_globalNY;
+        offset[0] = 0;
+        offset[1] = 0;
+    }
+
+    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->text);
+    MPI_Type_commit(&o_parallelData->text);
+
+    // get coordinates of cartesian communicator
+    MPI_Cart_coords(o_parallelData->communicator, o_parallelData->rank, 2, coordinate);
+
+    // restart Datatype init
+    size[0] = l_localNX + 2;
+    size[1] = l_localNY + 2;
+    offset[0] = 1;
+    offset[1] = 1;
+
+    if (coordinate[0] == 0) {
+        offset[0] = 0;
+    }
+    if (coordinate[1] == 0) {
+        offset[1] = 0;
+    }
+
+    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->restart);
+    MPI_Type_commit(&o_parallelData->restart);
+
+    // file Datatype init
+    size[0] = i_globalNX + 2;
+    size[1] = i_globalNY + 2;
+    offset[0] = 1 + coordinate[0] * l_localNX; // stride???
+    offset[1] = 1 + coordinate[1] * l_localNY; // stride???
+
+    for (int i=0; i < 2; i++) {
+        if (coordinate[i] == 0) {
+            offset[i] -= 1;
+            subsize[i] += 1;
+        }
+        if (coordinate[i] == dimension[i] - 1) {
+            subsize[i] += 1;
+        }
+    }
+
+    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->file);
+    MPI_Type_commit(&o_parallelData->file);
 
 }
 
@@ -99,7 +152,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     } else {
         l_waveProp = new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny);
     }
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create WaveProp Object");
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->prt_idxTime("Create WaveProp Object");
 
     // maximum observed height in the setup
     tsunami_lab::t_real l_hMax = std::numeric_limits<tsunami_lab::t_real>::lowest();
@@ -142,7 +195,7 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
                                       l_b);
         }
     }
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Caculate hMax and Init WaveProp");
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->prt_idxTime("Caculate hMax and Init WaveProp");
 
     // derive maximum wave speed in setup; the momentum is ignored
     tsunami_lab::t_real l_speedMax = std::sqrt(9.81 * l_hMax);
@@ -170,11 +223,11 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
     tsunami_lab::t_real l_scalingX = l_dt / l_dx;
     tsunami_lab::t_real l_scalingY = l_dt / l_dy;
 
-    // set up time and print control
+    // set up time and prt_idx control
     tsunami_lab::t_idx l_frame = 0;
     tsunami_lab::t_real l_endTime = i_simConfig.getEndSimTime();
     tsunami_lab::t_real l_simTime = 0;
-    if (i_simConfig.getFlagConfig().useCheckPoint()) {
+    if (i_simConfig.getFlagConfig().useCheckPot_idx()) {
         l_frame = i_simConfig.getCurrentFrame();
         l_simTime = i_simConfig.getStartSimTime();
     }
@@ -248,24 +301,24 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
                                                            i_simConfig.getCoarseFactor(),
                                                            l_waveProp->getBathymetry(),
                                                            l_path);
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create Writer Object");
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->prt_idxTime("Create Writer Object");
 
-        if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <tsunami_lab::setups::CheckPoint>(i_setup)) {
-            tsunami_lab::setups::CheckPoint *l_checkpoint = (tsunami_lab::setups::CheckPoint *)i_setup;
+        if (i_simConfig.getFlagConfig().useCheckPot_idx() && instanceof <tsunami_lab::setups::CheckPot_idx>(i_setup)) {
+            tsunami_lab::setups::CheckPot_idx *l_checkpot_idx = (tsunami_lab::setups::CheckPot_idx *)i_setup;
             for (t_idx l_i = 0; l_i < l_frame; l_i++) {
-                l_writer->store(l_checkpoint->getSimTimeData(l_i),
+                l_writer->store(l_checkpot_idx->getSimTimeData(l_i),
                                 l_i,
-                                l_checkpoint->getHeightData(l_i),
-                                l_checkpoint->getMomentumXData(l_i),
-                                l_checkpoint->getMomentumYData(l_i));
+                                l_checkpot_idx->getHeightData(l_i),
+                                l_checkpot_idx->getMomentumXData(l_i),
+                                l_checkpot_idx->getMomentumYData(l_i));
             }
-            if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Load Checkpoint");
+            if (i_simConfig.getFlagConfig().useTiming()) l_timer->prt_idxTime("Load Checkpot_idx");
         }
 
         // iterate over time
-        t_real l_checkPointTime = l_endTime / i_simConfig.getCheckPointCount();
-        std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
-        t_idx l_checkPoints = l_simTime / l_checkPointTime;
+        t_real l_checkPot_idxTime = l_endTime / i_simConfig.getCheckPot_idxCount();
+        std::cout << l_checkPot_idxTime << " | " << l_endTime << std::endl;
+        t_idx l_checkPot_idxs = l_simTime / l_checkPot_idxTime;
         if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
         while (l_simTime < l_endTime) {
             if (l_timeStep % 25 == 0) {
@@ -280,10 +333,10 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
                                     l_waveProp->getMomentumY());
                 }
 
-                if (i_simConfig.getFlagConfig().useCheckPoint() && l_simTime > l_checkPointTime * l_checkPoints) {
-                    std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
-                    l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
-                    l_checkPoints++;
+                if (i_simConfig.getFlagConfig().useCheckPot_idx() && l_simTime > l_checkPot_idxTime * l_checkPot_idxs) {
+                    std::string l_checkpot_idxPath = "./out/" + i_simConfig.getConfigName() + "_checkpot_idx.nc";
+                    l_writer->write(l_frame, l_checkpot_idxPath, l_simTime, l_endTime);
+                    l_checkPot_idxs++;
                 }
                 l_frame++;
             }
@@ -293,11 +346,11 @@ void tsunami_lab::simulator::runSimulation(tsunami_lab::setups::Setup *i_setup,
             l_timeStep++;
             l_simTime += l_dt;
         }
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->prt_idxTime("Simulation");
         if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
         if (i_simConfig.getFlagConfig().useIO())
             l_writer->write();
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->prt_idxTime("Write NC File");
         // free memory
         std::cout << "finished time loop" << std::endl;
         std::cout << "freeing memory" << std::endl;

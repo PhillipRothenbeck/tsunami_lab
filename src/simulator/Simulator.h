@@ -30,7 +30,7 @@ class tsunami_lab::simulator {
     MPI_Request requesst[8];
     MPI_Datatype row;
     MPI_Datatype column;
-    MPI_Datatype subarray;
+    MPI_Datatype text;
     MPI_Datatype file;
     MPI_Datatype restart; 
     }
