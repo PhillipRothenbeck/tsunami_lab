@@ -13,7 +13,6 @@
 TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
     std::string l_path = "demo_config.json";
     tsunami_lab::setups::Setup *l_setups = nullptr;
-    tsunami_lab::t_real l_hStar = -1;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
     tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
 
@@ -21,11 +20,9 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
     err = tsunami_lab::io::ConfigLoader::loadConfig(l_path,
                                                     l_flagConfig,
                                                     l_setups,
-                                                    l_hStar,
                                                     l_simConfig);
 
     REQUIRE(err == 0);
-    REQUIRE(l_simConfig.getDimension() == 2);
     REQUIRE(l_simConfig.getXCells() == 500);
     REQUIRE(l_simConfig.getYCells() == 500);
     REQUIRE(l_simConfig.getXLength() == 100.0);
@@ -37,6 +34,5 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
     REQUIRE(l_simConfig.getBoundaryCondition()[1] == tsunami_lab::REFLECTING);
     REQUIRE(l_simConfig.isRoeSolver());
     REQUIRE(l_simConfig.getCheckPointCount() == 2);
-    REQUIRE(l_hStar == -1);
     delete l_setups;
 }
