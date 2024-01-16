@@ -14,12 +14,6 @@
 #include <iostream>
 #include <limits>
 
-#include "../io/Csv/Csv.h"
-#include "../io/NetCDF/NetCDF.h"
-#include "../patches/2d/WavePropagation2d.h"
-#include "../setups/CheckPoint/CheckPoint.h"
-#include "../timer.h"
-
 template <typename Base, typename T>
 inline bool instanceof (const T *ptr) {
     return dynamic_cast<const Base *>(ptr) != nullptr;

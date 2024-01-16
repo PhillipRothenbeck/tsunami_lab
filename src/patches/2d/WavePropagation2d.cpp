@@ -7,8 +7,6 @@
 
 #include "WavePropagation2d.h"
 
-#include "../../solvers/FWave.h"
-
 tsunami_lab::patches::WavePropagation2d::WavePropagation2d(t_idx i_nCellsX,
                                                            t_idx i_mCellsY) {
     m_nCellsX = i_nCellsX;

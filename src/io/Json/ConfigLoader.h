@@ -10,10 +10,14 @@
 
 #include <string>
 
-#include "../../configs/SimConfig.h"
 #include "../../configs/FlagConfig.h"
+#include "../../configs/SimConfig.h"
 #include "../../constants.h"
+#include "../../io/Csv/Csv.h"
+#include "../../io/NetCDF/NetCDF.h"
+#include "../../setups/CheckPoint/CheckPoint.h"
 #include "../../setups/Setup.h"
+#include "../../setups/TsunamiEvent2d/TsunamiEvent2d.h"
 
 namespace tsunami_lab {
     namespace io {

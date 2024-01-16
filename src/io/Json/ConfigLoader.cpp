@@ -13,14 +13,6 @@
 #include <random>
 #include <string>
 
-#include "../../io/Csv/Csv.h"
-#include "../../io/NetCDF/NetCDF.h"
-
-// include setup classes
-#include "../../setups/CheckPoint/CheckPoint.h"
-#include "../../setups/TsunamiEvent2d/TsunamiEvent2d.h"
-using json = nlohmann::json;
-
 tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_configName,
                                                              tsunami_lab::configs::FlagConfig i_flagConfig,
                                                              tsunami_lab::setups::Setup *&o_setup,
@@ -35,7 +27,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
     }
 
     // read JSON config file
-    json l_configFile = json::parse(l_file);
+    nlohmann::json l_configFile = nlohmann::json::parse(l_file);
 
     // set number of cells in x-direction
     tsunami_lab::t_idx l_nx = 50;
