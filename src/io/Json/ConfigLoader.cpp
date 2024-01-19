@@ -120,13 +120,6 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
         l_displacementsFileName = l_configFile.at("displacementsFileName");
     }
 
-    // set setup configuration
-    std::string l_setupName = "TsunamiEvent";
-    if (l_configFile.contains("setup")) {
-        l_setupName = l_configFile.at("setup");
-    }
-    std::cout << "simulation setup was set to: " << l_setupName << std::endl;
-
     // check if checkpoint exists
     std::string l_configName = i_configName.substr(0, i_configName.find_last_of("."));
     std::string l_checkPointPath = "out/" + l_configName + "_checkpoint.nc";
@@ -160,7 +153,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
                                                       l_momentumY,
                                                       l_bathymetry,
                                                       l_time);
-    } else if (l_setupName.compare("TsunamiEvent") == 0) {
+    } else {
         tsunami_lab::t_idx l_bathymetryDimX, l_bathymetryDimY, l_dispDimX, l_dispDimY;
         tsunami_lab::t_real *l_bathymetry;
         tsunami_lab::t_real *l_bathymetryPosX;
@@ -201,9 +194,6 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
                                                           l_displacements,
                                                           l_epicenterOffsetX,
                                                           l_epicenterOffsetY);
-    } else {
-        std::cout << "unknown setup was entered" << std::endl;
-        return EXIT_FAILURE;
     }
 
     o_simConfig = tsunami_lab::configs::SimConfig(l_configName,
