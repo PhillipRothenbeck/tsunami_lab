@@ -21,9 +21,6 @@ namespace tsunami_lab {
 
 class tsunami_lab::configs::SimConfig {
    private:
-    //! dimension of the simulation
-    tsunami_lab::t_idx m_dimension = 1;
-
     //! config file name
     std::string m_configName;
 
@@ -72,7 +69,6 @@ class tsunami_lab::configs::SimConfig {
     /**
      * Constructs a simulation configuration object.
      *
-     * @param i_dimension dimension of the simulation.
      * @param i_configName name of config file.
      * @param i_flagConfig flag configurations.
      * @param i_checkPointCount number of checkpoints to create if useCheckPoint is true.
@@ -87,8 +83,7 @@ class tsunami_lab::configs::SimConfig {
      * @param i_boundaryCondition list that determines the chosen boundary conditions.
      * @param i_isRoeSolver boolean that shows if the roe solver is to be used (false -> f-wave solver).
      */
-    SimConfig(tsunami_lab::t_idx i_dimension,
-              std::string i_configName,
+    SimConfig(std::string i_configName,
               tsunami_lab::configs::FlagConfig i_flagConfig,
               t_idx i_checkPointCount,
               tsunami_lab::t_idx i_nx,
@@ -107,15 +102,6 @@ class tsunami_lab::configs::SimConfig {
     ~SimConfig();
 
     /**
-     * @brief Gets dimension of the simulation.
-     *
-     * @return dimension of the simulation.
-     */
-    tsunami_lab::t_idx getDimension() {
-        return m_dimension;
-    }
-
-    /**
      * @brief Gets the name of the config.
      *
      * @return config name.
@@ -126,9 +112,9 @@ class tsunami_lab::configs::SimConfig {
 
     /**
      * @brief Gets the flag configuration class.
-	  * 
+     *
      * @return flag configuration.
-	  * 
+     *
      */
     tsunami_lab::configs::FlagConfig getFlagConfig() {
         return m_flagConfig;
@@ -224,11 +210,11 @@ class tsunami_lab::configs::SimConfig {
         return m_isRoeSolver;
     }
 
-	 /**
-	  * @brief Gets number of checkpoints.
-	  * 
-	  * @return number of checkpoints.
-	  */
+    /**
+     * @brief Gets number of checkpoints.
+     *
+     * @return number of checkpoints.
+     */
     t_idx getCheckPointCount() {
         return m_checkPointCount;
     }

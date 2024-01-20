@@ -14,7 +14,6 @@
 #undef public
 
 TEST_CASE("Test the SimConfig data-structure.", "[SimConfig]") {
-    tsunami_lab::t_idx l_dimension = 2;
     tsunami_lab::t_idx l_nx = 575;
     tsunami_lab::t_idx l_ny = 540;
     tsunami_lab::t_real l_xLen = tsunami_lab::t_real(1200);
@@ -25,8 +24,7 @@ TEST_CASE("Test the SimConfig data-structure.", "[SimConfig]") {
     bool l_isRoeSolver = true;
     tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
 
-    tsunami_lab::configs::SimConfig l_config = tsunami_lab::configs::SimConfig(l_dimension,
-                                                                               "sim_config",
+    tsunami_lab::configs::SimConfig l_config = tsunami_lab::configs::SimConfig("sim_config",
                                                                                l_flagConfig,
                                                                                0,
                                                                                l_nx,
@@ -40,7 +38,6 @@ TEST_CASE("Test the SimConfig data-structure.", "[SimConfig]") {
                                                                                l_boundaryCondition,
                                                                                l_isRoeSolver);
 
-    REQUIRE(l_dimension == l_config.getDimension());
     REQUIRE(l_nx == l_config.getXCells());
     REQUIRE(l_ny == l_config.getYCells());
     REQUIRE(l_xLen == l_config.getXLength());

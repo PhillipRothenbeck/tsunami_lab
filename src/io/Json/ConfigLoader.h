@@ -10,10 +10,14 @@
 
 #include <string>
 
-#include "../../configs/SimConfig.h"
 #include "../../configs/FlagConfig.h"
+#include "../../configs/SimConfig.h"
 #include "../../constants.h"
+#include "../../io/Csv/Csv.h"
+#include "../../io/NetCDF/NetCDF.h"
+#include "../../setups/CheckPoint/CheckPoint.h"
 #include "../../setups/Setup.h"
+#include "../../setups/TsunamiEvent2d/TsunamiEvent2d.h"
 
 namespace tsunami_lab {
     namespace io {
@@ -25,9 +29,8 @@ class tsunami_lab::io::ConfigLoader {
    public:
     static tsunami_lab::t_idx loadConfig(std::string i_path,
                                          tsunami_lab::configs::FlagConfig i_flagConfig,
-                                         tsunami_lab::setups::Setup *&i_setup,
-                                         tsunami_lab::t_real &i_hStar,
-                                         tsunami_lab::configs::SimConfig &i_simConfig);
+                                         tsunami_lab::setups::Setup *&o_setup,
+                                         tsunami_lab::configs::SimConfig &o_simConfig);
 };
 
 #endif

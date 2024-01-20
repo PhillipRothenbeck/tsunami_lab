@@ -8,6 +8,7 @@
 #define TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 
 #include "../WavePropagation.h"
+#include "../../solvers/FWave.h"
 
 namespace tsunami_lab {
     namespace patches {

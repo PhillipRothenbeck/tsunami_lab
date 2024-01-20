@@ -9,6 +9,6 @@
     "simTime": 5.0,
     "boundaryCond": "OR",
     "solver": "Roe",
-    "setup": "DamBreak",
+    "setup": "TsunamiEvent",
 	 "checkPoints": 2
 }
