@@ -5,6 +5,7 @@
  * Entry-point for simulations.
  **/
 #include <mpi.h>
+#include <cassert>
 
 #include <cmath>
 #include <cstdlib>
@@ -20,13 +21,23 @@
 #include "timer.h"
 
 int main(int i_argc, char *i_argv[]) {
-    MPI_Init(&i_argc, &i_argv);
-    int l_rank, l_worldSize, l_nx, l_ny;
-    MPI_Comm_size(MPI_COMM_WORLD, &l_worldSize);
-    MPI_Comm_rank(MPI_COMM_WORLD, &l_rank);
+    // MPI_Init and error handling
+    int l_error = MPI_Init(&i_argc, &i_argv);
+    assert(l_error == MPI_SUCCESS);
+    
+    // get rank and communicator size and error handling
+    int l_rank, l_worldSize;
+    int l_nx, l_ny;
+    l_error = MPI_Comm_size(MPI_COMM_WORLD, &l_worldSize);
+    assert(l_error == MPI_SUCCESS);
+    l_error =MPI_Comm_rank(MPI_COMM_WORLD, &l_rank);
+    assert(l_error == MPI_SUCCESS);
+    
+    // timer and setup
     Timer *l_timer = new Timer();
     tsunami_lab::setups::Setup *l_setups = nullptr;
 
+    // only rank 0 executes this part
     if (l_rank == 0) {
         std::cout << "####################################" << std::endl;
         std::cout << "### Tsunami Lab                  ###" << std::endl;
@@ -72,28 +83,44 @@ int main(int i_argc, char *i_argv[]) {
             return EXIT_FAILURE;
         }
         for (int i = 1; i < l_worldSize; i++) {
-            l_nx = l_simConfig.getXCells();
-            l_ny = l_simConfig.getYCells();
-            MPI_Send(&l_nx, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-            MPI_Send(&l_ny, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+            l_nx = l_simConfig.getXCells(); // muss das jedes mal neu gefetched werden?
+            l_ny = l_simConfig.getYCells(); // muss das jedes mal neu gefetched werden?
+            
+            // Send x / y to every process != 0
+            l_error = MPI_Send(&l_nx, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+            assert(l_error == MPI_SUCCESS);
+            l_error = MPI_Send(&l_ny, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+            assert(l_error == MPI_SUCCESS);
         }
     } else {
-        MPI_Recv(&l_nx, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(&l_ny, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        // Receive x / y from process 0
+        l_error = MPI_Recv(&l_nx, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(&l_ny, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
     }
 
-    std::cout << "Rank " << l_rank << " has nx:" << l_nx << " and ny:" << l_ny << std::endl;
+    std::cout << "Process with rank " << l_rank << " has nx: " << l_nx << " and ny: " << l_ny << std::endl;
 
-    tsunami_lab::MPIKernel::ParallelData *l_parallelData = new tsunami_lab::MPIKernel::ParallelData();
-    tsunami_lab::MPIKernel::initParallelData(l_nx, l_ny, l_parallelData);
-    std::cout << l_parallelData->rank << " has neighbors: " << l_parallelData->up << " " << l_parallelData->down << " " << l_parallelData->left << " " << l_parallelData->right << std::endl;
+    // create ParralelData struct
+    // tsunami_lab::MPIKernel::ParallelData *l_parallelData = new tsunami_lab::MPIKernel::ParallelData();
+    tsunami_lab::MPIKernel::ParallelData l_parallelData;
+    
+    // init parallel data
+    tsunami_lab::MPIKernel::initParallelData(l_nx, l_ny, &l_parallelData);
+    std::cout << l_parallelData.rank << " has neighbors (up, down, left, right): " << l_parallelData.up << ", " << l_parallelData.down << ", " << l_parallelData.left << ", " << l_parallelData.right << std::endl;
     // start simulation from config
     // tsunami_lab::simulator::runSimulation(l_setups, l_simConfig);
 
     delete l_setups;
     delete l_timer;
-    delete l_parallelData;
+
+    // free parallel datatypes
+    tsunami_lab::MPIKernel::freeParallelData(&l_parallelData);
+    // delete l_parallelData;
     std::cout << "finished, exiting" << std::endl;
-    MPI_Finalize();
+    
+    l_error = MPI_Finalize();
+    assert(l_error == MPI_SUCCESS);
     return EXIT_SUCCESS;
 }

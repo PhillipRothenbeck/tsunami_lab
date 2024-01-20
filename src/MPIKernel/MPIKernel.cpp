@@ -5,15 +5,16 @@
  * routines and data structure
  **/
 
+#include <mpi.h>
+#include <cassert>
+#include <iostream> 
 #include "MPIKernel.h"
 
-void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData) {
+void tsunami_lab::MPIKernel::initParallelData(int i_globalNX, int i_globalNY, ParallelData *o_parallelData) {
     int l_localNX, l_localNY;
     int l_worldSize;
-    int l_dimension[0, 0];
-    int l_period[0, 0];  // logical array for cart_create
-    int size[2] = {l_localNX + 2, l_localNY + 2};
-    int subsize[2] = {l_localNX, l_localNY};
+    int l_dimension[2] = {0, 0};
+    int l_period[2] = {0, 0};  // logical array for cart_create
     int offset[2] = {1, 1};
     int coordinate[2];
 
@@ -27,6 +28,9 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
     // calculate size of local domain in subgrid / process
     l_localNX = i_globalNX / l_dimension[0];
     l_localNY = i_globalNY / l_dimension[1];
+
+    int size[2] = {l_localNX + 2, l_localNY + 2};
+    int subsize[2] = {l_localNX, l_localNY};
 
     // can the global domain be divided evenly between the subgrids/processes?
     if (l_localNX * l_dimension[0] != i_globalNX) {
@@ -108,4 +112,13 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
 
     MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->file);
     MPI_Type_commit(&o_parallelData->file);
+}
+
+void tsunami_lab::MPIKernel::freeParallelData(ParallelData *o_parallelData) {
+    // Free MPI datatypes
+    MPI_Type_free(&o_parallelData->row);
+    MPI_Type_free(&o_parallelData->column);
+    MPI_Type_free(&o_parallelData->text);
+    MPI_Type_free(&o_parallelData->file);
+    MPI_Type_free(&o_parallelData->restart);
 }

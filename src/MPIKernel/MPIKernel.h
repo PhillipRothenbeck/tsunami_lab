@@ -43,7 +43,9 @@ class tsunami_lab::MPIKernel {
         float *bathymetry;
     };
 
-    static void initParallelData(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData);
+    static void initParallelData(int i_globalNX, int i_globalNY, ParallelData *o_parallelData);
+
+    static void freeParallelData(ParallelData *o_parallelData);
 };
 
 #endif
