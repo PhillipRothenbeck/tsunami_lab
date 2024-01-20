@@ -23,37 +23,39 @@ namespace tsunami_lab {
     class simulator;
 }
 
-class tsunami_lab::simulator {
-   private:
-   static void initParallelData (t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData);
-   public:
-   struct ParallelData {
-    t_idx size;
-    t_idx rank;
-    t_idx up, down, left, right;
+struct ParallelData {
+    tsunami_lab::t_idx size;
+    tsunami_lab::t_idx rank;
+    tsunami_lab::t_idx up, down, left, right;
     MPI_Comm communicator;
     MPI_Request requesst[8];
     MPI_Datatype row;
     MPI_Datatype column;
     MPI_Datatype text;
     MPI_Datatype file;
-    MPI_Datatype restart; 
-    }
-   struct Grid {
-    t_idx localNX;
-    t_idx localNY;
-    t_idx globalNX;
-    t_idx globalNY;
-    t_real dX;
-    t_real dY;
-    t_real *height;
-    t_real *momentumX;
-    t_real *momentumY;
-    t_real *bathymetry; 
-    }
+    MPI_Datatype restart;
+};
+
+struct Grid {
+    tsunami_lab::t_idx localNX;
+    tsunami_lab::t_idx localNY;
+    tsunami_lab::t_idx globalNX;
+    tsunami_lab::t_idx globalNY;
+    tsunami_lab::t_real dX;
+    tsunami_lab::t_real dY;
+    tsunami_lab::t_real *height;
+    tsunami_lab::t_real *momentumX;
+    tsunami_lab::t_real *momentumY;
+    tsunami_lab::t_real *bathymetry;
+};
+
+class tsunami_lab::simulator {
+   private:
+    // static void initParallelData(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData);
+
+   public:
     static void runSimulation(tsunami_lab::setups::Setup *i_setup,
                               tsunami_lab::configs::SimConfig i_simConfig);
 };
-
 
 #endif
