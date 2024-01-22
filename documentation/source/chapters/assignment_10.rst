@@ -10,8 +10,6 @@ In the first week, we wanted to take care of the modularization of our code.
 We achieved this by abstracting and deleting parts of the code that were no longer necessary. 
 As a result, only a two-dimensional F-wave simulation can be calculated. We have left the Roe solver and one-dimensionality behind us.
 
-(RIP Roe-Solver: 21.10.2023 - 11.01.2024)
-
 However, we did not deal with the data dependencies for cache optimization, but familiarized ourselves with MPI.
 Unfortunately, we encountered more problems than we thought, which is why only the initialization of the parallel data and the first part of the input file reading was completed.
 
