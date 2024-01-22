@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "../MPIKernel/MPIKernel.h"
 #include "../configs/SimConfig.h"
 #include "../constants.h"
 #include "../io/Csv/Csv.h"
@@ -26,7 +27,9 @@ namespace tsunami_lab {
 class tsunami_lab::simulator {
    public:
     static void runSimulation(tsunami_lab::setups::Setup *i_setup,
-                              tsunami_lab::configs::SimConfig i_simConfig);
+                              tsunami_lab::configs::SimConfig i_simConfig,
+                              tsunami_lab::MPIKernel::ParallelData i_parallelData,
+                              tsunami_lab::MPIKernel::Grid i_grid);
 };
 
 #endif

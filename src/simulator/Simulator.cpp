@@ -21,19 +21,64 @@ inline bool instanceof (const T *ptr) {
 }
 
 void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
-                                           configs::SimConfig i_simConfig) {
-    Timer *l_timer = new Timer();
+                                           configs::SimConfig i_simConfig,
+                                           MPIKernel::ParallelData i_parallelData,
+                                           tsunami_lab::MPIKernel::Grid i_grid) {
+    // Timer *l_timer = new Timer();
 
     // define number of cells
-    t_idx l_nx = i_simConfig.getXCells();
-    t_idx l_ny = i_simConfig.getYCells();
+    if (i_parallelData.rank == 0) {
+        t_idx l_nx = i_simConfig.getXCells();
+        t_idx l_ny = i_simConfig.getYCells();
 
-    // define length of one cell
-    t_real l_dx = i_simConfig.getXLength() / l_nx;
-    t_real l_dy = i_simConfig.getYLength() / l_ny;
+        // define length of one cell
+        t_real l_dx = i_simConfig.getXLength() / l_nx;
+        t_real l_dy = i_simConfig.getYLength() / l_ny;
+
+        // init global arrays
+        tsunami_lab::t_real *l_height = new tsunami_lab::t_real[l_nx * l_ny];
+        tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[l_nx * l_ny];
+        tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[l_nx * l_ny];
+        tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[l_nx * l_ny];
+
+        // maximum observed height in the setup
+        t_real l_hMax = std::numeric_limits<t_real>::lowest();
+
+        // #pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
+        for (t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
+            for (t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
+                t_real l_y = l_cy * l_dy;
+                t_real l_x = l_cx * l_dx;
+
+                // get initial values of the setup
+                t_real l_h = i_setup->getHeight(l_x,
+                                                l_y);
+
+                l_hMax = l_hMax < l_h ? l_h : l_hMax;
+
+                t_real l_hu = i_setup->getMomentumX(l_x,
+                                                    l_y);
+                t_real l_hv = i_setup->getMomentumY(l_x,
+                                                    l_y);
+                t_real l_b = i_setup->getBathymetry(l_x,
+                                                    l_y);
+                t_idx l_idx = l_cy * l_nx + l_cx;
+
+                l_height[l_idx] = l_h;
+                l_momentumX[l_idx] = l_hu;
+                l_momentumY[l_idx] = l_hv;
+                l_bathymetry[l_idx] = l_b;
+            }
+        }
+        std::cout << "rank " << i_parallelData.rank << " has dx: " << l_dx << " and dy: " << l_dy << " " << i_setup->getHeight(0, 0) << " " << i_grid.localNX << " " << l_height[0] << " " << l_hMax << std::endl;
+        delete[] l_height;
+        delete[] l_momentumX;
+        delete[] l_momentumY;
+        delete[] l_bathymetry;
+    }
 
     // construct solver
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+    /*if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
     patches::WavePropagation *l_waveProp = new patches::WavePropagation2d(l_nx, l_ny);
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create WaveProp Object");
 
@@ -185,5 +230,5 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     std::cout << "freeing memory" << std::endl;
     delete l_writer;
     delete l_waveProp;
-    delete l_timer;
+    delete l_timer;*/
 }
