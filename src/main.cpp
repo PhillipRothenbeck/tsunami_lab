@@ -27,7 +27,7 @@ int main(int i_argc, char *i_argv[]) {
 
     // get rank and communicator size and error handling
     int l_rank, l_worldSize;
-    int l_nx, l_ny;
+    tsunami_lab::t_idx l_nx, l_ny;
     l_error = MPI_Comm_size(MPI_COMM_WORLD, &l_worldSize);
     assert(l_error == MPI_SUCCESS);
     l_error = MPI_Comm_rank(MPI_COMM_WORLD, &l_rank);
@@ -86,16 +86,16 @@ int main(int i_argc, char *i_argv[]) {
         l_ny = l_simConfig.getYCells();
         for (int i = 1; i < l_worldSize; i++) {
             // Send x / y to every process != 0
-            l_error = MPI_Send(&l_nx, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+            l_error = MPI_Send(&l_nx, 1, MPI_UNSIGNED_LONG, i, 0, MPI_COMM_WORLD);
             assert(l_error == MPI_SUCCESS);
-            l_error = MPI_Send(&l_ny, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+            l_error = MPI_Send(&l_ny, 1, MPI_UNSIGNED_LONG, i, 1, MPI_COMM_WORLD);
             assert(l_error == MPI_SUCCESS);
         }
     } else {
         // Receive x / y from process 0
-        l_error = MPI_Recv(&l_nx, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        l_error = MPI_Recv(&l_nx, 1, MPI_UNSIGNED_LONG, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Recv(&l_ny, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        l_error = MPI_Recv(&l_ny, 1, MPI_UNSIGNED_LONG, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
     }
 
