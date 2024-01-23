@@ -12,7 +12,7 @@
 #include <cassert>
 #include <iostream>
 
-void tsunami_lab::MPIKernel::init(int i_nx, int i_ny, ParallelData *o_parallelData, Grid *o_grid) {
+void tsunami_lab::MPIKernel::init(t_idx i_nx, t_idx i_ny, ParallelData *o_parallelData, Grid *o_grid) {
     int l_localNX, l_localNY;
     int l_worldSize;
     int l_dimension[2] = {0, 0};
@@ -28,26 +28,26 @@ void tsunami_lab::MPIKernel::init(int i_nx, int i_ny, ParallelData *o_parallelDa
     l_localNY = i_ny / l_dimension[1];
 
     // can the global domain be divided evenly between the subgrids/processes?
-    if (l_localNX * l_dimension[0] != i_nx) {
+    if ((t_idx)(l_localNX * l_dimension[0]) != i_nx) {
         std::cerr << "No even division between subgrids in x-direction possible. " << l_localNX << " x " << l_dimension[0] << " != " << i_nx << std::endl;
         MPI_Abort(MPI_COMM_WORLD, -2);
     }
-    if (l_localNY * l_dimension[1] != i_ny) {
+    if ((t_idx)(l_localNY * l_dimension[1]) != i_ny) {
         std::cerr << "No even division between subgrids in y-direction possible. " << l_localNY << " x " << l_dimension[1] << " != " << i_ny << std::endl;
         MPI_Abort(MPI_COMM_WORLD, -2);
     }
 
     initParallelData(i_nx, i_ny, l_localNX, l_localNY, l_dimension, o_parallelData);
-    initGrid(l_localNX, l_localNY, o_grid);
+    initGrid(l_localNX, l_localNY, i_nx, i_ny, o_grid);
 }
 
-void tsunami_lab::MPIKernel::initParallelData(int i_globalNX, int i_globalNY, int i_localNX, int i_localNY, int *i_dimension, ParallelData *o_parallelData) {
+void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY, t_idx i_localNX, t_idx i_localNY, int *i_dimension, ParallelData *o_parallelData) {
     int l_period[2] = {0, 0};  // logical array for cart_create
     int offset[2] = {1, 1};
     int coordinate[2];
 
-    int size[2] = {i_localNX + 2, i_localNY + 2};
-    int subsize[2] = {i_localNX, i_localNY};
+    int size[2] = {(int)i_localNX + 2, (int)i_localNY + 2};
+    int subsize[2] = {(int)i_localNX, (int)i_localNY};
 
     // create topolgy through cartesian communicator and cartesian shifts
     MPI_Cart_create(MPI_COMM_WORLD, 2, i_dimension, l_period, 1, &o_parallelData->communicator);
@@ -62,6 +62,9 @@ void tsunami_lab::MPIKernel::initParallelData(int i_globalNX, int i_globalNY, in
     if (o_parallelData->rank == 0) {
         std::cout << "Domain Decomposition: " << i_dimension[0] << " | " << i_dimension[1] << "\n Local Domain Size: " << i_localNX << " | " << i_localNY << std::endl;
     }
+
+    o_parallelData->xDim = i_dimension[0];
+    o_parallelData->yDim = i_dimension[1];
 
     // border Datatypes init (column: left/right, row: up/down)
     // hier bitte aufpassen welceher Datatype was ist (Column Major vs Row Major)
@@ -84,6 +87,8 @@ void tsunami_lab::MPIKernel::initParallelData(int i_globalNX, int i_globalNY, in
 
     // get coordinates of cartesian communicator
     MPI_Cart_coords(o_parallelData->communicator, o_parallelData->rank, 2, coordinate);
+
+    std::cout << "Rank " << o_parallelData->rank << " recieved nx:" << i_globalNX << " ny:" << i_globalNY << std::endl;
 
     // restart Datatype init
     size[0] = i_localNX + 2;
@@ -121,9 +126,11 @@ void tsunami_lab::MPIKernel::initParallelData(int i_globalNX, int i_globalNY, in
     MPI_Type_commit(&o_parallelData->file);
 }
 
-void tsunami_lab::MPIKernel::initGrid(int i_localNX, int i_localNY, Grid *o_grid) {
+void tsunami_lab::MPIKernel::initGrid(t_idx i_localNX, t_idx i_localNY, t_idx i_globalNX, t_idx i_globalNY, Grid *o_grid) {
     o_grid->localNX = i_localNX;
     o_grid->localNY = i_localNY;
+    o_grid->globalNX = i_globalNX;
+    o_grid->globalNY = i_globalNY;
 }
 
 void tsunami_lab::MPIKernel::freeParallelData(ParallelData *o_parallelData) {
