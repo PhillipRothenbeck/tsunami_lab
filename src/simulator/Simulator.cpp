@@ -10,6 +10,7 @@
 #include <mpi.h>
 #include <omp.h>
 
+#include <cassert>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -24,58 +25,145 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                                            configs::SimConfig i_simConfig,
                                            MPIKernel::ParallelData i_parallelData,
                                            tsunami_lab::MPIKernel::Grid i_grid) {
-    // Timer *l_timer = new Timer();
+    int l_error = MPI_SUCCESS;
+    t_idx l_nx = i_grid.globalNX;
+    t_idx l_ny = i_grid.globalNY;
+    float l_dxy, l_dt, l_scalingX, l_scalingY;
+
+    tsunami_lab::t_real *l_height = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
+    tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
+    tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
+    tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
 
     // define number of cells
     if (i_parallelData.rank == 0) {
-        t_idx l_nx = i_simConfig.getXCells();
-        t_idx l_ny = i_simConfig.getYCells();
-
         // define length of one cell
         t_real l_dx = i_simConfig.getXLength() / l_nx;
         t_real l_dy = i_simConfig.getYLength() / l_ny;
 
-        // init global arrays
-        tsunami_lab::t_real *l_height = new tsunami_lab::t_real[l_nx * l_ny];
-        tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[l_nx * l_ny];
-        tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[l_nx * l_ny];
-        tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[l_nx * l_ny];
+        // init global sub-arrays
+        float *l_tempHeight = new float[i_grid.localNX * i_grid.localNY];
+        float *l_tempMomentumX = new float[i_grid.localNX * i_grid.localNY];
+        float *l_tempMomentumY = new float[i_grid.localNX * i_grid.localNY];
+        float *l_tempBathymetry = new float[i_grid.localNX * i_grid.localNY];
 
         // maximum observed height in the setup
         t_real l_hMax = std::numeric_limits<t_real>::lowest();
 
-        // #pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
-        for (t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
-            for (t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
-                t_real l_y = l_cy * l_dy;
-                t_real l_x = l_cx * l_dx;
+        for (int l_processID = 0; l_processID < i_parallelData.size; l_processID++) {
+            t_idx l_processOffsetX = l_processID % i_parallelData.xDim * i_grid.localNX;
+            t_idx l_processOffsetY = floor(l_processID / i_parallelData.xDim) * i_grid.localNY;
+            // #pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
+            for (t_idx l_cy = 0; l_cy < i_grid.localNY; l_cy++) {
+                for (t_idx l_cx = 0; l_cx < i_grid.localNX; l_cx++) {
+                    t_real l_y = (l_cy + l_processOffsetY) * l_dy;
+                    t_real l_x = (l_cx + l_processOffsetX) * l_dx;
 
-                // get initial values of the setup
-                t_real l_h = i_setup->getHeight(l_x,
-                                                l_y);
-
-                l_hMax = l_hMax < l_h ? l_h : l_hMax;
-
-                t_real l_hu = i_setup->getMomentumX(l_x,
+                    // get initial values of the setup
+                    t_real l_h = i_setup->getHeight(l_x,
                                                     l_y);
-                t_real l_hv = i_setup->getMomentumY(l_x,
-                                                    l_y);
-                t_real l_b = i_setup->getBathymetry(l_x,
-                                                    l_y);
-                t_idx l_idx = l_cy * l_nx + l_cx;
 
-                l_height[l_idx] = l_h;
-                l_momentumX[l_idx] = l_hu;
-                l_momentumY[l_idx] = l_hv;
-                l_bathymetry[l_idx] = l_b;
+                    l_hMax = l_hMax < l_h ? l_h : l_hMax;
+
+                    t_real l_hu = i_setup->getMomentumX(l_x,
+                                                        l_y);
+                    t_real l_hv = i_setup->getMomentumY(l_x,
+                                                        l_y);
+                    t_real l_b = i_setup->getBathymetry(l_x,
+                                                        l_y);
+                    t_idx l_idx = l_cy * i_grid.localNX + l_cx;
+
+                    if (l_processID == 0) {
+                        l_height[l_idx] = l_h;
+                        l_momentumX[l_idx] = l_hu;
+                        l_momentumY[l_idx] = l_hv;
+                        l_bathymetry[l_idx] = l_b;
+                    } else {
+                        l_tempHeight[l_idx] = l_h;
+                        l_tempMomentumX[l_idx] = l_hu;
+                        l_tempMomentumY[l_idx] = l_hv;
+                        l_tempBathymetry[l_idx] = l_b;
+                    }
+                }
+            }
+            if (l_processID != 0) {
+                l_error = MPI_Send(l_tempHeight, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 0, i_parallelData.communicator);
+                assert(l_error == MPI_SUCCESS);
+                l_error = MPI_Send(l_tempMomentumX, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 1, i_parallelData.communicator);
+                assert(l_error == MPI_SUCCESS);
+                l_error = MPI_Send(l_tempMomentumY, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 2, i_parallelData.communicator);
+                assert(l_error == MPI_SUCCESS);
+                l_error = MPI_Send(l_tempBathymetry, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 3, i_parallelData.communicator);
+                assert(l_error == MPI_SUCCESS);
+                std::cout << "Successfully recieved the subgrid to " << l_processID << std::endl;
             }
         }
-        std::cout << "rank " << i_parallelData.rank << " has dx: " << l_dx << " and dy: " << l_dy << " " << i_setup->getHeight(0, 0) << " " << i_grid.localNX << " " << l_height[0] << " " << l_hMax << std::endl;
-        delete[] l_height;
-        delete[] l_momentumX;
-        delete[] l_momentumY;
-        delete[] l_bathymetry;
+
+        // derive maximum wave speed in setup; the momentum is ignored
+        t_real l_speedMax = std::sqrt(9.81 * l_hMax);
+
+        // check if delta x is smaller than delta y
+        bool l_isXStepSmaller = (l_dx <= l_dy);
+
+        // choose l_dxy as l_dx if it is smaller or l_dy if it is smaller
+        l_dxy = l_dx * l_isXStepSmaller + l_dy * !l_isXStepSmaller;
+
+        // derive constant time step; changes at simulation time are ignored
+        l_dt = 0.5 * l_dxy / l_speedMax;
+
+        std::cout << std::endl;
+        std::cout << "runtime configuration" << std::endl;
+        std::cout << "  number of cells in x-direction:         " << l_nx << std::endl;
+        std::cout << "  number of cells in y-direction:         " << l_ny << std::endl;
+        std::cout << "  number of (local) cells in x-direction: " << i_grid.localNX << std::endl;
+        std::cout << "  number of (local) cells in y-direction: " << i_grid.localNY << std::endl;
+        std::cout << "  cell size:                              " << l_dxy << std::endl;
+        std::cout << "  time step:                              " << l_dt << std::endl;
+        std::cout << std::endl;
+
+        // derive scaling for a time step
+        l_scalingX = l_dt / l_dx;
+        l_scalingY = l_dt / l_dy;
+
+        for (int l_processID = 1; l_processID < i_parallelData.size; l_processID++) {
+            l_error = MPI_Send(&l_dxy, 1, MPI_FLOAT, l_processID, 4, i_parallelData.communicator);
+            assert(l_error == MPI_SUCCESS);
+            l_error = MPI_Send(&l_dt, 1, MPI_FLOAT, l_processID, 5, i_parallelData.communicator);
+            assert(l_error == MPI_SUCCESS);
+            l_error = MPI_Send(&l_scalingX, 1, MPI_FLOAT, l_processID, 6, i_parallelData.communicator);
+            assert(l_error == MPI_SUCCESS);
+            l_error = MPI_Send(&l_scalingY, 1, MPI_FLOAT, l_processID, 7, i_parallelData.communicator);
+            assert(l_error == MPI_SUCCESS);
+        }
+
+        delete[] l_tempHeight;
+        delete[] l_tempMomentumX;
+        delete[] l_tempMomentumY;
+        delete[] l_tempBathymetry;
+    } else {
+        l_error = MPI_Recv(l_height, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 0, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(l_momentumX, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 1, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(l_momentumY, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 2, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(l_bathymetry, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 3, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(&l_dxy, 1, MPI_FLOAT, 0, 4, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(&l_dt, 1, MPI_FLOAT, 0, 5, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(&l_scalingX, 1, MPI_FLOAT, 0, 6, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(&l_scalingX, 1, MPI_FLOAT, 0, 7, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
     }
+
+    std::cout << "rank: " << i_parallelData.rank << " got height:" << l_height[0] << std::endl;
+    delete[] l_height;
+    delete[] l_momentumX;
+    delete[] l_momentumY;
+    delete[] l_bathymetry;
 
     // construct solver
     /*if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
