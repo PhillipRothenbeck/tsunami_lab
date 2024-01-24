@@ -28,12 +28,16 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     int l_error = MPI_SUCCESS;
     t_idx l_nx = i_grid.globalNX;
     t_idx l_ny = i_grid.globalNY;
-    float l_dxy, l_dt, l_scalingX, l_scalingY;
+    // important variable that need to be globally available
+    t_real l_dxy, l_dt, l_scalingX, l_scalingY;
+    // size of local domain
+    long int l_localSize = (i_grid.localNX + 2) * (i_grid.localNY + 2);
 
-    tsunami_lab::t_real *l_height = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
-    tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
-    tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
-    tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[i_grid.localNX * i_grid.localNY];
+    // initialize local subgrids for each MPI process
+    tsunami_lab::t_real *l_height = new tsunami_lab::t_real[l_localSize];
+    tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[l_localSize];
+    tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[l_localSize];
+    tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[l_localSize];
 
     // define number of cells
     if (i_parallelData.rank == 0) {
@@ -41,11 +45,11 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         t_real l_dx = i_simConfig.getXLength() / l_nx;
         t_real l_dy = i_simConfig.getYLength() / l_ny;
 
-        // init global sub-arrays
-        float *l_tempHeight = new float[i_grid.localNX * i_grid.localNY];
-        float *l_tempMomentumX = new float[i_grid.localNX * i_grid.localNY];
-        float *l_tempMomentumY = new float[i_grid.localNX * i_grid.localNY];
-        float *l_tempBathymetry = new float[i_grid.localNX * i_grid.localNY];
+        // init sub-domain on rank 0 for holding the values of other processes
+        float *l_tempHeight = new float[l_localSize];
+        float *l_tempMomentumX = new float[l_localSize];
+        float *l_tempMomentumY = new float[l_localSize];
+        float *l_tempBathymetry = new float[l_localSize];
 
         // maximum observed height in the setup
         t_real l_hMax = std::numeric_limits<t_real>::lowest();
@@ -71,14 +75,14 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                                                         l_y);
                     t_real l_b = i_setup->getBathymetry(l_x,
                                                         l_y);
-                    t_idx l_idx = l_cy * i_grid.localNX + l_cx;
+                    t_idx l_idx = (l_cy + 1) * (i_grid.localNX + 2) + (l_cx + 1);
 
-                    if (l_processID == 0) {
+                    if (l_processID == 0) {  // if rank 0 then set the values directly into the local sub-grid
                         l_height[l_idx] = l_h;
                         l_momentumX[l_idx] = l_hu;
                         l_momentumY[l_idx] = l_hv;
                         l_bathymetry[l_idx] = l_b;
-                    } else {
+                    } else {  // else set the values into the temporary arrays
                         l_tempHeight[l_idx] = l_h;
                         l_tempMomentumX[l_idx] = l_hu;
                         l_tempMomentumY[l_idx] = l_hv;
@@ -86,14 +90,16 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                     }
                 }
             }
+
+            // send the sub-grid to the accoring process
             if (l_processID != 0) {
-                l_error = MPI_Send(l_tempHeight, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 0, i_parallelData.communicator);
+                l_error = MPI_Send(l_tempHeight, l_localSize, MPI_FLOAT, l_processID, 0, i_parallelData.communicator);
                 assert(l_error == MPI_SUCCESS);
-                l_error = MPI_Send(l_tempMomentumX, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 1, i_parallelData.communicator);
+                l_error = MPI_Send(l_tempMomentumX, l_localSize, MPI_FLOAT, l_processID, 1, i_parallelData.communicator);
                 assert(l_error == MPI_SUCCESS);
-                l_error = MPI_Send(l_tempMomentumY, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 2, i_parallelData.communicator);
+                l_error = MPI_Send(l_tempMomentumY, l_localSize, MPI_FLOAT, l_processID, 2, i_parallelData.communicator);
                 assert(l_error == MPI_SUCCESS);
-                l_error = MPI_Send(l_tempBathymetry, i_grid.localNX * i_grid.localNY, MPI_FLOAT, l_processID, 3, i_parallelData.communicator);
+                l_error = MPI_Send(l_tempBathymetry, l_localSize, MPI_FLOAT, l_processID, 3, i_parallelData.communicator);
                 assert(l_error == MPI_SUCCESS);
                 std::cout << "Successfully recieved the subgrid to " << l_processID << std::endl;
             }
@@ -125,6 +131,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         l_scalingX = l_dt / l_dx;
         l_scalingY = l_dt / l_dy;
 
+        // send important values for the simulation to the other processes
         for (int l_processID = 1; l_processID < i_parallelData.size; l_processID++) {
             l_error = MPI_Send(&l_dxy, 1, MPI_FLOAT, l_processID, 4, i_parallelData.communicator);
             assert(l_error == MPI_SUCCESS);
@@ -141,13 +148,14 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         delete[] l_tempMomentumY;
         delete[] l_tempBathymetry;
     } else {
-        l_error = MPI_Recv(l_height, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 0, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        // wait until all data has been recieved
+        l_error = MPI_Recv(l_height, l_localSize, MPI_FLOAT, 0, 0, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Recv(l_momentumX, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 1, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        l_error = MPI_Recv(l_momentumX, l_localSize, MPI_FLOAT, 0, 1, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Recv(l_momentumY, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 2, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        l_error = MPI_Recv(l_momentumY, l_localSize, MPI_FLOAT, 0, 2, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Recv(l_bathymetry, i_grid.localNX * i_grid.localNY, MPI_FLOAT, 0, 3, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        l_error = MPI_Recv(l_bathymetry, l_localSize, MPI_FLOAT, 0, 3, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_dxy, 1, MPI_FLOAT, 0, 4, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
@@ -159,87 +167,15 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
     }
 
-    std::cout << "rank: " << i_parallelData.rank << " got height:" << l_height[0] << std::endl;
-    delete[] l_height;
-    delete[] l_momentumX;
-    delete[] l_momentumY;
-    delete[] l_bathymetry;
+    std::cout << "rank: " << i_parallelData.rank << " got h+b:" << l_height[i_grid.globalNX + 4] + l_bathymetry[i_grid.globalNX + 4] << std::endl;
+    patches::WavePropagation2d l_waveProp(i_grid.localNX,
+                                          i_grid.localNY,
+                                          l_height,
+                                          l_momentumX,
+                                          l_momentumY,
+                                          l_bathymetry);
 
-    // construct solver
-    /*if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-    patches::WavePropagation *l_waveProp = new patches::WavePropagation2d(l_nx, l_ny);
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create WaveProp Object");
-
-    // maximum observed height in the setup
-    t_real l_hMax = std::numeric_limits<t_real>::lowest();
-
-    // set up solver
-#pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
-    for (t_idx l_cy = 0; l_cy < l_ny; l_cy++) {
-        for (t_idx l_cx = 0; l_cx < l_nx; l_cx++) {
-            t_real l_y = l_cy * l_dy;
-            t_real l_x = l_cx * l_dx;
-
-            // get initial values of the setup
-            t_real l_h = i_setup->getHeight(l_x,
-                                            l_y);
-
-            l_hMax = l_hMax < l_h ? l_h : l_hMax;
-
-            t_real l_hu = i_setup->getMomentumX(l_x,
-                                                l_y);
-            t_real l_hv = i_setup->getMomentumY(l_x,
-                                                l_y);
-            t_real l_b = i_setup->getBathymetry(l_x,
-                                                l_y);
-
-            // set initial values in wave propagation solver
-            l_waveProp->setHeight(l_cx,
-                                  l_cy,
-                                  l_h);
-
-            l_waveProp->setMomentumX(l_cx,
-                                     l_cy,
-                                     l_hu);
-
-            l_waveProp->setMomentumY(l_cx,
-                                     l_cy,
-                                     l_hv);
-
-            l_waveProp->setBathymetry(l_cx,
-                                      l_cy,
-                                      l_b);
-        }
-    }
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Caculate hMax and Init WaveProp");
-
-    // derive maximum wave speed in setup; the momentum is ignored
-    t_real l_speedMax = std::sqrt(9.81 * l_hMax);
-
-    // check if delta x is smaller than delta y
-    bool l_isXStepSmaller = (l_dx <= l_dy);
-
-    // choose l_dxy as l_dx if it is smaller or l_dy if it is smaller
-    t_real l_dxy = l_dx * l_isXStepSmaller + l_dy * !l_isXStepSmaller;
-
-    // derive constant time step; changes at simulation time are ignored
-    t_real l_dt = 0.5 * l_dxy / l_speedMax;
-
-    std::cout << l_hMax << " | " << l_speedMax << std::endl;
-
-    std::cout << std::endl;
-    std::cout << "runtime configuration" << std::endl;
-    std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
-    std::cout << "  number of cells in y-direction: " << l_ny << std::endl;
-    std::cout << "  cell size:                      " << l_dxy << std::endl;
-    std::cout << "  time step:                      " << l_dt << std::endl;
-    std::cout << std::endl;
-
-    // derive scaling for a time step
-    t_real l_scalingX = l_dt / l_dx;
-    t_real l_scalingY = l_dt / l_dy;
-
-    // set up time and print control
+    /*// set up time and print control
     t_idx l_frame = 0;
     t_real l_endTime = i_simConfig.getEndSimTime();
     t_real l_simTime = 0;
@@ -318,5 +254,6 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     std::cout << "freeing memory" << std::endl;
     delete l_writer;
     delete l_waveProp;
-    delete l_timer;*/
+    delete l_timer;
+    */
 }
