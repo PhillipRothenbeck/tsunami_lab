@@ -31,33 +31,34 @@ TEST_CASE("Test the 2d wave propagation solver.", "[WaveProp2d]") {
      */
 
     // construct solver (F_Wave) and setup a dambreak problem
-    tsunami_lab::patches::WavePropagation2d l_waveProp(10, 10);
-
+    tsunami_lab::t_real *l_height = new tsunami_lab::t_real[102];
+    tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[102];
+    tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[102];
+    tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[102];
     for (std::size_t l_ceY = 0; l_ceY < 10; l_ceY++) {
         for (std::size_t l_ceX = 0; l_ceX < 5; l_ceX++) {
-            l_waveProp.setHeight(l_ceX,
-                                 l_ceY,
-                                 10);
-            l_waveProp.setMomentumX(l_ceX,
-                                    l_ceY,
-                                    0);
-            l_waveProp.setMomentumY(l_ceX,
-                                    l_ceY,
-                                    0);
+            tsunami_lab::t_idx l_idx = (l_ceY + 1) * (10 + 2) + (l_ceX + 1);
+            l_height[l_idx] = 10;
+            l_momentumX[l_idx] = 0;
+            l_momentumY[l_idx] = 0;
+            l_bathymetry[l_idx] = 0;
         }
 
         for (std::size_t l_ceX = 5; l_ceX < 10; l_ceX++) {
-            l_waveProp.setHeight(l_ceX,
-                                 l_ceY,
-                                 8);
-            l_waveProp.setMomentumX(l_ceX,
-                                    l_ceY,
-                                    0);
-            l_waveProp.setMomentumY(l_ceX,
-                                    l_ceY,
-                                    0);
+            tsunami_lab::t_idx l_idx = (l_ceY + 1) * (10 + 2) + (l_ceX + 1);
+            l_height[l_idx] = 8;
+            l_momentumX[l_idx] = 0;
+            l_momentumY[l_idx] = 0;
+            l_bathymetry[l_idx] = 0;
         }
     }
+
+    tsunami_lab::patches::WavePropagation2d l_waveProp(10,
+                                                       10,
+                                                       l_height,
+                                                       l_momentumX,
+                                                       l_momentumY,
+                                                       l_bathymetry);
 
     // set outflow boundary condition
     tsunami_lab::e_boundary l_boundary[4] = {tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW};

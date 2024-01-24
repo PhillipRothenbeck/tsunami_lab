@@ -7,8 +7,8 @@
 #ifndef TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 #define TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 
-#include "../WavePropagation.h"
 #include "../../solvers/FWave.h"
+#include "../WavePropagation.h"
 
 namespace tsunami_lab {
     namespace patches {
@@ -48,8 +48,17 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
      *
      * @param i_nCellsX number of cells in x-direction.
      * @param i_nCellsY number of cells in y-direction.
+     * @param i_height array of height values for step 0 (including ghost cell space).
+     * @param i_momentumX array of momentum values in x-direction for step 0 (including ghost cell space).
+     * @param i_momentumY array of momentum values in y-direction for step 0 (including ghost cell space).
+     * @param i_bathymetry array of bathymetry values for step 0 (including ghost cell space).
      **/
-    WavePropagation2d(t_idx i_nCellsX, t_idx i_nCellsY);
+    WavePropagation2d(t_idx i_nCellsX,
+                      t_idx i_mCellsY,
+                      t_real *i_height,
+                      t_real *i_momentumX,
+                      t_real *i_momentumY,
+                      t_real *i_bathymetry);
 
     /**
      * Destructor which frees all allocated memory.

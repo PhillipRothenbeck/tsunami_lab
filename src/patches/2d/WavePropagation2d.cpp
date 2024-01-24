@@ -8,27 +8,36 @@
 #include "WavePropagation2d.h"
 
 tsunami_lab::patches::WavePropagation2d::WavePropagation2d(t_idx i_nCellsX,
-                                                           t_idx i_mCellsY) {
+                                                           t_idx i_mCellsY,
+                                                           t_real *i_height,
+                                                           t_real *i_momentumX,
+                                                           t_real *i_momentumY,
+                                                           t_real *i_bathymetry) {
     m_nCellsX = i_nCellsX;
     m_nCellsY = i_mCellsY;
     m_nCellsAll = (i_nCellsX + 2) * (i_mCellsY + 2);
 
     // allocate memory including a single ghost cell on each side
-    for (unsigned short l_st = 0; l_st < 2; l_st++) {
-        m_h[l_st] = new t_real[m_nCellsAll];
-        m_hu[l_st] = new t_real[m_nCellsAll];
-        m_hv[l_st] = new t_real[m_nCellsAll];
-    }
-    m_b = new t_real[m_nCellsAll];
+    m_h[0] = i_height;
+    m_hu[0] = i_momentumX;
+    m_hv[0] = i_momentumY;
+
+    m_h[1] = new t_real[m_nCellsAll];
+    m_hu[1] = new t_real[m_nCellsAll];
+    m_hv[1] = new t_real[m_nCellsAll];
+    m_b = i_bathymetry;
 
     // init to zero
     for (t_idx l_ce = 0; l_ce < m_nCellsAll; l_ce++) {
-        for (unsigned short l_st = 0; l_st < 2; l_st++) {
-            m_h[l_st][l_ce] = 0;
-            m_hu[l_st][l_ce] = 0;
-            m_hv[l_st][l_ce] = 0;
+        if ((l_ce <= i_nCellsX + 2) | (l_ce % (i_nCellsX + 2) == 0) | (l_ce % (i_nCellsX + 2) == i_nCellsX + 1) | (l_ce >= (i_mCellsY + 1) * (i_nCellsX + 2))) {
+            m_h[0][l_ce] = 0;
+            m_hu[0][l_ce] = 0;
+            m_hv[0][l_ce] = 0;
+            m_b[l_ce] = 0;
         }
-        m_b[l_ce] = 0;
+        m_h[1][l_ce] = 0;
+        m_hu[1][l_ce] = 0;
+        m_hv[1][l_ce] = 0;
     }
 }
 
