@@ -52,8 +52,8 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
     // create topolgy through cartesian communicator and cartesian shifts
     MPI_Cart_create(MPI_COMM_WORLD, 2, i_dimension, l_period, 1, &o_parallelData->communicator);
     // MPI_coords wenn man will
-    MPI_Cart_shift(o_parallelData->communicator, 0, 1, &o_parallelData->up, &o_parallelData->down);
-    MPI_Cart_shift(o_parallelData->communicator, 1, 1, &o_parallelData->left, &o_parallelData->right);
+    MPI_Cart_shift(o_parallelData->communicator, 0, 1, &o_parallelData->left, &o_parallelData->right);
+    MPI_Cart_shift(o_parallelData->communicator, 1, 1, &o_parallelData->up, &o_parallelData->down);
 
     MPI_Comm_size(o_parallelData->communicator, &o_parallelData->size);
     MPI_Comm_rank(o_parallelData->communicator, &o_parallelData->rank);
