@@ -30,7 +30,7 @@ class tsunami_lab::MPIKernel {
         MPI_Datatype file;
         MPI_Datatype restart;
 
-        ParallelData() : size(0), rank(0), up(0), down(0), left(0), right(0){};
+        ParallelData() : size(1), rank(0), up(-2), down(-2), left(-2), right(-2){};
     };
 
     struct Grid {
