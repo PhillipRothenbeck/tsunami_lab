@@ -6,13 +6,15 @@ User Documentation
 Welcome to the Tsunami Lab project! 
 This quick start guide will show you how to set up and use the tsunami simulator.
 
-.. _ch:Getting_Started:
-
 Getting Started
 ---------------
+Depending on which version of the Tsunami Simulator you are using (normal or MPI-parallelized solver), 
+there are differences in how the solver is started and used. 
+If the normal version of the solver is used, please refer to (link einfügen) on how to run it.
+Otherwise please refer to (link einfügen) on how to run the solver with open MPI.
 
 Prerequisites
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 Before you can begin, ensure that you have the following prerequisites installed and set up on your system:
 
 * Python3
@@ -63,11 +65,11 @@ Compiling Doxygen
         file:///path/to/tsunami-lab-project/_build/html/index.html
 
 
-Compiling the project
+Building the Project
 ---------------------
 
 To compile the Tsunami Lab Project, you have various options and flags to choose from. 
-The primary compilation command is :code:`scons`, and you can specify different flags to customize the build.
+The primary building command is :code:`scons`, and you can specify different flags to customize the build.
 If no flag is set, the respective default value is used.
 
 **mode:**
@@ -90,7 +92,7 @@ If not further defined, the default value is :code:`CXX=g++`.
 #. :code:`g++`: GNU C++ Compiler.
 #. :code:`icpc`: Intel C++ Compiler.
 
-To compile the project with default values, navigate to the project's root directory and run the following command:
+To build the project with default values, navigate to the project's root directory and run the following command:
 
 .. code-block::
 
@@ -106,8 +108,19 @@ To compile the project with a specific mode and compiler, use the mode/CXX flag 
 
 .. _ch:Running_the_project:
 
-Running the project
+Running the Project
 -------------------
+When running the project, several flags can be used to influence the behavior of the solver. 
+They can be used in no particular order / interchangable
+
+:code:`-c` = activate checkpoints
+
+:code:`-t` = activate timer logging
+
+:code:`-nio` = deactivate i/o output
+
+Running the normal version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Make sure that the current terminal is located in the /tsunami_lab/ directory.
 
@@ -126,6 +139,29 @@ To execute the project, use the following command with the appropriate flags:
 The :code:`config_file.json` argument is used to pass the name of the JSON config 
 file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
 directory.
+
+
+Running the MPI-parallelized version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Make sure that the current terminal is located in the /tsunami_lab/ directory.
+
+To execute the test files, use the following command:
+
+.. code-block::
+
+    ./build/tests
+
+To execute the project, use the following command with the appropriate flags:
+
+.. code-block::
+
+    ./build/tsunami_lab <config_file.json>
+
+The :code:`config_file.json` argument is used to pass the name of the JSON config 
+file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
+directory.
+
 
 Structure of a config file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
