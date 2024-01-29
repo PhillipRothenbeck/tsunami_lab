@@ -71,7 +71,8 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
     MPI_Type_vector(i_localNY, 1, i_localNX + 2, MPI_DOUBLE, &o_parallelData->column);
     MPI_Type_commit(&o_parallelData->column);
 
-    MPI_Type_contiguous(i_localNX, MPI_DOUBLE, &o_parallelData->row);
+    // MPI data type for tranfering the border cells of the up and down transfer
+    MPI_Type_contiguous(i_localNX, MPI_FLOAT, &o_parallelData->row);
     MPI_Type_commit(&o_parallelData->row);
 
     // text Datatype init (subarray only contains real cells, no ghostcells)
@@ -87,8 +88,6 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
 
     // get coordinates of cartesian communicator
     MPI_Cart_coords(o_parallelData->communicator, o_parallelData->rank, 2, coordinate);
-
-    std::cout << "Rank " << o_parallelData->rank << " recieved nx:" << i_globalNX << " ny:" << i_globalNY << std::endl;
 
     // restart Datatype init
     size[0] = i_localNX + 2;

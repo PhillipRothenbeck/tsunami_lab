@@ -23,7 +23,8 @@ class tsunami_lab::MPIKernel {
         int up, down, left, right;
         int xDim, yDim;
         MPI_Comm communicator;
-        MPI_Request request[8];
+        MPI_Request firstRequest[8];
+        MPI_Request secondRequest[8];
         MPI_Datatype row;
         MPI_Datatype column;
         MPI_Datatype text;
@@ -38,12 +39,6 @@ class tsunami_lab::MPIKernel {
         t_idx localNY;
         t_idx globalNX;
         t_idx globalNY;
-        // float dX;
-        // float dY;
-        float *height;
-        float *momentumX;
-        float *momentumY;
-        float *bathymetry;
     };
 
     static void init(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData, Grid *o_grid);
