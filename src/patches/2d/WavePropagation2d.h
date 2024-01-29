@@ -7,6 +7,7 @@
 #ifndef TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 #define TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 
+#include "../../MPIKernel/MPIKernel.h"
 #include "../../solvers/FWave.h"
 #include "../WavePropagation.h"
 
@@ -42,6 +43,16 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     //! bathymetries for all cells
     t_real *m_b = nullptr;
 
+    //! parallel data like neighbour threads
+    MPIKernel::ParallelData m_parallelData;
+
+    //! set ghost cells by communicating with neighbours
+    void setSweepGhostCells(t_real *i_height,
+                            t_real *i_momentumX,
+                            t_real *i_momentumY,
+                            t_real *i_bathymetry,
+                            int i_mode);
+
    public:
     /**
      * Constructs the 2d wave propagation solver.
@@ -55,6 +66,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
      **/
     WavePropagation2d(t_idx i_nCellsX,
                       t_idx i_mCellsY,
+                      MPIKernel::ParallelData i_parallelData,
                       t_real *i_height,
                       t_real *i_momentumX,
                       t_real *i_momentumY,
