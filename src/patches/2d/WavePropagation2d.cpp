@@ -187,9 +187,11 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
                                                                  int i_mode) {
     int l_firstID, l_secondID, l_error;
     short axis[2][2];
+    t_idx l_firstIdxSend, l_secondIdxSend, l_firstIdxRecv, l_secondIdxRecv;
     MPI_Datatype l_datatype;
     switch (i_mode) {
         case 1:
+            // left / right
             l_firstID = m_parallelData.left;
             l_secondID = m_parallelData.right;
             l_datatype = m_parallelData.column;
@@ -197,8 +199,13 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
             axis[0][1] = 0;
             axis[1][0] = 1;
             axis[1][1] = 0;
+            l_firstIdxSend = m_nCellsX + 3;
+            l_secondIdxSend = m_nCellsX + 2 + m_nCellsX;
+            l_firstIdxRecv = m_nCellsX + 2;
+            l_secondIdxRecv = m_nCellsX + 2 + m_nCellsX + 1;
             break;
         case 2:
+            // up / down
             l_firstID = m_parallelData.up;
             l_secondID = m_parallelData.down;
             l_datatype = m_parallelData.row;
@@ -206,6 +213,10 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
             axis[0][1] = -1;
             axis[1][0] = 0;
             axis[1][1] = 1;
+            l_firstIdxSend = m_nCellsX + 3;
+            l_secondIdxSend = (m_nCellsX + 2) * m_nCellsY + 1;
+            l_firstIdxRecv = 1;
+            l_secondIdxRecv = (m_nCellsX + 2) * (m_nCellsY + 1);
             break;
         default:
             std::cout << "wrong communication mode was entered " << i_mode << std::endl;
@@ -214,48 +225,48 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
 
     // send/recieve data from left or upper neighbor
     if (l_firstID != -2) {
-        l_error = MPI_Isend(&i_height[m_nCellsX + 3], 1, l_datatype, l_firstID, 0, m_parallelData.communicator, &m_parallelData.firstRequest[0]);
+        l_error = MPI_Isend(&i_height[l_firstIdxSend], 1, l_datatype, l_firstID, 0, m_parallelData.communicator, &m_parallelData.firstRequest[0]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Isend(&i_momentumX[m_nCellsX + 3], 1, l_datatype, l_firstID, 1, m_parallelData.communicator, &m_parallelData.firstRequest[1]);
+        l_error = MPI_Isend(&i_momentumX[l_firstIdxSend], 1, l_datatype, l_firstID, 1, m_parallelData.communicator, &m_parallelData.firstRequest[1]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Isend(&i_momentumY[m_nCellsX + 3], 1, l_datatype, l_firstID, 2, m_parallelData.communicator, &m_parallelData.firstRequest[2]);
+        l_error = MPI_Isend(&i_momentumY[l_firstIdxSend], 1, l_datatype, l_firstID, 2, m_parallelData.communicator, &m_parallelData.firstRequest[2]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Isend(&i_bathymetry[m_nCellsX + 3], 1, l_datatype, l_firstID, 3, m_parallelData.communicator, &m_parallelData.firstRequest[3]);
+        l_error = MPI_Isend(&i_bathymetry[l_firstIdxSend], 1, l_datatype, l_firstID, 3, m_parallelData.communicator, &m_parallelData.firstRequest[3]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_height[m_nCellsX + 3], 1, l_datatype, l_firstID, 4, m_parallelData.communicator, &m_parallelData.firstRequest[4]);
+        l_error = MPI_Irecv(&i_height[l_secondIdxRecv], 1, l_datatype, l_firstID, 4, m_parallelData.communicator, &m_parallelData.firstRequest[4]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_momentumX[m_nCellsX + 3], 1, l_datatype, l_firstID, 5, m_parallelData.communicator, &m_parallelData.firstRequest[5]);
+        l_error = MPI_Irecv(&i_momentumX[l_secondIdxRecv], 1, l_datatype, l_firstID, 5, m_parallelData.communicator, &m_parallelData.firstRequest[5]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_momentumY[m_nCellsX + 3], 1, l_datatype, l_firstID, 6, m_parallelData.communicator, &m_parallelData.firstRequest[6]);
+        l_error = MPI_Irecv(&i_momentumY[l_secondIdxRecv], 1, l_datatype, l_firstID, 6, m_parallelData.communicator, &m_parallelData.firstRequest[6]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_bathymetry[m_nCellsX + 3], 1, l_datatype, l_firstID, 7, m_parallelData.communicator, &m_parallelData.firstRequest[7]);
+        l_error = MPI_Irecv(&i_bathymetry[l_secondIdxRecv], 1, l_datatype, l_firstID, 7, m_parallelData.communicator, &m_parallelData.firstRequest[7]);
         assert(l_error == MPI_SUCCESS);
     }
 
     // send/recieve data from right or lower neighbor
     if (l_secondID != -2) {
         // send/recv height to right or lower
-        l_error = MPI_Isend(&i_height[m_nCellsX + 3], 1, l_datatype, l_secondID, 4, m_parallelData.communicator, &m_parallelData.secondRequest[0]);
+        l_error = MPI_Isend(&i_height[l_secondIdxSend], 1, l_datatype, l_secondID, 4, m_parallelData.communicator, &m_parallelData.secondRequest[0]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_height[m_nCellsX + 3], 1, l_datatype, l_secondID, 0, m_parallelData.communicator, &m_parallelData.secondRequest[4]);
+        l_error = MPI_Irecv(&i_height[l_firstIdxRecv], 1, l_datatype, l_secondID, 0, m_parallelData.communicator, &m_parallelData.secondRequest[4]);
         assert(l_error == MPI_SUCCESS);
 
         // send/recv momentum x right or lower
-        l_error = MPI_Isend(&i_momentumX[m_nCellsX + 3], 1, l_datatype, l_secondID, 5, m_parallelData.communicator, &m_parallelData.secondRequest[1]);
+        l_error = MPI_Isend(&i_momentumX[l_secondIdxSend], 1, l_datatype, l_secondID, 5, m_parallelData.communicator, &m_parallelData.secondRequest[1]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_momentumX[m_nCellsX + 3], 1, l_datatype, l_secondID, 1, m_parallelData.communicator, &m_parallelData.secondRequest[5]);
+        l_error = MPI_Irecv(&i_momentumX[l_firstIdxRecv], 1, l_datatype, l_secondID, 1, m_parallelData.communicator, &m_parallelData.secondRequest[5]);
         assert(l_error == MPI_SUCCESS);
 
         // send/recv momentum y right or lower
-        l_error = MPI_Isend(&i_momentumY[m_nCellsX + 3], 1, l_datatype, l_secondID, 6, m_parallelData.communicator, &m_parallelData.secondRequest[2]);
+        l_error = MPI_Isend(&i_momentumY[l_secondIdxSend], 1, l_datatype, l_secondID, 6, m_parallelData.communicator, &m_parallelData.secondRequest[2]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_momentumY[m_nCellsX + 3], 1, l_datatype, l_secondID, 2, m_parallelData.communicator, &m_parallelData.secondRequest[6]);
+        l_error = MPI_Irecv(&i_momentumY[l_firstIdxRecv], 1, l_datatype, l_secondID, 2, m_parallelData.communicator, &m_parallelData.secondRequest[6]);
         assert(l_error == MPI_SUCCESS);
 
         // send/recv bathymetry right or lower
-        l_error = MPI_Isend(&i_bathymetry[m_nCellsX + 3], 1, l_datatype, l_secondID, 7, m_parallelData.communicator, &m_parallelData.secondRequest[3]);
+        l_error = MPI_Isend(&i_bathymetry[l_secondIdxSend], 1, l_datatype, l_secondID, 7, m_parallelData.communicator, &m_parallelData.secondRequest[3]);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Irecv(&i_bathymetry[m_nCellsX + 3], 1, l_datatype, l_secondID, 3, m_parallelData.communicator, &m_parallelData.secondRequest[7]);
+        l_error = MPI_Irecv(&i_bathymetry[l_firstIdxRecv], 1, l_datatype, l_secondID, 3, m_parallelData.communicator, &m_parallelData.secondRequest[7]);
         assert(l_error == MPI_SUCCESS);
     }
 
