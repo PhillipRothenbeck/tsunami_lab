@@ -29,7 +29,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     t_idx l_nx = i_grid.globalNX;
     t_idx l_ny = i_grid.globalNY;
     // important variable that need to be globally available
-    t_real l_dxy, l_dt, l_scalingX, l_scalingY;
+    t_real l_dxy, l_dt, l_scalingX, l_scalingY, l_endTime;
     // size of local domain
     long int l_localSize = (i_grid.localNX + 2) * (i_grid.localNY + 2);
 
@@ -131,6 +131,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         l_scalingX = l_dt / l_dx;
         l_scalingY = l_dt / l_dy;
 
+        l_endTime = i_simConfig.getEndSimTime();
+
         // send important values for the simulation to the other processes
         for (int l_processID = 1; l_processID < i_parallelData.size; l_processID++) {
             l_error = MPI_Send(&l_dxy, 1, MPI_FLOAT, l_processID, 4, i_parallelData.communicator);
@@ -140,6 +142,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
             l_error = MPI_Send(&l_scalingX, 1, MPI_FLOAT, l_processID, 6, i_parallelData.communicator);
             assert(l_error == MPI_SUCCESS);
             l_error = MPI_Send(&l_scalingY, 1, MPI_FLOAT, l_processID, 7, i_parallelData.communicator);
+            assert(l_error == MPI_SUCCESS);
+            l_error = MPI_Send(&l_endTime, 1, MPI_FLOAT, l_processID, 8, i_parallelData.communicator);
             assert(l_error == MPI_SUCCESS);
         }
 
@@ -165,28 +169,32 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_scalingX, 1, MPI_FLOAT, 0, 7, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
+        l_error = MPI_Recv(&l_endTime, 1, MPI_FLOAT, 0, 8, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        assert(l_error == MPI_SUCCESS);
     }
 
-    std::cout << "rank: " << i_parallelData.rank << " got h+b:" << l_height[i_grid.globalNX + 4] + l_bathymetry[i_grid.globalNX + 4] << std::endl;
     patches::WavePropagation2d l_waveProp(i_grid.localNX,
                                           i_grid.localNY,
+                                          i_parallelData,
                                           l_height,
                                           l_momentumX,
                                           l_momentumY,
                                           l_bathymetry);
 
-    /*// set up time and print control
+    // set up time and print control
+
     t_idx l_frame = 0;
-    t_real l_endTime = i_simConfig.getEndSimTime();
     t_real l_simTime = 0;
+    t_idx l_timestepsPerFrame = 25;
+    t_idx l_timeStep = l_timestepsPerFrame * l_frame;
+    /*
     if (i_simConfig.getFlagConfig().useCheckPoint()) {
         l_frame = i_simConfig.getCurrentFrame();
         l_simTime = i_simConfig.getStartSimTime();
     }
     std::string l_path = "./out/" + i_simConfig.getConfigName() + ".nc";
     std::cout << "  writing wave field to " << l_path << std::endl;
-    t_idx l_timestepsPerFrame = 25;
-    t_idx l_timeStep = l_timestepsPerFrame * l_frame;
+
     std::cout << l_timeStep << " > " << l_frame << std::endl;
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
     io::NetCDF *l_writer = new io::NetCDF(l_endTime,
@@ -218,13 +226,17 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
     t_idx l_checkPoints = l_simTime / l_checkPointTime;
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+    */
+    std::cout << i_parallelData.rank << " starts to simulate." << std::endl;
     while (l_simTime < l_endTime) {
         if (l_timeStep % 25 == 0) {
-            std::cout << "  simulation time / #time steps / #step: "
-                      << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
+            if (i_parallelData.rank == 1) {
+                std::cout << "  simulation time / #time steps / #step: "
+                          << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
+            }
 
-            if (i_simConfig.getFlagConfig().useIO()) {
-                l_writer->store(l_simTime,
+            /*if (i_simConfig.getFlagConfig().useIO()) {
+                l_writerstore(l_simTime,
                                 l_frame,
                                 l_waveProp->getHeight(),
                                 l_waveProp->getMomentumX(),
@@ -235,25 +247,25 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                 std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
                 l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
                 l_checkPoints++;
-            }
+            }*/
             l_frame++;
         }
-        l_waveProp->setGhostCells(i_simConfig.getBoundaryCondition());
-        l_waveProp->timeStep(l_scalingX, l_scalingY);
+        // l_waveProp.setGhostCells(i_simConfig.getBoundaryCondition());
+        l_waveProp.timeStep(l_scalingX, l_scalingY);
 
         l_timeStep++;
         l_simTime += l_dt;
     }
+    /*
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
     if (i_simConfig.getFlagConfig().useIO())
         l_writer->write();
     if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
-    // free memory
+    // free memory*/
     std::cout << "finished time loop" << std::endl;
     std::cout << "freeing memory" << std::endl;
-    delete l_writer;
-    delete l_waveProp;
-    delete l_timer;
-    */
+    // delete l_writer;
+    // delete l_waveProp;
+    // delete l_timer;
 }
