@@ -143,7 +143,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     // std::cout << m_parallelData.rank << " gC y setting done" << std::endl;
 
     // iterate over edges in y-direction for every column and update with Riemann solutions (y-sweep)
-// #pragma omp parallel for collapse(2) shared(l_hNew, l_hvNew)
+#pragma omp parallel for collapse(2) shared(l_hNew, l_hvNew)
     for (t_idx l_edX = 1; l_edX < m_nCellsX + 1; l_edX++) {
         for (t_idx l_edY = 0; l_edY < m_nCellsY + 1; l_edY++) {
             // determine upper and lower cell-id
@@ -152,7 +152,6 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
 
             // compute net-updates
             t_real l_netUpdates[2][2];
-
 
             solvers::FWave::netUpdates(l_hStar[l_ceU],
                                        l_hStar[l_ceD],
