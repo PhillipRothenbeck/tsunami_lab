@@ -52,6 +52,7 @@ class tsunami_lab::io::NetCDF {
     NetCDF(t_real i_endTime,
            t_real i_dt,
            t_idx i_timeStepsPerFrame,
+			  int i_coordinates[2],
            t_real i_dxy,
            t_idx i_nx,
            t_idx i_ny,

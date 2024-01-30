@@ -159,6 +159,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(l_momentumY, l_localSize, MPI_FLOAT, 0, 2, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
+		  //! Könnte hier sein
         l_error = MPI_Recv(l_bathymetry, l_localSize, MPI_FLOAT, 0, 3, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_dxy, 1, MPI_FLOAT, 0, 4, i_parallelData.communicator, MPI_STATUS_IGNORE);
@@ -172,6 +173,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         l_error = MPI_Recv(&l_endTime, 1, MPI_FLOAT, 0, 8, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
     }
+
+	 std::cout << l_bathymetry[l_localSize - 1] << std::endl;
 
     patches::WavePropagation2d l_waveProp(i_grid.localNX,
                                           i_grid.localNY,
@@ -187,67 +190,73 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     t_real l_simTime = 0;
     t_idx l_timestepsPerFrame = 25;
     t_idx l_timeStep = l_timestepsPerFrame * l_frame;
-    /*
-    if (i_simConfig.getFlagConfig().useCheckPoint()) {
-        l_frame = i_simConfig.getCurrentFrame();
-        l_simTime = i_simConfig.getStartSimTime();
-    }
-    std::string l_path = "./out/" + i_simConfig.getConfigName() + ".nc";
+
+    //  if (i_simConfig.getFlagConfig().useCheckPoint()) {
+    //      l_frame = i_simConfig.getCurrentFrame();
+    //      l_simTime = i_simConfig.getStartSimTime();
+    //  }
+    std::string l_path = "./out/" + i_simConfig.getConfigName() + "_" + std::to_string(i_parallelData.rank) + ".nc";
     std::cout << "  writing wave field to " << l_path << std::endl;
 
-    std::cout << l_timeStep << " > " << l_frame << std::endl;
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-    io::NetCDF *l_writer = new io::NetCDF(l_endTime,
-                                          l_dt,
-                                          l_timestepsPerFrame,
-                                          l_dxy,
-                                          l_nx,
-                                          l_ny,
-                                          l_waveProp->getStride(),
-                                          i_simConfig.getCoarseFactor(),
-                                          l_waveProp->getBathymetry(),
-                                          l_path);
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create Writer Object");
+    //  std::cout << l_timeStep << " > " << l_frame << std::endl;
+    //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
 
-    if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <setups::CheckPoint>(i_setup)) {
-        setups::CheckPoint *l_checkpoint = (setups::CheckPoint *)i_setup;
-        for (t_idx l_i = 0; l_i < l_frame; l_i++) {
-            l_writer->store(l_checkpoint->getSimTimeData(l_i),
-                            l_i,
-                            l_checkpoint->getHeightData(l_i),
-                            l_checkpoint->getMomentumXData(l_i),
-                            l_checkpoint->getMomentumYData(l_i));
-        }
-        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Load Checkpoint");
-    }
+    int l_coordinates[2];
+    MPI_Cart_coords(i_parallelData.communicator, i_parallelData.rank, 2, l_coordinates);
 
-    // iterate over time
-    t_real l_checkPointTime = l_endTime / i_simConfig.getCheckPointCount();
-    std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
-    t_idx l_checkPoints = l_simTime / l_checkPointTime;
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-    */
+    io::NetCDF l_writer(l_endTime,
+                        l_dt,
+                        l_timestepsPerFrame,
+                        l_coordinates,
+                        l_dxy,
+                        i_grid.localNX,
+                        i_grid.localNX,
+                        l_waveProp.getStride(),
+                        i_simConfig.getCoarseFactor(),
+                        l_waveProp.getBathymetry(),
+                        l_path);
+
+    //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Create Writer Object");
+
+    //  if (i_simConfig.getFlagConfig().useCheckPoint() && instanceof <setups::CheckPoint>(i_setup)) {
+    //      setups::CheckPoint *l_checkpoint = (setups::CheckPoint *)i_setup;
+    //      for (t_idx l_i = 0; l_i < l_frame; l_i++) {
+    //          l_writer->store(l_checkpoint->getSimTimeData(l_i),
+    //                          l_i,
+    //                          l_checkpoint->getHeightData(l_i),
+    //                          l_checkpoint->getMomentumXData(l_i),
+    //                          l_checkpoint->getMomentumYData(l_i));
+    //      }
+    //      if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Load Checkpoint");
+    //  }
+
+    //  // iterate over time
+    //  t_real l_checkPointTime = l_endTime / i_simConfig.getCheckPointCount();
+    //  std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
+    //  t_idx l_checkPoints = l_simTime / l_checkPointTime;
+    //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+
     std::cout << i_parallelData.rank << " starts to simulate." << std::endl;
     while (l_simTime < l_endTime) {
         if (l_timeStep % 25 == 0) {
             if (i_parallelData.rank == 1) {
-                std::cout << "  simulation time / #time steps / #step: "
+                std::cout << "  rank " << i_parallelData.rank << ": simulation time / #time steps / #step: "
                           << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
             }
 
-            /*if (i_simConfig.getFlagConfig().useIO()) {
-                l_writerstore(l_simTime,
-                                l_frame,
-                                l_waveProp->getHeight(),
-                                l_waveProp->getMomentumX(),
-                                l_waveProp->getMomentumY());
+            if (i_simConfig.getFlagConfig().useIO()) {
+                l_writer.store(l_simTime,
+                               l_frame,
+                               l_waveProp.getHeight(),
+                               l_waveProp.getMomentumX(),
+                               l_waveProp.getMomentumY());
             }
 
-            if (i_simConfig.getFlagConfig().useCheckPoint() && l_simTime > l_checkPointTime * l_checkPoints) {
-                std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
-                l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
-                l_checkPoints++;
-            }*/
+            // if (i_simConfig.getFlagConfig().useCheckPoint() && l_simTime > l_checkPointTime * l_checkPoints) {
+            //     std::string l_checkpointPath = "./out/" + i_simConfig.getConfigName() + "_checkpoint.nc";
+            //     l_writer->write(l_frame, l_checkpointPath, l_simTime, l_endTime);
+            //     l_checkPoints++;
+            // }
             l_frame++;
         }
         // l_waveProp.setGhostCells(i_simConfig.getBoundaryCondition());
@@ -256,16 +265,17 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         l_timeStep++;
         l_simTime += l_dt;
     }
-    /*
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+
+    //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Simulation");
+    //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
     if (i_simConfig.getFlagConfig().useIO())
-        l_writer->write();
-    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
-    // free memory*/
+        l_writer.write();
+    //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
+
+    // free memory
     std::cout << "finished time loop" << std::endl;
     std::cout << "freeing memory" << std::endl;
-    // delete l_writer;
+    //  delete l_writer;
     // delete l_waveProp;
     // delete l_timer;
 }

@@ -494,6 +494,7 @@ int tsunami_lab::io::NetCDF::readCheckpoint(std::string i_checkPoinPath,
 tsunami_lab::io::NetCDF::NetCDF(t_real i_endTime,
                                 t_real i_dt,
                                 t_idx i_timeStepsPerFrame,
+										  int i_coordinates[2],
                                 t_real i_dxy,
                                 t_idx i_nx,
                                 t_idx i_ny,
@@ -527,11 +528,14 @@ tsunami_lab::io::NetCDF::NetCDF(t_real i_endTime,
     m_dataY = new t_real[m_ny];
     m_dataB = new t_real[m_nxy];
 
+	 t_idx l_xStart = i_coordinates[0] * m_nx * m_dxy;
+	 t_idx l_yStart = i_coordinates[1] * m_ny * m_dxy;
+
     for (t_idx l_ix = 0; l_ix < m_nx; l_ix++) {
-        m_dataX[l_ix] = (l_ix + 0.5) * m_dxy;
+        m_dataX[l_ix] = l_xStart + (l_ix + 0.5) * m_dxy;
     }
     for (t_idx l_iy = 0; l_iy < m_ny; l_iy++) {
-        m_dataY[l_iy] = (l_iy + 0.5) * m_dxy;
+        m_dataY[l_iy] = l_yStart + (l_iy + 0.5) * m_dxy;
     }
     for (t_idx l_iy = 0; l_iy < m_ny; l_iy++) {
         for (t_idx l_ix = 0; l_ix < m_nx; l_ix++) {
