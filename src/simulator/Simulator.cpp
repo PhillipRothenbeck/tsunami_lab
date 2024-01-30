@@ -159,7 +159,6 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(l_momentumY, l_localSize, MPI_FLOAT, 0, 2, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
-		  //! Könnte hier sein
         l_error = MPI_Recv(l_bathymetry, l_localSize, MPI_FLOAT, 0, 3, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_dxy, 1, MPI_FLOAT, 0, 4, i_parallelData.communicator, MPI_STATUS_IGNORE);
@@ -173,8 +172,6 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         l_error = MPI_Recv(&l_endTime, 1, MPI_FLOAT, 0, 8, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
     }
-
-	 std::cout << l_bathymetry[l_localSize - 1] << std::endl;
 
     patches::WavePropagation2d l_waveProp(i_grid.localNX,
                                           i_grid.localNY,
@@ -210,7 +207,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                         l_coordinates,
                         l_dxy,
                         i_grid.localNX,
-                        i_grid.localNX,
+                        i_grid.localNY,
                         l_waveProp.getStride(),
                         i_simConfig.getCoarseFactor(),
                         l_waveProp.getBathymetry(),
