@@ -27,7 +27,8 @@ namespace tsunami_lab {
 
 class tsunami_lab::io::ConfigLoader {
    public:
-    static tsunami_lab::t_idx loadConfig(std::string i_path,
+    static tsunami_lab::t_idx loadConfig(int i_rank,
+                                         std::string i_path,
                                          tsunami_lab::configs::FlagConfig i_flagConfig,
                                          tsunami_lab::setups::Setup *&o_setup,
                                          tsunami_lab::configs::SimConfig &o_simConfig);

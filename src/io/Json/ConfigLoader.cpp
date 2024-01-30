@@ -13,7 +13,8 @@
 #include <random>
 #include <string>
 
-tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_configName,
+tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
+                                                             std::string i_configName,
                                                              tsunami_lab::configs::FlagConfig i_flagConfig,
                                                              tsunami_lab::setups::Setup *&o_setup,
                                                              tsunami_lab::configs::SimConfig &o_simConfig) {
@@ -153,7 +154,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(std::string i_confi
                                                       l_momentumY,
                                                       l_bathymetry,
                                                       l_time);
-    } else {
+    } else if(i_rank == 0) {
         tsunami_lab::t_idx l_bathymetryDimX, l_bathymetryDimY, l_dispDimX, l_dispDimY;
         tsunami_lab::t_real *l_bathymetry;
         tsunami_lab::t_real *l_bathymetryPosX;
