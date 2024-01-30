@@ -38,16 +38,18 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::setups::Setup *l_setup = nullptr;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
 
-    std::cout << "####################################" << std::endl;
-    std::cout << "### Tsunami Lab                  ###" << std::endl;
-    std::cout << "###                              ###" << std::endl;
-    std::cout << "### https://scalable.uni-jena.de ###" << std::endl;
-    std::cout << "####################################" << std::endl;
+    if (l_rank == 0) {
+        std::cout << "####################################" << std::endl;
+        std::cout << "### Tsunami Lab                  ###" << std::endl;
+        std::cout << "###                              ###" << std::endl;
+        std::cout << "### https://scalable.uni-jena.de ###" << std::endl;
+        std::cout << "####################################" << std::endl;
 
-    if (i_argc < 2) {
-        std::cerr << "invalid number of program parameter" << std::endl;
-        std::cerr << "  ./build/tsunami_lab CONFIG_FILE_NAME.json" << std::endl;
-        return EXIT_FAILURE;
+        if (i_argc < 2) {
+            std::cerr << "invalid number of program parameter" << std::endl;
+            std::cerr << "  ./build/tsunami_lab CONFIG_FILE_NAME.json" << std::endl;
+            return EXIT_FAILURE;
+        }
     }
 
     std::string l_configName = std::string(i_argv[1]);
@@ -81,7 +83,7 @@ int main(int i_argc, char *i_argv[]) {
         return EXIT_FAILURE;
     }
 
-	 l_nx = l_simConfig.getXCells();
+    l_nx = l_simConfig.getXCells();
     l_ny = l_simConfig.getYCells();
 
     // create ParralelData struct
