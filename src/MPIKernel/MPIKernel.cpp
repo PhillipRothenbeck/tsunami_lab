@@ -68,7 +68,7 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
 
     // border Datatypes init (column: left/right, row: up/down)
     // hier bitte aufpassen welceher Datatype was ist (Column Major vs Row Major)
-    MPI_Type_vector(i_localNY, 1, i_localNX + 2, MPI_DOUBLE, &o_parallelData->column);
+    MPI_Type_vector(i_localNY, 1, i_localNX + 2, MPI_FLOAT, &o_parallelData->column);
     MPI_Type_commit(&o_parallelData->column);
 
     // MPI data type for tranfering the border cells of the up and down transfer
@@ -83,7 +83,7 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
         offset[1] = 0;
     }
 
-    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->text);
+    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_FLOAT, &o_parallelData->text);
     MPI_Type_commit(&o_parallelData->text);
 
     // get coordinates of cartesian communicator
@@ -102,7 +102,7 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
         offset[1] = 0;
     }
 
-    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->restart);
+    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_FLOAT, &o_parallelData->restart);
     MPI_Type_commit(&o_parallelData->restart);
 
     // file Datatype init
@@ -121,7 +121,7 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_globalNX, t_idx i_globalNY
         }
     }
 
-    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_DOUBLE, &o_parallelData->file);
+    MPI_Type_create_subarray(2, size, subsize, offset, MPI_ORDER_C, MPI_FLOAT, &o_parallelData->file);
     MPI_Type_commit(&o_parallelData->file);
 }
 
