@@ -18,10 +18,35 @@ to integrate them into the simulation.
 Einführung MPI
 --------------
 Moritz
+Erklären was MPI ist (mehrere Prozesse laufen echt Parallel, alle führen gesamten Code aus)
+MPI ist message parsing interface - parallele prozesse kommunizieren untereinander
+verwendet um compute domain aufzuteilen und Rechenlast zu verringern / compute time zu verringern
+
 
 Was haben wir gemacht? (technisch)
 ----------------------------------
 Alle
+Domain decomp
+comm vor x sweep (left / right) und vor y sweep (up down)
+
+In order to reduce the computation time, the global compute domain was divided into several smaller subgrids that run in parallel.
+The input files are read in the root process and distributed to the subgrids. 
+Once each process has received its local domain and the associated data, the calculation is performed as normal with the respective smaller domain.
+
+Since our solver uses a two-point-stencil, a column or row of values is missing at the edges of the subgrids for the calculation, which can be found in the respective neighboring grids.
+
+.. warning::
+
+    Grafik über data dependency in zwischen subgrids
+
+As the calculation of the NetUpdates is split up into x and y sweep and takes place one after the other, our data is interdependent.
+This means that we have to communicate twice. The columns (left and right border) are communicated before the x-sweep and the rows (top and bottom border) before the y-sweep.
+
+.. warning::
+
+    Grafik einfügen was wann kommuniziert wird.
+
+
 
 Ergebnisse (Berechnungen und vid von Sim)
 -----------------------------------------
