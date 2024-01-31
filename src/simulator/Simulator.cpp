@@ -167,7 +167,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_scalingX, 1, MPI_FLOAT, 0, 6, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Recv(&l_scalingX, 1, MPI_FLOAT, 0, 7, i_parallelData.communicator, MPI_STATUS_IGNORE);
+        l_error = MPI_Recv(&l_scalingY, 1, MPI_FLOAT, 0, 7, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_endTime, 1, MPI_FLOAT, 0, 8, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
@@ -236,7 +236,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     std::cout << i_parallelData.rank << " starts to simulate." << std::endl;
     while (l_simTime < l_endTime) {
         if (l_timeStep % 25 == 0) {
-            if (i_parallelData.rank == 1) {
+            if (i_parallelData.rank == 0) {
                 std::cout << "  rank " << i_parallelData.rank << ": simulation time / #time steps / #step: "
                           << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
             }
