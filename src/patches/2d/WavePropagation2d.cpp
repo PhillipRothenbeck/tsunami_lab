@@ -90,7 +90,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
         }
     }
 
-    setSweepGhostCells(l_hOld, l_huOld, l_hvNew, m_b, 1);
+    setSweepGhostCells(l_hOld, l_huOld, l_hvOld, m_b, 1);
     // std::cout << m_parallelData.rank << " gC x setting done" << std::endl;
 
     // iterate over edges in x-direction for every row and update with Riemann solutions (x-sweep)
@@ -126,8 +126,6 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
         }
     }
 
-    // std::cout << m_parallelData.rank << " x sweep done" << std::endl;
-
     // init new cell quantities
 #pragma omp parallel for collapse(2) schedule(static, 32)
     for (t_idx l_ceY = 1; l_ceY < m_nCellsY + 1; l_ceY++) {
@@ -140,7 +138,6 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     }
 
     setSweepGhostCells(l_hStar, l_huStar, l_hvStar, m_b, 2);
-    // std::cout << m_parallelData.rank << " gC y setting done" << std::endl;
 
     // iterate over edges in y-direction for every column and update with Riemann solutions (y-sweep)
 #pragma omp parallel for collapse(2) shared(l_hNew, l_hvNew)
@@ -224,7 +221,7 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
     }
 
     // send/recieve data from left or upper neighbor
-			// std::cout << "rank: " << m_parallelData.rank << " | first: " << l_firstID << " | second: " << l_secondID << " | mode: " << i_mode << std::endl;
+    // std::cout << "rank: " << m_parallelData.rank << " | first: " << l_firstID << " | second: " << l_secondID << " | mode: " << i_mode << std::endl;
     if (l_firstID != -2) {
         l_error = MPI_Isend(&i_height[l_firstIdxSend], 1, l_datatype, l_firstID, 0, m_parallelData.communicator, &m_parallelData.firstRequest[0]);
         assert(l_error == MPI_SUCCESS);
