@@ -10,8 +10,8 @@ Getting Started
 ---------------
 Depending on which version of the Tsunami Simulator you are using (normal or MPI-parallelized solver), 
 there are differences in how the solver is started and used. 
-If the normal version of the solver is used, please refer to (link einfügen) on how to run it.
-Otherwise please refer to (link einfügen) on how to run the solver with open MPI.
+If the normal version of the solver is used, please refer to `running the normal version`_ on how to run it.
+Otherwise please refer to `running the mpi version`_ on how to run the solver with open MPI.
 
 Prerequisites
 ^^^^^^^^^^^^^^^
@@ -111,13 +111,13 @@ To compile the project with a specific mode and compiler, use the mode/CXX flag 
 Running the Project
 -------------------
 When running the project, several flags can be used to influence the behavior of the solver. 
-They can be used in no particular order / interchangable
+There is no predetermined order and they can all be used at the same time.
 
-:code:`-c` = activate checkpoints
+#. :code:`-c`: Activate Checkpointing.
+#. :code:`-t`: Activate Time Measurement.
+#. :code:`-nio`: Deactivate I/O Output.
 
-:code:`-t` = activate timer logging
-
-:code:`-nio` = deactivate i/o output
+.. _running the normal version:
 
 Running the normal version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -140,23 +140,49 @@ The :code:`config_file.json` argument is used to pass the name of the JSON confi
 file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
 directory.
 
+.. _running the mpi version:
 
 Running the MPI-parallelized version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Make sure that the current terminal is located in the /tsunami_lab/ directory.
+When running the MPI version, you must use a batch script.
+In this script, computing time must be allocated on a compute node, the project must be built, compiled and then run.
 
-To execute the test files, use the following command:
+Example batch script tsunami_lab_mpi.sh:
+
+.. code-block:: c++
+
+    #!/bin/bash
+    #SBATCH --job-name=tsunami
+    #SBATCH --output=tsunami.out
+    #SBATCH --error=tsunami.err
+    #SBATCH --partition=s_hadoop
+    #SBATCH --nodes=1
+    #SBATCH --ntasks=1
+    #SBATCH --time=10:00:00
+    #SBATCH --cpus-per-task=72
+
+    # Load necessary modules
+    module load tools/python/3.8
+    module load compiler/gcc/11.2.0
+    module load compiler/intel/2020-Update2
+    module load mpi/openmpi/4.1.2-gcc-10.2.0
+    python3.8 -m pip install --user scons
+
+    date
+    cd /beegfs/ri26lit/tsunami_lab
+    scons CXX=mpic++
+    mpirun -n 5 ./build/tsunami_lab chile_10000m.json -t
+
+
+By default, a batch script named :code:`tsunami_lab_mpi.sh` should be located in the tsunami_lab/scripts directory.
+
+Execute it with the following command in the terminal while you are in the said directory:
 
 .. code-block::
 
-    ./build/tests
+    sbatch tsunami_lab_mpi.sh
 
-To execute the project, use the following command with the appropriate flags:
-
-.. code-block::
-
-    ./build/tsunami_lab <config_file.json>
 
 The :code:`config_file.json` argument is used to pass the name of the JSON config 
 file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
