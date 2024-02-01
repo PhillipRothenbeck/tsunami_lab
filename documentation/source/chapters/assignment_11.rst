@@ -17,15 +17,24 @@ to integrate them into the simulation.
 
 Einführung MPI
 --------------
-Moritz
+
 Erklären was MPI ist (mehrere Prozesse laufen echt Parallel, alle führen gesamten Code aus)
 MPI ist message parsing interface - parallele prozesse kommunizieren untereinander
 verwendet um compute domain aufzuteilen und Rechenlast zu verringern / compute time zu verringern
 
+In order to parallelize a program, you need a way to transfer data between the parallel running processes for critical sections or data dependencies.
+This is where MPI comes into play. Each process executes the program itself and is initially independent of the others. 
+This means that every process has its own address space and therefore does not share a global address space.
+MPI means nothing other than Message Parsing Interface. It is used to move data from the address space of one process to that of another (through cooperative operations on each process).
+
+For example Send Data ... to process ... Beispiel
 
 Was haben wir gemacht? (technisch)
 ----------------------------------
-Alle
+
+
+Parallelization with MPI
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 Domain decomp
 comm vor x sweep (left / right) und vor y sweep (up down)
 
@@ -47,10 +56,95 @@ This means that we have to communicate twice. The columns (left and right border
     Grafik einfügen was wann kommuniziert wird.
 
 
+Cache optimization
+^^^^^^^^^^^^^^^^^^^^
+
+In order to make the cache usage of our solver more efficient, we first looked at the cache specifications of the ARA cluster.
+
+.. warning::
+
+    Hier bitte Cache Specs von ARA
+
+    16 Hadoop-Knoten mit jeweils:
+
+    - 36 CPU-Kernen (2x Intel Xeon Gold 6140 18 Core 2,3 Ghz)
+    - 192 GB Arbeitsspeicher
+    - einer lokalen SSD
+
+    L1 = 1.125 MiB	
+        - L1I	576 KiB	18x32 KiB	8-way set associative	 
+        - L1D	576 KiB	18x32 KiB	8-way set associative	write-back
+
+    L2 = 18 MiB
+ 	 	- 18x1 MiB	16-way set associative	write-back
+    
+    L3 = 24.75 MiB	
+ 	 	- 18x1.375 MiB	11-way set associative	write-back
+
+Anzahl an Sets in Cache: cache size / (block size * set size)
+
+Cache line füllen und dann möglichst alle Operationen durchführen um capacity misses zu minimieren
+
 
 Ergebnisse (Berechnungen und vid von Sim)
 -----------------------------------------
-können wir noch nicht
+
+Anmerken, welche Zwischenergebnisse wir hatten, die falsch waren? (z.B. kaputte Bathymetry etc.)
+
+video von fehlschlägen
+
+MPI läuft korrekt
+
+video of Sim with [?] number of processes als Beweis
+
+Speedup im vergleich zu kein MPI (hoffentlich positiv)
+
+Eventuell Theoretische Speedups vs. praktische Speedups (wird vllt nicht möglich sein, weil wir die Daten dafür nicht haben)
+
+Amdahl vs. Gustafson
+
+.. warning::
+
+    Auszug aus pc1 Website als Kontext (https://scalable.uni-jena.de/opt/pc/chapters/assignment_performance_metrics.html)
+    
+    Kann später wieder weg
+
+Amdahl's Law predicts the speedup of a computation when only a fraction of the computation can be parallelized. The law is named after Gene Amdahl, who introduced it in 1967:
+
+.. math::
+
+   S = \frac{1}{{(1 - \alpha) + \frac{\alpha}{p}}}
+
+Where:
+   - :math:`S` is the speedup of the parallelized computation,
+   - :math:`\alpha` is the fraction of the computation that can be parallelized,
+   - :math:`p` is the number of processors.
+
+Gustafson's Law emphasizes scalability, stating that as the problem size increases, the parallelizable portion grows, allowing better scaling with more resources. 
+Gustafson's Law introduces the idea that we can adjust the problem size to  utilize larger parallel systems. While Amdahl's Law highlights limitations in fixed-sized problems. 
+This law is named after John Gustafson, who introduced it in 1988.
+
+In mathematical terms, Gustafson's Law can be expressed as:
+
+.. math:: T_p = (1 - \alpha) + \alpha
+
+.. math:: T_1(p) = (1 - \alpha) + \alpha \cdot p
+
+.. math:: S(p) = \frac{T_1(p)}{T_p} = \frac{1 - \alpha + \alpha \cdot p}{1}
+
+where:
+
+- :math:`T_p` is the execution time for parallel processing with :math:`p > 1` worker,
+- :math:`T_1(p)` is the execution time on one worker,
+- :math:`\alpha` is the fraction of the problem that can be parallelized.
+- :math:`S(p)` is the speedup with :math:`p` workers
+
+Additionally:
+
+.. math:: E(p) = \frac{S(p)}{p} = \frac{1 - \alpha}{p} + \alpha
+
+This expression represents the parallel efficiency :math:`E(p)` and is defined in terms of speedup :math:`S(p)` and the number of resources :math:`p`. 
+It shows that as the number of resources approaches infinity, the efficiency goes towards the parallel fraction :math:`\alpha`.
 
 Fazit (hats sich gelohnt?)
 --------------------------
