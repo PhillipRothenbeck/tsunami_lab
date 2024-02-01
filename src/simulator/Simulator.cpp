@@ -55,8 +55,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         t_real l_hMax = std::numeric_limits<t_real>::lowest();
 
         for (int l_processID = 0; l_processID < i_parallelData.size; l_processID++) {
-            t_idx l_processOffsetX = l_processID % i_parallelData.xDim * i_grid.localNX;
-            t_idx l_processOffsetY = floor(l_processID / i_parallelData.xDim) * i_grid.localNY;
+            t_idx l_processOffsetY = l_processID % i_parallelData.yDim * i_grid.localNY;
+            t_idx l_processOffsetX = floor(l_processID / i_parallelData.yDim) * i_grid.localNX;
             // #pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
             for (t_idx l_cy = 0; l_cy < i_grid.localNY; l_cy++) {
                 for (t_idx l_cx = 0; l_cx < i_grid.localNX; l_cx++) {
