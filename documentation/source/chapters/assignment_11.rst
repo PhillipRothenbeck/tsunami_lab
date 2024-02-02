@@ -22,7 +22,12 @@ Erklären was MPI ist (mehrere Prozesse laufen echt Parallel, alle führen gesam
 MPI ist message parsing interface - parallele prozesse kommunizieren untereinander
 verwendet um compute domain aufzuteilen und Rechenlast zu verringern / compute time zu verringern
 
+During parallelization, several processes are executed in parallel. If not further specified, each process executes the entire code.
+
+However, if there are dependencies between data on different processes, there needs to be a way to communicate this data between the processes.
+oder
 In order to parallelize a program, you need a way to transfer data between the parallel running processes for critical sections or data dependencies.
+
 This is where MPI comes into play. Each process executes the program itself and is initially independent of the others. 
 This means that every process has its own address space and therefore does not share a global address space.
 MPI means nothing other than Message Parsing Interface. It is used to move data from the address space of one process to that of another (through cooperative operations on each process).
