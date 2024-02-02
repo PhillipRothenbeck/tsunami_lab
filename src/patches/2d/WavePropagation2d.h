@@ -8,6 +8,7 @@
 #define TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 
 #include "../../MPIKernel/MPIKernel.h"
+#include "../../allocator.h"
 #include "../../solvers/FWave.h"
 #include "../WavePropagation.h"
 
