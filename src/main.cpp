@@ -94,7 +94,7 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::MPIKernel::init(l_nx, l_ny, &l_parallelData, &l_grid);
 
     // start simulation from config
-    tsunami_lab::simulator::runSimulation(l_setup, l_simConfig, l_parallelData, l_grid);
+    tsunami_lab::Simulator::runSimulation(l_setup, l_simConfig, l_parallelData, l_grid);
 
     delete l_setup;
     delete l_timer;

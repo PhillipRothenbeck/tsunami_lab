@@ -21,10 +21,10 @@
 #include "../timer.h"
 
 namespace tsunami_lab {
-    class simulator;
+    class Simulator;
 }
 
-class tsunami_lab::simulator {
+class tsunami_lab::Simulator {
    public:
     static void runSimulation(tsunami_lab::setups::Setup *i_setup,
                               tsunami_lab::configs::SimConfig i_simConfig,

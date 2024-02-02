@@ -15,13 +15,14 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <string>
 
 template <typename Base, typename T>
 inline bool instanceof (const T *ptr) {
     return dynamic_cast<const Base *>(ptr) != nullptr;
 }
 
-void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
+void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
                                            configs::SimConfig i_simConfig,
                                            MPIKernel::ParallelData i_parallelData,
                                            tsunami_lab::MPIKernel::Grid i_grid) {
@@ -33,6 +34,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     // size of local domain
     long int l_localSize = (i_grid.localNX + 2) * (i_grid.localNY + 2);
 
+    Timer *l_timer = new Timer();
+
     // initialize local subgrids for each MPI process
     tsunami_lab::t_real *l_height = new tsunami_lab::t_real[l_localSize];
     tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[l_localSize];
@@ -41,6 +44,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
 
     // define number of cells
     if (i_parallelData.rank == 0) {
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
         // define length of one cell
         t_real l_dx = i_simConfig.getXLength() / l_nx;
         t_real l_dy = i_simConfig.getYLength() / l_ny;
@@ -57,7 +61,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         for (int l_processID = 0; l_processID < i_parallelData.size; l_processID++) {
             t_idx l_processOffsetY = l_processID % i_parallelData.yDim * i_grid.localNY;
             t_idx l_processOffsetX = floor(l_processID / i_parallelData.yDim) * i_grid.localNX;
-            // #pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
+#pragma omp parallel for collapse(2) schedule(static, 8) reduction(max : l_hMax)
             for (t_idx l_cy = 0; l_cy < i_grid.localNY; l_cy++) {
                 for (t_idx l_cx = 0; l_cx < i_grid.localNX; l_cx++) {
                     t_real l_y = (l_cy + l_processOffsetY) * l_dy;
@@ -104,6 +108,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                 std::cout << "Successfully recieved the subgrid to " << l_processID << std::endl;
             }
         }
+
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Setup Domain Decomposition");
 
         // derive maximum wave speed in setup; the momentum is ignored
         t_real l_speedMax = std::sqrt(9.81 * l_hMax);
@@ -161,6 +167,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(l_bathymetry, l_localSize, MPI_FLOAT, 0, 3, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
+        if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("rank " + std::to_string(i_parallelData.rank) + " Data reception");
         l_error = MPI_Recv(&l_dxy, 1, MPI_FLOAT, 0, 4, i_parallelData.communicator, MPI_STATUS_IGNORE);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Recv(&l_dt, 1, MPI_FLOAT, 0, 5, i_parallelData.communicator, MPI_STATUS_IGNORE);
@@ -173,6 +180,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
         assert(l_error == MPI_SUCCESS);
     }
 
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
+
     patches::WavePropagation2d l_waveProp(i_grid.localNX,
                                           i_grid.localNY,
                                           i_parallelData,
@@ -180,6 +189,8 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
                                           l_momentumX,
                                           l_momentumY,
                                           l_bathymetry);
+
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("rank " + std::to_string(i_parallelData.rank) + " initialize solver");
 
     // set up time and print control
 
@@ -192,6 +203,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     //      l_frame = i_simConfig.getCurrentFrame();
     //      l_simTime = i_simConfig.getStartSimTime();
     //  }
+
     std::string l_path = "./out/" + i_simConfig.getConfigName() + "_" + std::to_string(i_parallelData.rank) + ".nc";
     std::cout << "  writing wave field to " << l_path << std::endl;
 
@@ -232,7 +244,7 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     //  std::cout << l_checkPointTime << " | " << l_endTime << std::endl;
     //  t_idx l_checkPoints = l_simTime / l_checkPointTime;
     //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
-
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
     std::cout << i_parallelData.rank << " starts to simulate." << std::endl;
     while (l_simTime < l_endTime) {
         if (l_timeStep % 25 == 0) {
@@ -267,12 +279,14 @@ void tsunami_lab::simulator::runSimulation(setups::Setup *i_setup,
     //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->start();
     if (i_simConfig.getFlagConfig().useIO())
         l_writer.write();
+
+    if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("rank " + std::to_string(i_parallelData.rank) + " simulation");
     //  if (i_simConfig.getFlagConfig().useTiming()) l_timer->printTime("Write NC File");
 
     // free memory
-    std::cout << "finished time loop" << std::endl;
-    std::cout << "freeing memory" << std::endl;
+    std::cout << "rank " << std::to_string(i_parallelData.rank) << "finished time loop" << std::endl;
+    std::cout << "rank " << std::to_string(i_parallelData.rank) << "freeing memory" << std::endl;
     //  delete l_writer;
     // delete l_waveProp;
-    // delete l_timer;
+    delete l_timer;
 }
