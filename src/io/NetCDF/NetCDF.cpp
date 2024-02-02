@@ -229,7 +229,7 @@ int tsunami_lab::io::NetCDF::init(t_idx i_currentFrame, bool i_isCeckPoint) {
 
     l_nc_err += nc_def_var(m_ncId, "simTime", NC_FLOAT, 1, &m_dimSimTimeId, &m_varSimTimeId);
     l_nc_err += nc_def_var(m_ncId, "endTime", NC_FLOAT, 1, &m_dimEndTimeId, &m_varEndTimeId);
-    l_nc_err += nc_def_var(m_ncId, "frame", NC_FLOAT, 1, &m_dimFrameId, &m_varFrameId);
+    l_nc_err += nc_def_var(m_ncId, "frame", NC_LONG, 1, &m_dimFrameId, &m_varFrameId);
 
     l_nc_err += nc_enddef(m_ncId);
     if (l_nc_err != NC_NOERR) {
@@ -382,8 +382,8 @@ int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
 
     l_nc_err += nc_put_var_float(m_ncId, m_varSimTimeId, &i_simTime);
     l_nc_err += nc_put_var_float(m_ncId, m_varEndTimeId, &i_endTime);
-    unsigned long long l_currentFrame = i_currentFrame;
-    l_nc_err += nc_put_var_ulonglong(m_ncId, m_varFrameId, &l_currentFrame);
+    long l_currentFrame = i_currentFrame;
+    l_nc_err += nc_put_var_long(m_ncId, m_varFrameId, &l_currentFrame);
     if (l_nc_err != NC_NOERR) {
         std::cerr << "NCError: Put variables." << std::endl;
         return 1;
@@ -480,8 +480,8 @@ int tsunami_lab::io::NetCDF::readCheckpoint(std::string i_checkPoinPath,
 
     l_nc_err += nc_get_var_float(l_ncID, l_varIDsimTime, o_startSimTime);
     l_nc_err += nc_get_var_float(l_ncID, l_varIDendTime, o_endSimTime);
-    unsigned long long l_currentFrame;
-    l_nc_err += nc_get_var_ulonglong(l_ncID, l_varIDframe, &l_currentFrame);
+    long l_currentFrame;
+    l_nc_err += nc_get_var_long(l_ncID, l_varIDframe, &l_currentFrame);
     *o_currentFrame = (t_idx)l_currentFrame;
     if (l_nc_err != NC_NOERR) {
         std::cerr << "NCError: Load Data" << std::endl;
