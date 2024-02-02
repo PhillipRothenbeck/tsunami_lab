@@ -141,8 +141,8 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
 
     // iterate over edges in y-direction for every column and update with Riemann solutions (y-sweep)
 #pragma omp parallel for collapse(2) shared(l_hNew, l_hvNew)
-    for (t_idx l_edX = 1; l_edX < m_nCellsX + 1; l_edX++) {
-        for (t_idx l_edY = 0; l_edY < m_nCellsY + 1; l_edY++) {
+    for (t_idx l_edY = 0; l_edY < m_nCellsY + 1; l_edY++) {
+        for (t_idx l_edX = 1; l_edX < m_nCellsX + 1; l_edX++) {
             // determine upper and lower cell-id
             t_idx l_ceU = getIndex(l_edX, l_edY);
             t_idx l_ceD = getIndex(l_edX, l_edY + 1);
