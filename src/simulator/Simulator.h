@@ -17,7 +17,6 @@
 #include "../io/Csv/Csv.h"
 #include "../io/NetCDF/NetCDF.h"
 #include "../patches/2d/WavePropagation2d.h"
-#include "../setups/CheckPoint/CheckPoint.h"
 #include "../setups/Setup.h"
 #include "../timer.h"
 
