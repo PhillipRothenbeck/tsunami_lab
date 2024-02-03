@@ -87,9 +87,6 @@ int main(int i_argc, char *i_argv[]) {
 
     l_nx = l_simConfig.nx;
     l_ny = l_simConfig.ny;
-    if (l_rank == 0) {
-        std::cout << l_nx << " | " << l_ny << std::endl;
-    }
 
     // init parallel data
     tsunami_lab::MPIKernel::ParallelData l_parallelData;
