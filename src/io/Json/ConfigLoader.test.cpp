@@ -31,7 +31,5 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
     REQUIRE(l_simConfig.endSimTime == 5.0);
     REQUIRE(l_simConfig.startSimTime == 0);
     REQUIRE(l_simConfig.coarseFactor == 1.0);
-    REQUIRE(l_simConfig.boundaryCondition[0] == tsunami_lab::OUTFLOW);
-    REQUIRE(l_simConfig.boundaryCondition[1] == tsunami_lab::REFLECTING);
     delete l_setups;
 }

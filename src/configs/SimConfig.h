@@ -41,8 +41,6 @@ struct tsunami_lab::configs::SimConfig {
     t_idx currentFrame = t_idx(0);
     //! coarse output - factor
     tsunami_lab::t_real coarseFactor = tsunami_lab::t_real(1.0);
-    //! list of which boundary condition to use.
-    e_boundary boundaryCondition[4] = {OUTFLOW, OUTFLOW, OUTFLOW, OUTFLOW};
 };
 
 #endif

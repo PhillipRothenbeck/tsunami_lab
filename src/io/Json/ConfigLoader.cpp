@@ -68,16 +68,6 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
         o_simConfig.endSimTime = l_configFile.at("simTime");
     }
 
-    // set boundary condition
-    if (l_configFile.contains("boundaryCond")) {
-        std::string l_boundary = l_configFile.at("boundaryCond");
-        for (t_idx l_i = 0; l_i < l_boundary.length(); l_i++) {
-            if (l_boundary[l_i] == 'R') {
-                o_simConfig.boundaryCondition[l_i] = REFLECTING;
-            }
-        }
-    }
-
     // factor for coarse output
     if (l_configFile.contains("coarseFactor")) {
         o_simConfig.coarseFactor = l_configFile.at("coarseFactor");

@@ -17,9 +17,6 @@ namespace tsunami_lab {
     //! floating point type
     typedef float t_real;
 
-    //! boundary condition type enum
-    enum e_boundary { OUTFLOW,
-                      REFLECTING };
 }  // namespace tsunami_lab
 
 #endif
