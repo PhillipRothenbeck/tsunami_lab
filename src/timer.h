@@ -22,6 +22,7 @@ class Timer {
      * @brief timer constructer, runs timer->start() when init
      */
     Timer(bool i_useTiming) {
+        m_useTiming = i_useTiming;
         start();
     }
 
