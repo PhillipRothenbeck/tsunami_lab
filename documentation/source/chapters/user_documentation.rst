@@ -135,6 +135,8 @@ To execute the project, use the following command with the appropriate flags:
 
     ./build/tsunami_lab <config_file.json>
 
+To generate a output file, make sure you create a folder with the name :code:`out` in the top layer of the project.
+
 The :code:`config_file.json` argument is used to pass the name of the JSON config 
 file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
 directory.
