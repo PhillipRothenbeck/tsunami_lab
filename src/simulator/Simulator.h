@@ -16,7 +16,6 @@
 #include "../MPIKernel/MPIKernel.h"
 #include "../configs/SimConfig.h"
 #include "../constants.h"
-#include "../io/Csv/Csv.h"
 #include "../io/NetCDF/NetCDF.h"
 #include "../patches/2d/WavePropagation2d.h"
 #include "../setups/Setup.h"
@@ -41,19 +40,19 @@ class tsunami_lab::Simulator {
 
     alignas(8) t_real *m_height, *m_momentumX, *m_momentumY, *m_bathymetry;
 
-	 /**
-	  * @brief Sends data from process 0 to the other processes.
-	  * 
-	  * @param i_setup data stored in setup.
-	  * @param i_timer timer helper class.
-	  */
+    /**
+     * @brief Sends data from process 0 to the other processes.
+     *
+     * @param i_setup data stored in setup.
+     * @param i_timer timer helper class.
+     */
     void sendData(setups::Setup *i_setup, Timer *i_timer);
 
-	 /**
-	  * @brief Recieve data from process 0.
-	  * 
-	  * @param i_timer timer helper class.
-	  */
+    /**
+     * @brief Recieve data from process 0.
+     *
+     * @param i_timer timer helper class.
+     */
     void recieveData(Timer *i_timer);
 
    public:
