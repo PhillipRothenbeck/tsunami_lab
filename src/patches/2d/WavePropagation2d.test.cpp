@@ -67,10 +67,6 @@ TEST_CASE("Test the 2d wave propagation solver.", "[WaveProp2d]") {
                                                        l_momentumY,
                                                        l_bathymetry);
 
-    // set outflow boundary condition
-    tsunami_lab::e_boundary l_boundary[4] = {tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW, tsunami_lab::OUTFLOW};
-    l_waveProp.setGhostCells(l_boundary);
-
     // perform a time step
     l_waveProp.timeStep(0.1, 0.1);
 

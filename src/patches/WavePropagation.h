@@ -39,13 +39,6 @@ class tsunami_lab::patches::WavePropagation {
                           t_real i_scalingY) = 0;
 
     /**
-     * @brief Sets the values of the ghost cells according to entered outflow boundary conditions.
-     *
-     * @param i_boundary defines the boundary condition.
-     **/
-    virtual void setGhostCells(e_boundary *i_boundary) = 0;
-
-    /**
      * @brief Gets the stride in y-direction. x-direction is stride-1.
      *
      * @return stride in y-direction.
