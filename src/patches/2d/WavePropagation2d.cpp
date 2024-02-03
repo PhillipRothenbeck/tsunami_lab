@@ -191,7 +191,7 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
             // left / right
             l_firstID = m_parallelData.left;
             l_secondID = m_parallelData.right;
-            l_datatype = m_parallelData.column;
+            l_datatype = m_parallelData.verticalBorder;
             axis[0][0] = -1;
             axis[0][1] = 0;
             axis[1][0] = 1;
@@ -205,7 +205,7 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
             // up / down
             l_firstID = m_parallelData.up;
             l_secondID = m_parallelData.down;
-            l_datatype = m_parallelData.row;
+            l_datatype = m_parallelData.horizontalBorder;
             axis[0][0] = 0;
             axis[0][1] = -1;
             axis[1][0] = 0;

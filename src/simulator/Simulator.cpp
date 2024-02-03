@@ -172,7 +172,7 @@ void tsunami_lab::Simulator::recieveData(Timer *i_timer) {
 void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
                                            configs::SimConfig i_simConfig,
                                            MPIKernel::ParallelData i_parallelData,
-                                           tsunami_lab::MPIKernel::Grid i_grid) {
+                                           tsunami_lab::MPIKernel::GridData i_grid) {
     m_simConfig = i_simConfig;
     m_parallelData = i_parallelData;
     m_grid = i_grid;
@@ -236,7 +236,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
 
     l_timer->printTime("creating writer object", m_parallelData.rank);
 
-	 // run simulation
+    // run simulation
     std::cout << "Rank " << m_parallelData.rank << ": Simulation started" << std::endl;
     while (l_simTime < m_endTime) {
         if (l_timeStep % 25 == 0) {
