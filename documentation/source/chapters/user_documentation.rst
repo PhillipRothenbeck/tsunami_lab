@@ -113,7 +113,6 @@ Running the Project
 When running the project, several flags can be used to influence the behavior of the solver. 
 There is no predetermined order and they can all be used at the same time.
 
-#. :code:`-c`: Activate Checkpointing.
 #. :code:`-t`: Activate Time Measurement.
 #. :code:`-nio`: Deactivate I/O Output.
 
@@ -135,6 +134,8 @@ To execute the project, use the following command with the appropriate flags:
 .. code-block::
 
     ./build/tsunami_lab <config_file.json>
+
+To generate a output file, make sure you create a folder with the name :code:`out` in the top layer of the project.
 
 The :code:`config_file.json` argument is used to pass the name of the JSON config 
 file on to the program. The config needs to be located in the /tsunami_lab/res/configs/ 
