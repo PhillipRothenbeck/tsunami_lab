@@ -264,7 +264,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
     l_timer->printTime("simulation", m_parallelData.rank);
 
     if (m_simConfig.flagConfig.useIO())
-        l_writer.write();
+        l_writer.write(m_parallelData.rank);
 
     l_timer->printTime("writing output", m_parallelData.rank);
 
