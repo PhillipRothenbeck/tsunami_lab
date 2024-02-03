@@ -27,12 +27,12 @@ namespace tsunami_lab {
 
 class tsunami_lab::Simulator {
    private:
-	 //! simulation configuration
+    //! simulation configuration
     configs::SimConfig m_simConfig;
-	 //! MPI data
+    //! MPI data
     MPIKernel::ParallelData m_parallelData;
-	 //! grid dimensions
-    tsunami_lab::MPIKernel::Grid m_grid;
+    //! grid dimensions
+    tsunami_lab::MPIKernel::GridData m_grid;
 
     t_idx m_nx, m_ny;
     t_real m_dxy, m_dt, m_scalingX, m_scalingY, m_endTime;
@@ -40,19 +40,19 @@ class tsunami_lab::Simulator {
 
     alignas(8) t_real *m_height, *m_momentumX, *m_momentumY, *m_bathymetry;
 
-	 /**
-	  * @brief sends data from process 0 to the other processes
-	  * 
-	  * @param i_setup data stored in setup
-	  * @param i_timer timer helper class
-	  */
+    /**
+     * @brief sends data from process 0 to the other processes
+     *
+     * @param i_setup data stored in setup
+     * @param i_timer timer helper class
+     */
     void sendData(setups::Setup *i_setup, Timer *i_timer);
 
-	 /**
-	  * @brief recieve data from process 0
-	  * 
-	  * @param i_timer timer helper class
-	  */
+    /**
+     * @brief recieve data from process 0
+     *
+     * @param i_timer timer helper class
+     */
     void recieveData(Timer *i_timer);
 
    public:
@@ -67,7 +67,7 @@ class tsunami_lab::Simulator {
     void runSimulation(tsunami_lab::setups::Setup *i_setup,
                        tsunami_lab::configs::SimConfig i_simConfig,
                        tsunami_lab::MPIKernel::ParallelData i_parallelData,
-                       tsunami_lab::MPIKernel::Grid i_grid);
+                       tsunami_lab::MPIKernel::GridData i_grid);
 };
 
 #endif

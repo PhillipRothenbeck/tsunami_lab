@@ -90,7 +90,7 @@ int main(int i_argc, char *i_argv[]) {
 
     // init parallel data
     tsunami_lab::MPIKernel::ParallelData l_parallelData;
-    tsunami_lab::MPIKernel::Grid l_grid;
+    tsunami_lab::MPIKernel::GridData l_grid;
 
     tsunami_lab::MPIKernel::init(l_nx, l_ny, &l_parallelData, &l_grid);
 
@@ -98,7 +98,7 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::Simulator simulator = tsunami_lab::Simulator();
     simulator.runSimulation(l_setup, l_simConfig, l_parallelData, l_grid);
 
-	 // free memory
+    // free memory
     delete l_timer;
 
     // free parallel datatypes

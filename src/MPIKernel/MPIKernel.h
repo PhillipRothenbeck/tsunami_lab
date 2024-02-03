@@ -23,27 +23,26 @@ class tsunami_lab::MPIKernel {
         int up, down, left, right;
         int xDim, yDim;
         MPI_Comm communicator;
+        MPI_Request subgridRequest[4];
         MPI_Request firstRequest[8];
         MPI_Request secondRequest[8];
-        MPI_Datatype row;
-        MPI_Datatype column;
-        MPI_Datatype text;
-        MPI_Datatype file;
-        MPI_Datatype restart;
+        MPI_Datatype horizontalBorder;
+        MPI_Datatype verticalBorder;
+        MPI_Datatype subgrid;
 
         ParallelData() : size(1), rank(0), up(-2), down(-2), left(-2), right(-2){};
     };
 
-    struct Grid {
+    struct GridData {
         t_idx localNX;
         t_idx localNY;
         t_idx globalNX;
         t_idx globalNY;
     };
 
-    static void init(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData, Grid *o_grid);
-    static void initParallelData(t_idx i_globalNX, t_idx i_globalNY, t_idx i_localNX, t_idx i_localNY, int *i_dimension, ParallelData *o_parallelData);
-    static void initGrid(t_idx i_localNX, t_idx i_localNY, t_idx i_globalNX, t_idx i_globalNY, Grid *o_grid);
+    static void init(t_idx i_globalNX, t_idx i_globalNY, ParallelData *o_parallelData, GridData *o_grid);
+    static void initParallelData(t_idx i_localNX, t_idx i_localNY, int *i_dimension, ParallelData *o_parallelData);
+    static void initGrid(t_idx i_localNX, t_idx i_localNY, t_idx i_globalNX, t_idx i_globalNY, GridData *o_grid);
 
     static void freeParallelData(ParallelData *o_parallelData);
 };
