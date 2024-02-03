@@ -113,7 +113,6 @@ Running the Project
 When running the project, several flags can be used to influence the behavior of the solver. 
 There is no predetermined order and they can all be used at the same time.
 
-#. :code:`-c`: Activate Checkpointing.
 #. :code:`-t`: Activate Time Measurement.
 #. :code:`-nio`: Deactivate I/O Output.
 
