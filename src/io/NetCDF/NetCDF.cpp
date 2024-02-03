@@ -1,6 +1,5 @@
 /**
  * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
- * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  * @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
  *
  * @section DESCRIPTION
@@ -14,487 +13,10 @@
 #include <cmath>
 #include <iostream>
 
-int tsunami_lab::io::NetCDF::read(std::string i_nameBathymetry,
-                                  std::string i_nameDisplacements,
-                                  t_idx *o_bathymetryDimX,
-                                  t_idx *o_bathymetryDimY,
-                                  t_real *&o_bathymetryPosX,
-                                  t_real *&o_bathymetryPosY,
-                                  t_real *&o_bathymetry,
-                                  t_idx *o_dispDimX,
-                                  t_idx *o_dispDimY,
-                                  t_real *&o_dispPosX,
-                                  t_real *&o_dispPosY,
-                                  t_real *&o_displacements) {
-    // add res path
-    i_nameBathymetry = "./res/" + i_nameBathymetry;
-    i_nameDisplacements = "./res/" + i_nameDisplacements;
-    int l_ncIDBathymetry, l_ncIDDisplacements;
-
-    std::cout << "loading bathymetry file: " << i_nameBathymetry << "..." << std::endl;
-    int l_nc_err = nc_open(i_nameBathymetry.c_str(), 0, &l_ncIDBathymetry);
-
-    // open bathymetry file
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not open file: " << i_nameBathymetry << std::endl;
-        return 1;
-    }
-
-    // read bathymetry
-    // get dimensions
-    std::size_t l_xDim, l_yDim;
-    l_nc_err = nc_inq_dimlen(l_ncIDBathymetry, 0, &l_xDim);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not get the size of the x-dimension in bathymetry." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_dimlen(l_ncIDBathymetry, 1, &l_yDim);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not get the size of the y-dimension in bathymetry." << std::endl;
-        return 1;
-    }
-
-    *o_bathymetryDimX = (t_idx)l_xDim;
-    *o_bathymetryDimY = (t_idx)l_yDim;
-    o_bathymetry = new tsunami_lab::t_real[l_xDim * l_yDim];
-    o_bathymetryPosX = new tsunami_lab::t_real[l_xDim];
-    o_bathymetryPosY = new tsunami_lab::t_real[l_yDim];
-
-    // get variable ids
-    int l_varIDx, l_varIDy, l_varIDz;
-    l_nc_err = nc_inq_varid(l_ncIDBathymetry, "x", &l_varIDx);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not find the x variable in bathymetry." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_varid(l_ncIDBathymetry, "y", &l_varIDy);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not find the y-variable in bathymetry." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_varid(l_ncIDBathymetry, "z", &l_varIDz);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not find the z-variable in bathymetry." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_get_var_float(l_ncIDBathymetry, l_varIDx, &o_bathymetryPosX[0]);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not load data from variable x" << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_get_var_float(l_ncIDBathymetry, l_varIDy, &o_bathymetryPosY[0]);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not load data from variable y" << std::endl;
-        return 1;
-    }
-
-    // read bathymetry
-    l_nc_err = nc_get_var_float(l_ncIDBathymetry, l_varIDz, &o_bathymetry[0]);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not load data from variable z" << std::endl;
-        return 1;
-    }
-    // read displacements
-
-    std::cout << "loading displacement file: " << i_nameDisplacements << "..." << std::endl;
-    l_nc_err = nc_open(i_nameDisplacements.c_str(), 0, &l_ncIDDisplacements);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not open file: " << i_nameDisplacements << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_dimlen(l_ncIDDisplacements, 0, &l_xDim);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not get the size of the x-dimension in displacements." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_dimlen(l_ncIDDisplacements, 1, &l_yDim);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not get the size of the y-dimension in displacements." << std::endl;
-        return 1;
-    }
-
-    *o_dispDimX = (t_idx)l_xDim;
-    *o_dispDimY = (t_idx)l_yDim;
-    o_displacements = new tsunami_lab::t_real[l_xDim * l_yDim];
-    o_dispPosX = new tsunami_lab::t_real[l_xDim];
-    o_dispPosY = new tsunami_lab::t_real[l_yDim];
-
-    // get variable ids
-    l_nc_err = nc_inq_varid(l_ncIDDisplacements, "x", &l_varIDx);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not find x-variable in displacements." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_varid(l_ncIDDisplacements, "y", &l_varIDy);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not find y-variable in displacements." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_inq_varid(l_ncIDDisplacements, "z", &l_varIDz);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not find z-variable in displacements." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_get_var_float(l_ncIDDisplacements, l_varIDx, &o_dispPosX[0]);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not load data from variable x" << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_get_var_float(l_ncIDDisplacements, l_varIDy, &o_dispPosY[0]);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not load data from variable y" << std::endl;
-        return 1;
-    }
-
-    // read displacements
-    l_nc_err = nc_get_var_float(l_ncIDDisplacements, l_varIDz, &o_displacements[0]);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not load data from variable z" << std::endl;
-        return 1;
-    }
-    return 0;
-}
-
-int tsunami_lab::io::NetCDF::init(t_idx i_currentFrame, bool i_isCeckPoint) {
-    int l_nc_err = 0;
-
-    // define dimensions
-    if (i_isCeckPoint) {
-        l_nc_err = nc_def_dim(m_ncId, "x", m_nx, &m_dimXId);
-        l_nc_err += nc_def_dim(m_ncId, "y", m_ny, &m_dimYId);
-    } else {
-        l_nc_err = nc_def_dim(m_ncId, "x", m_nxCoarse, &m_dimXId);
-        l_nc_err += nc_def_dim(m_ncId, "y", m_nyCoarse, &m_dimYId);
-    }
-
-    l_nc_err += nc_def_dim(m_ncId, "time", i_currentFrame, &m_dimTimeId);
-    l_nc_err += nc_def_dim(m_ncId, "simTime", 1, &m_dimSimTimeId);
-    l_nc_err += nc_def_dim(m_ncId, "endTime", 1, &m_dimEndTimeId);
-    l_nc_err += nc_def_dim(m_ncId, "frame", 1, &m_dimFrameId);
-
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Define dimensions." << std::endl;
-        return 1;
-    }
-
-    // define variables
-    l_nc_err = nc_def_var(m_ncId, "x", NC_FLOAT, 1, &m_dimXId, &m_varXId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varXId, "units", 6, "meters");
-    l_nc_err += nc_put_att_text(m_ncId, m_varXId, "axis", 1, "X");
-
-    l_nc_err += nc_def_var(m_ncId, "y", NC_FLOAT, 1, &m_dimYId, &m_varYId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varYId, "units", 6, "meters");
-    l_nc_err += nc_put_att_text(m_ncId, m_varXId, "axis", 1, "Y");
-
-    l_nc_err += nc_def_var(m_ncId, "time", NC_FLOAT, 1, &m_dimTimeId, &m_varTimeId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varTimeId, "units", 7, "seconds");
-
-    int l_dimBathymetryIds[2] = {m_dimYId, m_dimXId};
-    l_nc_err += nc_def_var(m_ncId, "bathymetry", NC_FLOAT, 2, l_dimBathymetryIds, &m_varBathymetryId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varBathymetryId, "units", 6, "meters");
-
-    int l_dimHeightIds[3] = {m_dimTimeId, m_dimYId, m_dimXId};
-    l_nc_err += nc_def_var(m_ncId, "height", NC_FLOAT, 3, l_dimHeightIds, &m_varHeightId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varHeightId, "units", 6, "meters");
-
-    int l_dimMomentumXIds[3] = {m_dimTimeId, m_dimYId, m_dimXId};
-    l_nc_err += nc_def_var(m_ncId, "momentum_x", NC_FLOAT, 3, l_dimMomentumXIds, &m_varMomentumXId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varMomentumXId, "units", 11, "meters*kg/s");
-
-    int l_dimMomentumYIds[3] = {m_dimTimeId, m_dimYId, m_dimXId};
-    l_nc_err += nc_def_var(m_ncId, "momentum_y", NC_FLOAT, 3, l_dimMomentumYIds, &m_varMomentumYId);
-    l_nc_err += nc_put_att_text(m_ncId, m_varMomentumYId, "units", 11, "meters*kg/s");
-
-    l_nc_err += nc_def_var(m_ncId, "simTime", NC_FLOAT, 1, &m_dimSimTimeId, &m_varSimTimeId);
-    l_nc_err += nc_def_var(m_ncId, "endTime", NC_FLOAT, 1, &m_dimEndTimeId, &m_varEndTimeId);
-    l_nc_err += nc_def_var(m_ncId, "frame", NC_LONG, 1, &m_dimFrameId, &m_varFrameId);
-
-    l_nc_err += nc_enddef(m_ncId);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Define variables." << std::endl;
-        return 1;
-    }
-
-    return NC_NOERR;
-}
-
-int tsunami_lab::io::NetCDF::store(t_real i_simTime,
-                                   t_idx i_frame,
-                                   t_real const *i_h,
-                                   t_real const *i_hu,
-                                   t_real const *i_hv) {
-    m_time[i_frame] = i_simTime;
-
-    for (t_idx l_iy = 0; l_iy < m_ny; l_iy++) {
-        for (t_idx l_ix = 0; l_ix < m_nx; l_ix++) {
-            t_real l_h = i_h[(l_iy + 1) * m_stride + (l_ix + 1)];
-            // t_real l_b = m_dataB[l_iy * m_nx + l_ix];
-            m_height[l_ix + l_iy * m_nx + m_nxy * i_frame] = l_h;
-            m_momentumX[l_ix + l_iy * m_nx + m_nxy * i_frame] = i_hu[(l_iy + 1) * m_stride + (l_ix + 1)];
-            m_momentumY[l_ix + l_iy * m_nx + m_nxy * i_frame] = i_hv[(l_iy + 1) * m_stride + (l_ix + 1)];
-        }
-    }
-
-    return 0;
-}
-
-int tsunami_lab::io::NetCDF::write(t_idx i_currentFrame,
-                                   std::string i_checkPointPath = "",
-                                   t_real i_simTime = -1,
-                                   t_real i_endTime = -1) {
-    int l_nc_err = 0;
-
-    // create netCDF file
-    std::string l_outFileName;
-    if (i_checkPointPath.compare("") != 0) {
-        l_outFileName = i_checkPointPath;
-    } else {
-        l_outFileName = m_outFileName;
-    }
-    std::cout << l_outFileName << std::endl;
-    l_nc_err += nc_create((l_outFileName).c_str(), NC_CLOBBER, &m_ncId);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Create file." << std::endl;
-        return 1;
-    }
-
-    // define dims and vars
-    init(i_currentFrame, (i_checkPointPath.compare("") != 0));
-
-    // write data
-    if (i_checkPointPath.compare("") != 0) {
-        l_nc_err = nc_put_var_float(m_ncId, m_varXId, m_dataX);
-        l_nc_err += nc_put_var_float(m_ncId, m_varYId, m_dataY);
-        l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, m_dataB);
-        l_nc_err += nc_put_var_float(m_ncId, m_varTimeId, m_time);
-        l_nc_err += nc_put_var_float(m_ncId, m_varHeightId, m_height);
-        l_nc_err += nc_put_var_float(m_ncId, m_varMomentumXId, m_momentumX);
-        l_nc_err += nc_put_var_float(m_ncId, m_varMomentumYId, m_momentumY);
-    } else {
-        // coarse output
-        t_real *l_dataX = new tsunami_lab::t_real[m_nxCoarse];
-#pragma omp parallel for schedule(static, 16)
-        for (t_idx l_idx = 0; l_idx < m_nxCoarse; l_idx++) {
-            t_idx l_ix = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
-            l_dataX[l_idx] = m_dataX[l_ix];
-        }
-        l_nc_err = nc_put_var_float(m_ncId, m_varXId, l_dataX);
-        delete[] l_dataX;
-
-        t_real *l_dataY = new tsunami_lab::t_real[m_nyCoarse];
-#pragma omp parallel for schedule(static, 16)
-        for (t_idx l_idx = 0; l_idx < m_nyCoarse; l_idx++) {
-            t_idx l_iy = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
-            l_dataY[l_idx] = m_dataY[l_iy];
-        }
-        l_nc_err += nc_put_var_float(m_ncId, m_varYId, l_dataY);
-        delete[] l_dataY;
-
-        t_real *l_dataB = new tsunami_lab::t_real[m_nxyCoarse];
-#pragma omp parallel for schedule(static, 8)
-        for (t_idx l_idx = 0; l_idx < m_nxyCoarse; l_idx++) {
-            t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
-            t_idx l_iy = m_coarseFactor * (t_idx)std::floor(l_idx / m_nxCoarse) + m_coarseFactor - 1;
-            // average over neighbors
-            l_dataB[l_idx] = m_dataB[l_iy * m_nx + l_ix];
-            t_idx l_neighborCount = 1;
-            if (m_coarseFactor != 1) {
-                for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
-                    for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
-                        int l_idxX = l_ix + l_offsetX;
-                        int l_idxY = l_iy + l_offsetY;
-                        if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
-                            l_dataB[l_idx] += m_dataB[l_idxY * m_nx + l_idxX];
-                            l_neighborCount++;
-                        }
-                    }
-                }
-            }
-            l_dataB[l_idx] /= l_neighborCount;
-        }
-        l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, l_dataB);
-        delete[] l_dataB;
-
-        t_real *l_height = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
-        t_real *l_momentumX = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
-        t_real *l_momentumY = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
-#pragma omp parallel for schedule(static, 16)
-        for (t_idx l_idx = 0; l_idx < m_nxyCoarse * m_frameCount; l_idx++) {
-            // average over neighbors
-            t_idx l_frame = std::floor(l_idx / m_nxyCoarse);
-            t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
-            t_idx l_iy = m_coarseFactor * (t_idx)std::floor((l_idx % m_nxyCoarse) / m_nxCoarse) + m_coarseFactor - 1;
-            t_idx l_framedIdx = (l_iy * m_nx + l_ix) + m_nxy * l_frame;
-            l_height[l_idx] = m_height[l_framedIdx];
-            l_momentumX[l_idx] = m_momentumX[l_framedIdx];
-            l_momentumY[l_idx] = m_momentumY[l_framedIdx];
-            t_idx l_neighborCount = 1;
-            if (m_coarseFactor != 1) {
-                for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
-                    for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
-                        int l_idxX = l_ix + l_offsetX;
-                        int l_idxY = l_iy + l_offsetY;
-                        if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
-                            t_idx l_framedIdxOffset = (l_idxY * m_nx + l_idxX) + m_nxy * l_frame;
-                            l_height[l_idx] += m_height[l_framedIdxOffset];
-                            l_momentumX[l_idx] += m_momentumX[l_framedIdxOffset];
-                            l_momentumY[l_idx] += m_momentumY[l_framedIdxOffset];
-                            l_neighborCount++;
-                        }
-                    }
-                }
-            }
-            l_height[l_idx] /= l_neighborCount;
-            l_momentumX[l_idx] /= l_neighborCount;
-            l_momentumY[l_idx] /= l_neighborCount;
-        }
-        l_nc_err += nc_put_var_float(m_ncId, m_varHeightId, l_height);
-        l_nc_err += nc_put_var_float(m_ncId, m_varMomentumXId, l_momentumX);
-        l_nc_err += nc_put_var_float(m_ncId, m_varMomentumYId, l_momentumY);
-        delete[] l_height;
-        delete[] l_momentumX;
-        delete[] l_momentumY;
-    }
-
-    l_nc_err += nc_put_var_float(m_ncId, m_varTimeId, m_time);
-
-    l_nc_err += nc_put_var_float(m_ncId, m_varSimTimeId, &i_simTime);
-    l_nc_err += nc_put_var_float(m_ncId, m_varEndTimeId, &i_endTime);
-    long l_currentFrame = i_currentFrame;
-    l_nc_err += nc_put_var_long(m_ncId, m_varFrameId, &l_currentFrame);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Put variables." << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_close(m_ncId);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Close file." << std::endl;
-        return 1;
-    }
-
-    return NC_NOERR;
-}
-
-int tsunami_lab::io::NetCDF::write() {
-    return write(m_frameCount);
-}
-
-bool tsunami_lab::io::NetCDF::isInBounds(int i_x, int i_y) {
-    if (i_x < 0 || i_x >= (int)m_nx) {
-        return false;
-    }
-    if (i_y < 0 || i_y >= (int)m_ny) {
-        return false;
-    }
-    return true;
-}
-
-int tsunami_lab::io::NetCDF::readCheckpoint(std::string i_checkPoinPath,
-                                            t_real *&o_height,
-                                            t_real *&o_momentumX,
-                                            t_real *&o_momentumY,
-                                            t_real *&o_bathymetry,
-                                            t_real *&o_time,
-                                            t_idx *o_currentFrame,
-                                            t_real *o_endSimTime,
-                                            t_real *o_startSimTime) {
-    int l_ncID;
-    // open checkpoint file
-    int l_nc_err = nc_open(i_checkPoinPath.c_str(), 0, &l_ncID);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "Could not open file: " << i_checkPoinPath << std::endl;
-        return 1;
-    }
-
-    // get dimensions
-    std::size_t l_xDim, l_yDim, l_timeDim;
-    std::size_t l_simTimeDim, l_endTimeDim, l_frameDim;
-
-    l_nc_err = nc_inq_dimlen(l_ncID, 0, &l_xDim);
-    l_nc_err += nc_inq_dimlen(l_ncID, 1, &l_yDim);
-    l_nc_err += nc_inq_dimlen(l_ncID, 2, &l_timeDim);
-
-    l_nc_err += nc_inq_dimlen(l_ncID, 3, &l_simTimeDim);
-    l_nc_err += nc_inq_dimlen(l_ncID, 4, &l_endTimeDim);
-    l_nc_err += nc_inq_dimlen(l_ncID, 5, &l_frameDim);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Load Dimensions." << std::endl;
-        return 1;
-    }
-
-    std::cout << "timedim: " << l_timeDim << std::endl;
-    std::cout << l_xDim << " | " << l_yDim << " | " << l_timeDim << std::endl;
-
-    o_time = new tsunami_lab::t_real[l_timeDim];
-    o_height = new tsunami_lab::t_real[l_xDim * l_yDim * l_timeDim];
-    o_momentumX = new tsunami_lab::t_real[l_xDim * l_yDim * l_timeDim];
-    o_momentumY = new tsunami_lab::t_real[l_xDim * l_yDim * l_timeDim];
-    o_bathymetry = new tsunami_lab::t_real[l_xDim * l_yDim];
-
-    // get variable ids
-    int l_varIDtime, l_varIDheight, l_varIDmomentumX, l_varIDmomentumY, l_varIDbathymetry;
-    int l_varIDsimTime, l_varIDendTime, l_varIDframe;
-
-    l_nc_err += nc_inq_varid(l_ncID, "time", &l_varIDtime);
-    l_nc_err += nc_inq_varid(l_ncID, "height", &l_varIDheight);
-    l_nc_err += nc_inq_varid(l_ncID, "momentum_x", &l_varIDmomentumX);
-    l_nc_err += nc_inq_varid(l_ncID, "momentum_y", &l_varIDmomentumY);
-    l_nc_err += nc_inq_varid(l_ncID, "bathymetry", &l_varIDbathymetry);
-
-    l_nc_err += nc_inq_varid(l_ncID, "simTime", &l_varIDsimTime);
-    l_nc_err += nc_inq_varid(l_ncID, "endTime", &l_varIDendTime);
-    l_nc_err += nc_inq_varid(l_ncID, "frame", &l_varIDframe);
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Load Variable IDs" << std::endl;
-        return 1;
-    }
-
-    l_nc_err = nc_get_var_float(l_ncID, l_varIDtime, o_time);
-    l_nc_err += nc_get_var_float(l_ncID, l_varIDheight, o_height);
-    l_nc_err += nc_get_var_float(l_ncID, l_varIDmomentumX, o_momentumX);
-    l_nc_err += nc_get_var_float(l_ncID, l_varIDmomentumY, o_momentumY);
-    l_nc_err += nc_get_var_float(l_ncID, l_varIDbathymetry, o_bathymetry);
-
-    l_nc_err += nc_get_var_float(l_ncID, l_varIDsimTime, o_startSimTime);
-    l_nc_err += nc_get_var_float(l_ncID, l_varIDendTime, o_endSimTime);
-    long l_currentFrame;
-    l_nc_err += nc_get_var_long(l_ncID, l_varIDframe, &l_currentFrame);
-    *o_currentFrame = (t_idx)l_currentFrame;
-    if (l_nc_err != NC_NOERR) {
-        std::cerr << "NCError: Load Data" << std::endl;
-        return 1;
-    }
-
-    return 0;
-}
-
 tsunami_lab::io::NetCDF::NetCDF(t_real i_endTime,
                                 t_real i_dt,
                                 t_idx i_timeStepsPerFrame,
-										  int i_coordinates[2],
+                                int i_coordinates[2],
                                 t_real i_dxy,
                                 t_idx i_nx,
                                 t_idx i_ny,
@@ -528,8 +50,8 @@ tsunami_lab::io::NetCDF::NetCDF(t_real i_endTime,
     m_dataY = new t_real[m_ny];
     m_dataB = new t_real[m_nxy];
 
-	 t_idx l_xStart = i_coordinates[0] * m_nx * m_dxy;
-	 t_idx l_yStart = i_coordinates[1] * m_ny * m_dxy;
+    t_idx l_xStart = i_coordinates[0] * m_nx * m_dxy;
+    t_idx l_yStart = i_coordinates[1] * m_ny * m_dxy;
 
     for (t_idx l_ix = 0; l_ix < m_nx; l_ix++) {
         m_dataX[l_ix] = l_xStart + (l_ix + 0.5) * m_dxy;
@@ -542,6 +64,336 @@ tsunami_lab::io::NetCDF::NetCDF(t_real i_endTime,
             m_dataB[l_ix + l_iy * m_nx] = i_b[(l_iy + 1) * m_stride + (l_ix + 1)];
         }
     }
+}
+
+int tsunami_lab::io::NetCDF::store(t_real i_simTime,
+                                   t_idx i_frame,
+                                   t_real const *i_h,
+                                   t_real const *i_hu,
+                                   t_real const *i_hv) {
+    m_time[i_frame] = i_simTime;
+
+    for (t_idx l_iy = 0; l_iy < m_ny; l_iy++) {
+        for (t_idx l_ix = 0; l_ix < m_nx; l_ix++) {
+            t_real l_h = i_h[(l_iy + 1) * m_stride + (l_ix + 1)];
+            // t_real l_b = m_dataB[l_iy * m_nx + l_ix];
+            m_height[l_ix + l_iy * m_nx + m_nxy * i_frame] = l_h;
+            m_momentumX[l_ix + l_iy * m_nx + m_nxy * i_frame] = i_hu[(l_iy + 1) * m_stride + (l_ix + 1)];
+            m_momentumY[l_ix + l_iy * m_nx + m_nxy * i_frame] = i_hv[(l_iy + 1) * m_stride + (l_ix + 1)];
+        }
+    }
+
+    return 0;
+}
+
+int tsunami_lab::io::NetCDF::write(int i_rank) {
+    // create netCDF file
+    std::cout << "Rank " << i_rank << ": Writing to "<< m_outFileName << std::endl;
+    int l_nc_err = nc_create((m_outFileName).c_str(), NC_CLOBBER, &m_ncId);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Create file." << std::endl;
+        return 1;
+    }
+
+    // define dims and vars
+    init();
+
+    //* coarse output
+
+    // x data coarse
+    t_real *l_dataX = new tsunami_lab::t_real[m_nxCoarse];
+#pragma omp parallel for schedule(static, 16)
+    for (t_idx l_idx = 0; l_idx < m_nxCoarse; l_idx++) {
+        t_idx l_ix = m_coarseFactor - 1 + (l_idx * m_coarseFactor);
+        l_dataX[l_idx] = m_dataX[l_ix];
+    }
+    l_nc_err = nc_put_var_float(m_ncId, m_varXId, l_dataX);
+    delete[] l_dataX;
+
+    // y data coarse
+    t_real *l_dataY = new tsunami_lab::t_real[m_nyCoarse];
+#pragma omp parallel for schedule(static, 16)
+    for (t_idx l_idy = 0; l_idy < m_nyCoarse; l_idy++) {
+        t_idx l_iy = m_coarseFactor - 1 + (l_idy * m_coarseFactor);
+        l_dataY[l_idy] = m_dataY[l_iy];
+    }
+    l_nc_err += nc_put_var_float(m_ncId, m_varYId, l_dataY);
+    delete[] l_dataY;
+
+    // bathymetry coarse
+    t_real *l_dataB = new tsunami_lab::t_real[m_nxyCoarse];
+#pragma omp parallel for schedule(static, 8)
+    for (t_idx l_idx = 0; l_idx < m_nxyCoarse; l_idx++) {
+        t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
+        t_idx l_iy = m_coarseFactor * (t_idx)std::floor(l_idx / m_nxCoarse) + m_coarseFactor - 1;
+        // average over neighbors
+        l_dataB[l_idx] = m_dataB[l_iy * m_nx + l_ix];
+        t_idx l_neighborCount = 1;
+        if (m_coarseFactor != 1) {
+            for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
+                for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
+                    int l_idxX = l_ix + l_offsetX;
+                    int l_idxY = l_iy + l_offsetY;
+                    if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
+                        l_dataB[l_idx] += m_dataB[l_idxY * m_nx + l_idxX];
+                        l_neighborCount++;
+                    }
+                }
+            }
+        }
+        l_dataB[l_idx] /= l_neighborCount;
+    }
+    l_nc_err += nc_put_var_float(m_ncId, m_varBathymetryId, l_dataB);
+    delete[] l_dataB;
+
+	 // height, momentumX, momentumY coarse
+    t_real *l_height = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
+    t_real *l_momentumX = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
+    t_real *l_momentumY = new tsunami_lab::t_real[m_nxyCoarse * m_frameCount];
+#pragma omp parallel for schedule(static, 16)
+    for (t_idx l_idx = 0; l_idx < m_nxyCoarse * m_frameCount; l_idx++) {
+        t_idx l_frame = std::floor(l_idx / m_nxyCoarse);
+        t_idx l_ix = m_coarseFactor * (l_idx % m_nxCoarse) + m_coarseFactor - 1;
+        t_idx l_iy = m_coarseFactor * (t_idx)std::floor((l_idx % m_nxyCoarse) / m_nxCoarse) + m_coarseFactor - 1;
+        t_idx l_framedIdx = (l_iy * m_nx + l_ix) + m_nxy * l_frame;
+        // average over neighbors
+        l_height[l_idx] = m_height[l_framedIdx];
+        l_momentumX[l_idx] = m_momentumX[l_framedIdx];
+        l_momentumY[l_idx] = m_momentumY[l_framedIdx];
+        t_idx l_neighborCount = 1;
+        if (m_coarseFactor != 1) {
+            for (int l_offsetY = -(m_coarseFactor - 1); l_offsetY < (int)m_coarseFactor; l_offsetY++) {
+                for (int l_offsetX = -(m_coarseFactor - 1); l_offsetX < (int)m_coarseFactor; l_offsetX++) {
+                    int l_idxX = l_ix + l_offsetX;
+                    int l_idxY = l_iy + l_offsetY;
+                    if (tsunami_lab::io::NetCDF::isInBounds(l_idxX, l_idxY)) {
+                        t_idx l_framedIdxOffset = (l_idxY * m_nx + l_idxX) + m_nxy * l_frame;
+                        l_height[l_idx] += m_height[l_framedIdxOffset];
+                        l_momentumX[l_idx] += m_momentumX[l_framedIdxOffset];
+                        l_momentumY[l_idx] += m_momentumY[l_framedIdxOffset];
+                        l_neighborCount++;
+                    }
+                }
+            }
+        }
+        l_height[l_idx] /= l_neighborCount;
+        l_momentumX[l_idx] /= l_neighborCount;
+        l_momentumY[l_idx] /= l_neighborCount;
+    }
+    l_nc_err += nc_put_var_float(m_ncId, m_varHeightId, l_height);
+    l_nc_err += nc_put_var_float(m_ncId, m_varMomentumXId, l_momentumX);
+    l_nc_err += nc_put_var_float(m_ncId, m_varMomentumYId, l_momentumY);
+    delete[] l_height;
+    delete[] l_momentumX;
+    delete[] l_momentumY;
+
+	 // write time data
+    l_nc_err += nc_put_var_float(m_ncId, m_varTimeId, m_time);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Put variables." << std::endl;
+        return 1;
+    }
+
+	 // close file
+    l_nc_err = nc_close(m_ncId);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Close file." << std::endl;
+        return 1;
+    }
+
+    return NC_NOERR;
+}
+
+int tsunami_lab::io::NetCDF::read(std::string i_nameBathymetry,
+                                  std::string i_nameDisplacements,
+                                  t_idx *o_bathymetryDimX,
+                                  t_idx *o_bathymetryDimY,
+                                  t_real *&o_bathymetryPosX,
+                                  t_real *&o_bathymetryPosY,
+                                  t_real *&o_bathymetry,
+                                  t_idx *o_dispDimX,
+                                  t_idx *o_dispDimY,
+                                  t_real *&o_dispPosX,
+                                  t_real *&o_dispPosY,
+                                  t_real *&o_displacements) {
+    // add res path
+    i_nameBathymetry = "./res/" + i_nameBathymetry;
+    i_nameDisplacements = "./res/" + i_nameDisplacements;
+    int l_ncIDBathymetry, l_ncIDDisplacements;
+
+    //* read bathymetry
+
+    // open bathymetry file
+    std::cout << "Rank 0: Loading bathymetry file: " << i_nameBathymetry << "..." << std::endl;
+    int l_nc_err = nc_open(i_nameBathymetry.c_str(), 0, &l_ncIDBathymetry);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Could not open file " << i_nameBathymetry << std::endl;
+        return 1;
+    }
+
+    // get dimensions
+    std::size_t l_xDim, l_yDim;
+    l_nc_err = nc_inq_dimlen(l_ncIDBathymetry, 0, &l_xDim);
+    l_nc_err += nc_inq_dimlen(l_ncIDBathymetry, 1, &l_yDim);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Could not get dimensions. (bathymetry)" << std::endl;
+        return 1;
+    }
+
+    *o_bathymetryDimX = (t_idx)l_xDim;
+    *o_bathymetryDimY = (t_idx)l_yDim;
+    o_bathymetry = new tsunami_lab::t_real[l_xDim * l_yDim];
+    o_bathymetryPosX = new tsunami_lab::t_real[l_xDim];
+    o_bathymetryPosY = new tsunami_lab::t_real[l_yDim];
+
+    // get variable ids
+    int l_varIDx, l_varIDy, l_varIDz;
+    l_nc_err = nc_inq_varid(l_ncIDBathymetry, "x", &l_varIDx);
+    l_nc_err += nc_inq_varid(l_ncIDBathymetry, "y", &l_varIDy);
+    l_nc_err += nc_inq_varid(l_ncIDBathymetry, "z", &l_varIDz);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Could not get variable ids. (bathymetry)" << std::endl;
+        return 1;
+    }
+
+    // load data
+    l_nc_err = nc_get_var_float(l_ncIDBathymetry, l_varIDx, &o_bathymetryPosX[0]);
+    l_nc_err += nc_get_var_float(l_ncIDBathymetry, l_varIDy, &o_bathymetryPosY[0]);
+    l_nc_err += nc_get_var_float(l_ncIDBathymetry, l_varIDz, &o_bathymetry[0]);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCERR: Could not load data. (bathymetry)" << std::endl;
+        return 1;
+    }
+
+    //* read displacements
+
+    // open displacement file
+    std::cout << "Rank 0: Loading displacement file " << i_nameDisplacements << "..." << std::endl;
+    l_nc_err = nc_open(i_nameDisplacements.c_str(), 0, &l_ncIDDisplacements);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Could not open file " << i_nameDisplacements << std::endl;
+        return 1;
+    }
+
+    // get dimensions
+    l_nc_err = nc_inq_dimlen(l_ncIDDisplacements, 0, &l_xDim);
+    l_nc_err += nc_inq_dimlen(l_ncIDDisplacements, 1, &l_yDim);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Could not get dimensions. (displacement)" << std::endl;
+        return 1;
+    }
+
+    *o_dispDimX = (t_idx)l_xDim;
+    *o_dispDimY = (t_idx)l_yDim;
+    o_displacements = new tsunami_lab::t_real[l_xDim * l_yDim];
+    o_dispPosX = new tsunami_lab::t_real[l_xDim];
+    o_dispPosY = new tsunami_lab::t_real[l_yDim];
+
+    // get variable ids
+    l_nc_err = nc_inq_varid(l_ncIDDisplacements, "x", &l_varIDx);
+    l_nc_err += nc_inq_varid(l_ncIDDisplacements, "y", &l_varIDy);
+    l_nc_err += nc_inq_varid(l_ncIDDisplacements, "z", &l_varIDz);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Could not get variable ids. (displacement)" << std::endl;
+        return 1;
+    }
+
+    // load data
+    l_nc_err = nc_get_var_float(l_ncIDDisplacements, l_varIDx, &o_dispPosX[0]);
+    l_nc_err += nc_get_var_float(l_ncIDDisplacements, l_varIDy, &o_dispPosY[0]);
+    l_nc_err += nc_get_var_float(l_ncIDDisplacements, l_varIDz, &o_displacements[0]);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCERR: Could not load data. (displacement)" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+int tsunami_lab::io::NetCDF::init() {
+    int l_nc_err;
+
+    // define dimensions
+    l_nc_err = nc_def_dim(m_ncId, "x", m_nxCoarse, &m_dimXId);
+    l_nc_err += nc_def_dim(m_ncId, "y", m_nyCoarse, &m_dimYId);
+    l_nc_err += nc_def_dim(m_ncId, "time", m_frameCount, &m_dimTimeId);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define dimensions." << std::endl;
+        return 1;
+    }
+
+    // define variables
+    l_nc_err = nc_def_var(m_ncId, "x", NC_FLOAT, 1, &m_dimXId, &m_varXId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varXId, "units", 6, "meters");
+    l_nc_err += nc_put_att_text(m_ncId, m_varXId, "axis", 1, "X");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (x)" << std::endl;
+        return 1;
+    }
+
+    l_nc_err = nc_def_var(m_ncId, "y", NC_FLOAT, 1, &m_dimYId, &m_varYId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varYId, "units", 6, "meters");
+    l_nc_err += nc_put_att_text(m_ncId, m_varXId, "axis", 1, "Y");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (y)" << std::endl;
+        return 1;
+    }
+
+    l_nc_err = nc_def_var(m_ncId, "time", NC_FLOAT, 1, &m_dimTimeId, &m_varTimeId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varTimeId, "units", 7, "seconds");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (time)" << std::endl;
+        return 1;
+    }
+
+    int l_dimBathymetryIds[2] = {m_dimYId, m_dimXId};
+    l_nc_err = nc_def_var(m_ncId, "bathymetry", NC_FLOAT, 2, l_dimBathymetryIds, &m_varBathymetryId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varBathymetryId, "units", 6, "meters");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (bathymetry)" << std::endl;
+        return 1;
+    }
+
+    int l_dimHeightIds[3] = {m_dimTimeId, m_dimYId, m_dimXId};
+    l_nc_err = nc_def_var(m_ncId, "height", NC_FLOAT, 3, l_dimHeightIds, &m_varHeightId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varHeightId, "units", 6, "meters");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (height)" << std::endl;
+        return 1;
+    }
+
+    int l_dimMomentumXIds[3] = {m_dimTimeId, m_dimYId, m_dimXId};
+    l_nc_err = nc_def_var(m_ncId, "momentum_x", NC_FLOAT, 3, l_dimMomentumXIds, &m_varMomentumXId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varMomentumXId, "units", 11, "meters*kg/s");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (momentumX)" << std::endl;
+        return 1;
+    }
+
+    int l_dimMomentumYIds[3] = {m_dimTimeId, m_dimYId, m_dimXId};
+    l_nc_err = nc_def_var(m_ncId, "momentum_y", NC_FLOAT, 3, l_dimMomentumYIds, &m_varMomentumYId);
+    l_nc_err += nc_put_att_text(m_ncId, m_varMomentumYId, "units", 11, "meters*kg/s");
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: Define variables. (momentumY)" << std::endl;
+        return 1;
+    }
+
+    l_nc_err = nc_enddef(m_ncId);
+    if (l_nc_err != NC_NOERR) {
+        std::cerr << "NCError: enddef" << std::endl;
+        return 1;
+    }
+
+    return NC_NOERR;
+}
+
+bool tsunami_lab::io::NetCDF::isInBounds(int i_x, int i_y) {
+    if (i_x < 0 || i_x >= (int)m_nx) {
+        return false;
+    }
+    if (i_y < 0 || i_y >= (int)m_ny) {
+        return false;
+    }
+    return true;
 }
 
 tsunami_lab::io::NetCDF::~NetCDF() {
