@@ -15,10 +15,8 @@ l_sources = [ 'solvers/Roe.cpp',
               'patches/2d/WavePropagation2d.cpp',
               'simulator/Simulator.cpp',
               'setups/TsunamiEvent2d/TsunamiEvent2d.cpp',
-              'configs/SimConfig.cpp',
               'io/Json/ConfigLoader.cpp',
               'io/NetCDF/NetCDF.cpp',
-              'io/Csv/Csv.cpp',
               'MPIKernel/MPIKernel.cpp',
               ]
 
@@ -34,10 +32,8 @@ l_tests = [ 'tests.cpp',
             'patches/2d/WavePropagation2d.test.cpp',
             'simulator/Simulator.test.cpp',
             'setups/TsunamiEvent2d/TsunamiEvent2d.test.cpp',
-            'configs/SimConfig.test.cpp',
             'io/Json/ConfigLoader.test.cpp',
             'io/NetCDF/NetCDF.test.cpp',
-            'io/Csv/Csv.test.cpp',
           ]
 
 for l_te in l_tests:
