@@ -36,6 +36,8 @@ TEST_CASE("Test the 2d wave propagation solver.", "[WaveProp2d]") {
     tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[102];
     tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[102];
     tsunami_lab::MPIKernel::ParallelData l_parallelData;
+    tsunami_lab::MPIKernel::Grid l_grid;
+    tsunami_lab::MPIKernel::init(100, 100, &l_parallelData, &l_grid);
 
     for (std::size_t l_ceY = 0; l_ceY < 10; l_ceY++) {
         for (std::size_t l_ceX = 0; l_ceX < 5; l_ceX++) {
@@ -94,4 +96,5 @@ TEST_CASE("Test the 2d wave propagation solver.", "[WaveProp2d]") {
             REQUIRE(l_waveProp.getMomentumY()[l_ceY * 12 + l_ceX] == Approx(0));
         }
     }
+    tsunami_lab::MPIKernel::freeParallelData(&l_parallelData);
 }
