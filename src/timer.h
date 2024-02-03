@@ -17,23 +17,35 @@ class Timer {
     t_time m_startTime;
 
    public:
+    /**
+     * @brief timer constructer, runs timer->start() when init
+     */
     Timer() {
         start();
     }
 
+    /**
+     * @brief helper function to get current time
+     */
     t_time now() {
         return std::chrono::high_resolution_clock::now();
     }
 
+    /**
+     * @brief resets timer to current time
+     */
     void start() {
         m_startTime = now();
     }
 
+    /**
+     * prints out time took since last reset, resets time afterwards
+     */
     void printTime(std::string i_description = "") {
         std::chrono::duration<double> l_chronoTimeElapsed = now() - m_startTime;
-		  if (i_description.compare("") != 0) {
-			std::cout << i_description << std::endl;
-		  }
+        if (i_description.compare("") != 0) {
+            std::cout << i_description << std::endl;
+        }
         std::cout << "Took: " << l_chronoTimeElapsed.count() << "s" << std::endl;
         start();
     }
