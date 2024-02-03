@@ -64,7 +64,27 @@ This means that we have to communicate twice. The columns (left and right border
 Cache optimization
 ^^^^^^^^^^^^^^^^^^^^
 
-In order to make the cache usage of our solver more efficient, we first looked at the cache specifications of the ARA cluster.
+In order to make the cache usage of our solver more efficient, we first looked at the cache specifications of the ARA cluster Hadoop nodes.
+
+16 Hadoop nodes each with:
+
+    - 36 CPU cores (2x Intel Xeon Gold 6140 18 Core 2.3 Ghz)
+    - 192 GB RAM
+
+Intel Xeon Gold 6140 18 Core 2.3 Ghz Cache specifications:
+
+L1 Cache: 8-way set associative, write-back
+
+    L1i = 576 KiB (18 x 32 KiB) 
+    L1d = 576 KiB (18 x 32 KiB) 
+
+L2 Cache: 16-way set associative, write-back
+
+    L2 = 18 MiB (18 x 1 MiB) 
+
+L3 Cache: 11-way set associative, write-back
+
+    L3 = 24.75 MiB (18 x 1.375 MiB) 
 
 .. warning::
 
@@ -90,6 +110,10 @@ Anzahl an Sets in Cache: cache size / (block size * set size)
 
 Cache line füllen und dann möglichst alle Operationen durchführen um capacity misses zu minimieren
 
+Alignement check.
+
+Blocking?
+
 
 Ergebnisse (Berechnungen und vid von Sim)
 -----------------------------------------
@@ -102,9 +126,31 @@ MPI läuft korrekt
 
 video of Sim with [?] number of processes als Beweis
 
-Speedup im vergleich zu kein MPI (hoffentlich positiv)
+We have successfully MPI-parallelized our solver. In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
 
-Eventuell Theoretische Speedups vs. praktische Speedups (wird vllt nicht möglich sein, weil wir die Daten dafür nicht haben)
+The following measured values were recorded in comparison to the non-parallelized version of our solver.
+
++---------------+----------+----------+
+| Simulation    |  time    |   icpc   |
++===============+==========+==========+
+|      1000     | 13.1988s | 12.6979s |
++---------------+----------+----------+
+|   1000 | 5    | 11.1114s |  13.11s  |
++---------------+----------+----------+
+|   1000 | 10   |          | 10.9384s |
++---------------+----------+----------+
+
+You can see that the time needed to read and set the initial grids is longer in the parallelized version, for which in turn the time needed to calculate is shorter.
+
+You can see that the normal version is faster than the parallelized version when reading / loading data and defining the Grid. On the other hand, the parallelized version requires less computing time than the normal version.
+The larger the computational domain (or the smaller the cells become), the greater the time difference between normal and parallelized version when calculating the NetUpdates.
+
+Speedup :math:`S_p` of computation time :math:`T_{comp}` for various simulations with different numbers of subgrids: 
+
+.. math::   
+    
+    S_p &= \frac{T_1}{T_p} \\
+    S_{72} &= \frac{2078.36s}{37.2162s} = 55.845
 
 Amdahl vs. Gustafson
 
