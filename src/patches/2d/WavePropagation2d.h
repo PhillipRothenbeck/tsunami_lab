@@ -1,5 +1,7 @@
 /**
- * @author Phillip Rothenbeck
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+ * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Two-dimensional wave propagation patch.
@@ -46,19 +48,28 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     //! parallel data like neighbour threads
     MPIKernel::ParallelData m_parallelData;
 
-    //! set ghost cells by communicating with neighbours
+    /**
+     * @brief Set ghost cells by communicating with neighbours.
+     *
+     * @param i_height cell height data.
+     * @param i_momentumX cell momentum data in x direction.
+     * @param i_momentumY cell momentum data in y direction.
+     * @param i_bathymetry cell bathymetry data.
+     * @param i_mode sweep mode for ghost cell direction HORIZONTAL/VERTICAL.
+     */
     void setSweepGhostCells(t_real *i_height,
                             t_real *i_momentumX,
                             t_real *i_momentumY,
                             t_real *i_bathymetry,
-                            int i_mode);
+                            e_sweepMode i_mode);
 
    public:
     /**
-     * Constructs the 2d wave propagation solver.
+     * @brief Constructs the 2d wave propagation solver.
      *
      * @param i_nCellsX number of cells in x-direction.
      * @param i_nCellsY number of cells in y-direction.
+	  * @param i_parallelData data for MPI usage.
      * @param i_height array of height values for step 0 (including ghost cell space).
      * @param i_momentumX array of momentum values in x-direction for step 0 (including ghost cell space).
      * @param i_momentumY array of momentum values in y-direction for step 0 (including ghost cell space).
@@ -73,12 +84,13 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
                       t_real *i_bathymetry);
 
     /**
-     * Destructor which frees all allocated memory.
+     * @brief Destructor which frees all allocated memory.
+     *
      **/
     ~WavePropagation2d();
 
     /**
-     * Calculate linear position from 2d coordinates.
+     * @brief Calculate linear position from 2d coordinates.
      *
      * @param i_x x coordinate of queried point.
      * @param i_y y coordinate of queried point.
@@ -86,7 +98,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     t_idx getIndex(t_idx i_x, t_idx i_y);
 
     /**
-     * Performs a time step.
+     * @brief Performs a time step.
      *
      * @param i_scalingX scaling of the time step (dt / dx).
      * @param i_scalingY scaling of the time step (dt / dy).
@@ -95,14 +107,14 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
                   t_real i_scalingY);
 
     /**
-     * @brief copies the 4 corner cells of the water grid into the ghost corner cells.
+     * @brief Copies the 4 corner cells of the water grid into the ghost corner cells.
      *
      * @param o_dataArray corresponding data array containing cell data, for example h or hu.
      */
     void copyCornerCells(t_real *o_dataArray);
 
     /**
-     * @brief copies the data of each outter cell into the ghost cells according to axis alignment.
+     * @brief Copies the data of each outter cell into the ghost cells according to axis alignment.
      *
      * @param i_axis array to determine which edge should be set. 0: x-Axis (-1, 1; left, right); 1: y-Axis (-1, 1: bottom, top).
      * @param o_dataArray corresponding data array containing cell data, for example h or hu.
@@ -110,23 +122,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     void copyGhostCellsOutflow(short i_axis[2], t_real *o_dataArray);
 
     /**
-     * @brief copies the data of each outter cell into the ghost cells according to axis alignment.
-     *
-     * @param i_axis array to determine which edge should be set. 0: x-Axis (-1, 1; left, right); 1: y-Axis (-1, 1: bottom, top).
-     * @param i_value the value the cell should be set to.
-     * @param o_dataArray corresponding data array containing cell data, for example h or hu.
-     */
-    void copyGhostCellsReflecting(short i_axis[2], t_real i_value, t_real *o_dataArray);
-
-    /**
-     * Sets the values of the ghost cells according to entered outflow boundary conditions.
-     *
-     * @param i_boundary defines the boundary condition.
-     **/
-    void setGhostCells(e_boundary *i_boundary);
-
-    /**
-     * Gets the stride in y-direction. x-direction is stride-1.
+     * @brief Gets the stride in y-direction. x-direction is stride-1.
      *
      * @return stride in y-direction.
      **/
@@ -135,7 +131,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Gets cells' water heights.
+     * @brief Gets cells' water heights.
      *
      * @return water heights.
      */
@@ -144,7 +140,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Gets the cells' momenta in x-direction.
+     * @brief Gets the cells' momenta in x-direction.
      *
      * @return momenta in x-direction.
      **/
@@ -153,7 +149,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Gets the cells' momenta in y-direction.
+     * @brief Gets the cells' momenta in y-direction.
      *
      * @return momenta in y-direction.
      **/
@@ -162,7 +158,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Gets the cells bathymetries;
+     * @brief Gets the cells bathymetries;
      *
      * @return bathymetries.
      */
@@ -171,7 +167,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Sets the height of the cell to the given value.
+     * @brief Sets the height of the cell to the given value.
      *
      * @param i_ix id of the cell in x-direction.
      * @param i_iy id of the cell in y-direction.
@@ -185,7 +181,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Sets the momentum in x-direction to the given value.
+     * @brief Sets the momentum in x-direction to the given value.
      *
      * @param i_ix id of the cell in x-direction.
      * @param i_iy id of the cell in y-direction.
@@ -199,7 +195,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     }
 
     /**
-     * Sets the momentum in y-direction to the given value.
+     * @brief Sets the momentum in y-direction to the given value.
      *
      * @param i_ix id of the cell in x-direction.
      * @param i_iy id of the cell in y-direction.
@@ -213,7 +209,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     };
 
     /**
-     * Sets the bathymetry to the given value.
+     * @brief Sets the bathymetry to the given value.
      *
      * @param i_ix id of the cell in x-direction.
      * @param i_ix id of the cell in y-direction.

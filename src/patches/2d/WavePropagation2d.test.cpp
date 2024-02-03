@@ -1,5 +1,7 @@
 /**
- * @author Phillip Rothenbeck
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+ * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Unit tests for the two-dimensional wave propagation patch.

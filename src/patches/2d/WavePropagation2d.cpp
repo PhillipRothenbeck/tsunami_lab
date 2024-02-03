@@ -1,5 +1,7 @@
 /**
- * @author Phillip Rothenbeck
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+ * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Two-dimensional wave propagation patch.
@@ -58,7 +60,8 @@ tsunami_lab::patches::WavePropagation2d::~WavePropagation2d() {
     delete[] m_b;
 }
 
-tsunami_lab::t_idx tsunami_lab::patches::WavePropagation2d::getIndex(t_idx i_x, t_idx i_y) {
+tsunami_lab::t_idx tsunami_lab::patches::WavePropagation2d::getIndex(t_idx i_x,
+                                                                     t_idx i_y) {
     return i_y * getStride() + i_x;
 }
 
@@ -90,8 +93,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
         }
     }
 
-    setSweepGhostCells(l_hOld, l_huOld, l_hvOld, m_b, 1);
-    // std::cout << m_parallelData.rank << " gC x setting done" << std::endl;
+    setSweepGhostCells(l_hOld, l_huOld, l_hvOld, m_b, HORIZONTAL);
 
     // iterate over edges in x-direction for every row and update with Riemann solutions (x-sweep)
 #pragma omp parallel for collapse(2) shared(l_hStar, l_huStar)
@@ -137,7 +139,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
         }
     }
 
-    setSweepGhostCells(l_hStar, l_huStar, l_hvStar, m_b, 2);
+    setSweepGhostCells(l_hStar, l_huStar, l_hvStar, m_b, VERTICAL);
 
     // iterate over edges in y-direction for every column and update with Riemann solutions (y-sweep)
 #pragma omp parallel for collapse(2) shared(l_hNew, l_hvNew)
@@ -181,61 +183,62 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
                                                                  t_real *i_momentumX,
                                                                  t_real *i_momentumY,
                                                                  t_real *i_bathymetry,
-                                                                 int i_mode) {
+                                                                 e_sweepMode i_mode) {
     int l_firstID, l_secondID, l_error;
     short axis[2][2];
     t_idx l_firstIdxSend, l_secondIdxSend, l_firstIdxRecv, l_secondIdxRecv;
     MPI_Datatype l_datatype;
-    switch (i_mode) {
-        case 1:
-            // left / right
-            l_firstID = m_parallelData.left;
-            l_secondID = m_parallelData.right;
-            l_datatype = m_parallelData.verticalBorder;
-            axis[0][0] = -1;
-            axis[0][1] = 0;
-            axis[1][0] = 1;
-            axis[1][1] = 0;
-            l_firstIdxSend = m_nCellsX + 3;
-            l_secondIdxSend = m_nCellsX + 2 + m_nCellsX;
-            l_firstIdxRecv = m_nCellsX + 2;
-            l_secondIdxRecv = m_nCellsX + 2 + m_nCellsX + 1;
-            break;
-        case 2:
-            // up / down
-            l_firstID = m_parallelData.up;
-            l_secondID = m_parallelData.down;
-            l_datatype = m_parallelData.horizontalBorder;
-            axis[0][0] = 0;
-            axis[0][1] = -1;
-            axis[1][0] = 0;
-            axis[1][1] = 1;
-            l_firstIdxSend = m_nCellsX + 3;
-            l_secondIdxSend = (m_nCellsX + 2) * m_nCellsY + 1;
-            l_firstIdxRecv = 1;
-            l_secondIdxRecv = (m_nCellsX + 2) * (m_nCellsY + 1);
-            break;
-        default:
-            std::cout << "wrong communication mode was entered " << i_mode << std::endl;
-            return;
+
+    if (i_mode == HORIZONTAL) {
+        // HORIZONTAL
+        l_firstID = m_parallelData.left;
+        l_secondID = m_parallelData.right;
+        l_datatype = m_parallelData.verticalBorder;
+        axis[0][0] = -1;
+        axis[0][1] = 0;
+        axis[1][0] = 1;
+        axis[1][1] = 0;
+        l_firstIdxSend = m_nCellsX + 3;
+        l_secondIdxSend = m_nCellsX + 2 + m_nCellsX;
+        l_firstIdxRecv = m_nCellsX + 2;
+        l_secondIdxRecv = m_nCellsX + 2 + m_nCellsX + 1;
+    } else {
+        // VERTICAL
+        l_firstID = m_parallelData.up;
+        l_secondID = m_parallelData.down;
+        l_datatype = m_parallelData.horizontalBorder;
+        axis[0][0] = 0;
+        axis[0][1] = -1;
+        axis[1][0] = 0;
+        axis[1][1] = 1;
+        l_firstIdxSend = m_nCellsX + 3;
+        l_secondIdxSend = (m_nCellsX + 2) * m_nCellsY + 1;
+        l_firstIdxRecv = 1;
+        l_secondIdxRecv = (m_nCellsX + 2) * (m_nCellsY + 1);
     }
 
     // send/recieve data from left or upper neighbor
-    // std::cout << "rank: " << m_parallelData.rank << " | first: " << l_firstID << " | second: " << l_secondID << " | mode: " << i_mode << std::endl;
     if (l_firstID != -2) {
+        // send/recv height to left or upper
         l_error = MPI_Isend(&i_height[l_firstIdxSend], 1, l_datatype, l_firstID, 0, m_parallelData.communicator, &m_parallelData.firstRequest[0]);
-        assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Isend(&i_momentumX[l_firstIdxSend], 1, l_datatype, l_firstID, 1, m_parallelData.communicator, &m_parallelData.firstRequest[1]);
-        assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Isend(&i_momentumY[l_firstIdxSend], 1, l_datatype, l_firstID, 2, m_parallelData.communicator, &m_parallelData.firstRequest[2]);
-        assert(l_error == MPI_SUCCESS);
-        l_error = MPI_Isend(&i_bathymetry[l_firstIdxSend], 1, l_datatype, l_firstID, 3, m_parallelData.communicator, &m_parallelData.firstRequest[3]);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_height[l_firstIdxRecv], 1, l_datatype, l_firstID, 4, m_parallelData.communicator, &m_parallelData.firstRequest[4]);
         assert(l_error == MPI_SUCCESS);
+
+        // send/recv momentum x to left or upper
+        l_error = MPI_Isend(&i_momentumX[l_firstIdxSend], 1, l_datatype, l_firstID, 1, m_parallelData.communicator, &m_parallelData.firstRequest[1]);
+        assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_momentumX[l_firstIdxRecv], 1, l_datatype, l_firstID, 5, m_parallelData.communicator, &m_parallelData.firstRequest[5]);
         assert(l_error == MPI_SUCCESS);
+
+        // send/recv momentum y to left or upper
+        l_error = MPI_Isend(&i_momentumY[l_firstIdxSend], 1, l_datatype, l_firstID, 2, m_parallelData.communicator, &m_parallelData.firstRequest[2]);
+        assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_momentumY[l_firstIdxRecv], 1, l_datatype, l_firstID, 6, m_parallelData.communicator, &m_parallelData.firstRequest[6]);
+        assert(l_error == MPI_SUCCESS);
+
+        // send/recv bathymetry to left or upper
+        l_error = MPI_Isend(&i_bathymetry[l_firstIdxSend], 1, l_datatype, l_firstID, 3, m_parallelData.communicator, &m_parallelData.firstRequest[3]);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_bathymetry[l_firstIdxRecv], 1, l_datatype, l_firstID, 7, m_parallelData.communicator, &m_parallelData.firstRequest[7]);
         assert(l_error == MPI_SUCCESS);
@@ -249,19 +252,19 @@ void tsunami_lab::patches::WavePropagation2d::setSweepGhostCells(t_real *i_heigh
         l_error = MPI_Irecv(&i_height[l_secondIdxRecv], 1, l_datatype, l_secondID, 0, m_parallelData.communicator, &m_parallelData.secondRequest[4]);
         assert(l_error == MPI_SUCCESS);
 
-        // send/recv momentum x right or lower
+        // send/recv momentum x to right or lower
         l_error = MPI_Isend(&i_momentumX[l_secondIdxSend], 1, l_datatype, l_secondID, 5, m_parallelData.communicator, &m_parallelData.secondRequest[1]);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_momentumX[l_secondIdxRecv], 1, l_datatype, l_secondID, 1, m_parallelData.communicator, &m_parallelData.secondRequest[5]);
         assert(l_error == MPI_SUCCESS);
 
-        // send/recv momentum y right or lower
+        // send/recv momentum y to right or lower
         l_error = MPI_Isend(&i_momentumY[l_secondIdxSend], 1, l_datatype, l_secondID, 6, m_parallelData.communicator, &m_parallelData.secondRequest[2]);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_momentumY[l_secondIdxRecv], 1, l_datatype, l_secondID, 2, m_parallelData.communicator, &m_parallelData.secondRequest[6]);
         assert(l_error == MPI_SUCCESS);
 
-        // send/recv bathymetry right or lower
+        // send/recv bathymetry to right or lower
         l_error = MPI_Isend(&i_bathymetry[l_secondIdxSend], 1, l_datatype, l_secondID, 7, m_parallelData.communicator, &m_parallelData.secondRequest[3]);
         assert(l_error == MPI_SUCCESS);
         l_error = MPI_Irecv(&i_bathymetry[l_secondIdxRecv], 1, l_datatype, l_secondID, 3, m_parallelData.communicator, &m_parallelData.secondRequest[7]);
@@ -327,52 +330,4 @@ void tsunami_lab::patches::WavePropagation2d::copyGhostCellsOutflow(short i_axis
     }
 
     copyCornerCells(o_dataArray);
-}
-
-void tsunami_lab::patches::WavePropagation2d::copyGhostCellsReflecting(short i_axis[2], t_real i_value, t_real *o_dataArray) {
-    t_idx l_xMax = m_nCellsX + 1;
-    t_idx l_yMax = m_nCellsY + 1;
-
-    if (i_axis[0] == 1) {
-        for (t_idx l_iy = 1; l_iy < l_yMax; l_iy++) {
-            o_dataArray[getIndex(l_xMax, l_iy)] = i_value;
-        }
-    } else if (i_axis[0] == -1) {
-        for (t_idx l_iy = 1; l_iy < l_yMax; l_iy++) {
-            o_dataArray[getIndex(0, l_iy)] = i_value;
-        }
-    }
-
-    if (i_axis[1] == 1) {
-        for (t_idx l_ix = 1; l_ix < l_xMax; l_ix++) {
-            o_dataArray[getIndex(l_ix, l_yMax)] = i_value;
-        }
-    } else if (i_axis[1] == -1) {
-        for (t_idx l_ix = 1; l_ix < l_xMax; l_ix++) {
-            o_dataArray[getIndex(l_ix, 0)] = i_value;
-        }
-    }
-
-    copyCornerCells(o_dataArray);
-}
-
-void tsunami_lab::patches::WavePropagation2d::setGhostCells(e_boundary *i_boundary) {
-    short l_axis[4][2] = {{1, 0},
-                          {0, 1},
-                          {-1, 0},
-                          {0, -1}};
-
-    for (t_idx l_i = 0; l_i < 4; l_i++) {
-        if (i_boundary[l_i] == OUTFLOW) {
-            copyGhostCellsOutflow(l_axis[l_i], m_h[m_step]);
-            copyGhostCellsOutflow(l_axis[l_i], m_hu[m_step]);
-            copyGhostCellsOutflow(l_axis[l_i], m_hv[m_step]);
-            copyGhostCellsOutflow(l_axis[l_i], m_b);
-        } else if (i_boundary[l_i] == REFLECTING) {
-            copyGhostCellsReflecting(l_axis[l_i], 0, m_h[m_step]);
-            copyGhostCellsReflecting(l_axis[l_i], 0, m_hu[m_step]);
-            copyGhostCellsReflecting(l_axis[l_i], 0, m_hv[m_step]);
-            copyGhostCellsReflecting(l_axis[l_i], 20, m_b);
-        }
-    }
 }
