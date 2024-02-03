@@ -37,7 +37,7 @@ TEST_CASE("Test the NetCDF writer.", "[NetCDFWrite]") {
 
     REQUIRE(l_writer->store(0.5, 0, h1, hu1, hv1) == NC_NOERR);
     REQUIRE(l_writer->store(1.0, 1, h2, hu2, hv2) == NC_NOERR);
-    REQUIRE(l_writer->write() == NC_NOERR);
+    REQUIRE(l_writer->write(-1) == NC_NOERR);
 
     int l_ncId;
     int l_varIDx, l_varIDy, l_varIDtime, l_varIDheight, l_varIDmomentumX, l_varIDmomentumY, l_varIDbathymetry;
