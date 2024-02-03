@@ -8,7 +8,6 @@
 #define TSUNAMI_LAB_PATCHES_WAVE_PROPAGATION_2D
 
 #include "../../MPIKernel/MPIKernel.h"
-#include "../../allocator.h"
 #include "../../solvers/FWave.h"
 #include "../WavePropagation.h"
 
@@ -33,16 +32,16 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     t_idx m_nCellsAll = 0;
 
     //! water heights for the current and next time step for all cells
-    t_real *m_h[2] = {nullptr, nullptr};
+    alignas(8) t_real *m_h[2] = {nullptr, nullptr};
 
     //! momenta in x-direction for the current and next time step for all cells
-    t_real *m_hu[2] = {nullptr, nullptr};
+    alignas(8) t_real *m_hu[2] = {nullptr, nullptr};
 
     //! momenta in y-direction for the current and next time step for all cells
-    t_real *m_hv[2] = {nullptr, nullptr};
+    alignas(8) t_real *m_hv[2] = {nullptr, nullptr};
 
     //! bathymetries for all cells
-    t_real *m_b = nullptr;
+    alignas(8) t_real *m_b = nullptr;
 
     //! parallel data like neighbour threads
     MPIKernel::ParallelData m_parallelData;

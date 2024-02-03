@@ -26,9 +26,9 @@ tsunami_lab::patches::WavePropagation2d::WavePropagation2d(t_idx i_nCellsX,
     m_hu[0] = i_momentumX;
     m_hv[0] = i_momentumY;
 
-    m_h[1] = tsunami_lab::aligned_alloc_real(m_nCellsAll);
-    m_hu[1] = tsunami_lab::aligned_alloc_real(m_nCellsAll);
-    m_hv[1] = tsunami_lab::aligned_alloc_real(m_nCellsAll);
+    m_h[1] = new t_real[m_nCellsAll];
+    m_hu[1] = new t_real[m_nCellsAll];
+    m_hv[1] = new t_real[m_nCellsAll];
     m_b = i_bathymetry;
 
     // init to zero
@@ -75,9 +75,9 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     t_real *l_hvNew = m_hv[m_step];
 
     // create arrays to save the data from the x-sweep
-    t_real *l_hStar = tsunami_lab::aligned_alloc_real(m_nCellsAll);
-    t_real *l_huStar = tsunami_lab::aligned_alloc_real(m_nCellsAll);
-    t_real *l_hvStar = tsunami_lab::aligned_alloc_real(m_nCellsAll);
+    alignas(8) t_real *l_hStar = new t_real[m_nCellsAll];
+    alignas(8) t_real *l_huStar = new t_real[m_nCellsAll];
+    alignas(8) t_real *l_hvStar = new t_real[m_nCellsAll];
 
     // init cell (Star) quantities
 #pragma omp parallel for collapse(2) schedule(static, 32)
