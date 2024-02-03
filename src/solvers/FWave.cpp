@@ -1,5 +1,5 @@
 /**
- * @author Bohdan Babii
+ * @author Bohdan Babii (bohdan.babii AT uni-jena.de)
  * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
  *
  * @section DESCRIPTION

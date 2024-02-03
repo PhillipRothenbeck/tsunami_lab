@@ -1,5 +1,6 @@
 /**
- * @author Phillip Rothenbeck, Moritz Rätz
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  *
  * @section DESCRIPTION
  * routines and data structure
