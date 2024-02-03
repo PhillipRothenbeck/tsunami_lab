@@ -1,5 +1,8 @@
 ##
 # @author Alexander Breuer (alex.breuer AT uni-jena.de)
+# @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+# @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+# @author Moritz Rätz (moritz.raetz AT uni-jena.de)
 #
 # @section DESCRIPTION
 # Collects sources for a build.
@@ -12,12 +15,11 @@ l_sources = [ 'solvers/Roe.cpp',
               'patches/2d/WavePropagation2d.cpp',
               'simulator/Simulator.cpp',
               'setups/TsunamiEvent2d/TsunamiEvent2d.cpp',
-              'setups/CheckPoint/CheckPoint.cpp',
               'configs/SimConfig.cpp',
               'io/Json/ConfigLoader.cpp',
               'io/NetCDF/NetCDF.cpp',
               'io/Csv/Csv.cpp',
-              'MPIKernel/MPIKernel.cpp'
+              'MPIKernel/MPIKernel.cpp',
               ]
 
 for l_so in l_sources:
@@ -32,7 +34,6 @@ l_tests = [ 'tests.cpp',
             'patches/2d/WavePropagation2d.test.cpp',
             'simulator/Simulator.test.cpp',
             'setups/TsunamiEvent2d/TsunamiEvent2d.test.cpp',
-            'setups/CheckPoint/CheckPoint.test.cpp',
             'configs/SimConfig.test.cpp',
             'io/Json/ConfigLoader.test.cpp',
             'io/NetCDF/NetCDF.test.cpp',
