@@ -15,7 +15,6 @@
 #include "../../constants.h"
 #include "../../io/Csv/Csv.h"
 #include "../../io/NetCDF/NetCDF.h"
-#include "../../setups/CheckPoint/CheckPoint.h"
 #include "../../setups/Setup.h"
 #include "../../setups/TsunamiEvent2d/TsunamiEvent2d.h"
 
