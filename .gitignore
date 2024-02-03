@@ -21,4 +21,6 @@ _build/*
 /res/chile*
 /res/tohoku*
 
-scripts/tsunami_lab_mpi.sh
+# ara output / error
+*.out*
+*.err*
