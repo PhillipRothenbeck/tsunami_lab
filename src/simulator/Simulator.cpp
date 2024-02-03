@@ -29,8 +29,8 @@ void tsunami_lab::Simulator::sendData(setups::Setup *i_setup, Timer *i_timer) {
     i_timer->start();
 
     // define length of one cell
-    t_real l_dx = m_simConfig.getXLength() / m_grid.globalNX;
-    t_real l_dy = m_simConfig.getYLength() / m_grid.globalNY;
+    t_real l_dx = m_simConfig.xLen / m_grid.globalNX;
+    t_real l_dy = m_simConfig.yLen / m_grid.globalNY;
 
     // init sub-domain on rank 0 for holding the values of other processes
     alignas(8) t_real *l_tempHeight = new t_real[m_localSize];
@@ -119,7 +119,7 @@ void tsunami_lab::Simulator::sendData(setups::Setup *i_setup, Timer *i_timer) {
     m_scalingX = m_dt / l_dx;
     m_scalingY = m_dt / l_dy;
 
-    m_endTime = m_simConfig.getEndSimTime();
+    m_endTime = m_simConfig.endSimTime;
 
     // send important values for the simulation to the other processes
     for (int l_processID = 1; l_processID < m_parallelData.size; l_processID++) {
@@ -182,7 +182,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
     m_ny = m_grid.globalNY;
     m_localSize = (m_grid.localNX + 2) * (m_grid.localNY + 2);
 
-    Timer *l_timer = new Timer(m_simConfig.getFlagConfig().useTiming());
+    Timer *l_timer = new Timer(m_simConfig.flagConfig.useTiming());
 
     // initialize local subgrids for each MPI process
     m_height = new t_real[m_localSize];
@@ -215,7 +215,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
     t_idx l_timestepsPerFrame = 25;
     t_idx l_timeStep = l_timestepsPerFrame * l_frame;
 
-    std::string l_path = "./out/" + m_simConfig.getConfigName() + "_" + std::to_string(m_parallelData.rank) + ".nc";
+    std::string l_path = "./out/" + m_simConfig.configName + "_" + std::to_string(m_parallelData.rank) + ".nc";
 
     l_timer->start();
 
@@ -230,7 +230,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
                         m_grid.localNX,
                         m_grid.localNY,
                         l_waveProp.getStride(),
-                        m_simConfig.getCoarseFactor(),
+                        m_simConfig.coarseFactor,
                         l_waveProp.getBathymetry(),
                         l_path);
 
@@ -245,7 +245,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
                           << l_simTime << " / " << l_timeStep << " / " << l_frame << std::endl;
             }
 
-            if (m_simConfig.getFlagConfig().useIO()) {
+            if (m_simConfig.flagConfig.useIO()) {
                 l_writer.store(l_simTime,
                                l_frame,
                                l_waveProp.getHeight(),
@@ -263,7 +263,7 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
 
     l_timer->printTime("simulation", m_parallelData.rank);
 
-    if (m_simConfig.getFlagConfig().useIO())
+    if (m_simConfig.flagConfig.useIO())
         l_writer.write();
 
     l_timer->printTime("writing output", m_parallelData.rank);

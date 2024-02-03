@@ -30,82 +30,59 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
     nlohmann::json l_configFile = nlohmann::json::parse(l_file);
 
     // set number of cells in x-direction
-    tsunami_lab::t_idx l_nx = 50;
     if (l_configFile.contains("nx")) {
-        l_nx = l_configFile.at("nx");
+        o_simConfig.nx = l_configFile.at("nx");
     }
 
     // set number of cells in y-direction
-    tsunami_lab::t_idx l_ny = 50;
     if (l_configFile.contains("ny")) {
-        l_ny = l_configFile.at("ny");
+        o_simConfig.ny = l_configFile.at("ny");
     }
 
     // set length of simulation x-direction
-    tsunami_lab::t_real l_xLen = 10;
+    o_simConfig.xLen = 10;
     if (l_configFile.contains("xLen")) {
-        l_xLen = l_configFile.at("xLen");
+        o_simConfig.xLen = l_configFile.at("xLen");
     }
 
     // set length of simulation y-direction
-    tsunami_lab::t_real l_yLen = 10;
+    o_simConfig.yLen = 10;
     if (l_configFile.contains("yLen")) {
-        l_yLen = l_configFile.at("yLen");
+        o_simConfig.yLen = l_configFile.at("yLen");
     }
 
     // offset of the epicenter to the 0-point in x-direction
-    tsunami_lab::t_real l_epicenterOffsetX = -(l_xLen / 2);
+    tsunami_lab::t_real l_epicenterOffsetX = -(o_simConfig.xLen / 2);
     if (l_configFile.contains("epicenterOffsetX")) {
         l_epicenterOffsetX = l_configFile.at("epicenterOffsetX");
     }
 
     // offset of the epicenter to the 0-point in x-direction
-    tsunami_lab::t_real l_epicenterOffsetY = -(l_yLen / 2);
+    tsunami_lab::t_real l_epicenterOffsetY = -(o_simConfig.yLen / 2);
     if (l_configFile.contains("epicenterOffsetY")) {
         l_epicenterOffsetY = l_configFile.at("epicenterOffsetY");
     }
 
     // set time of simulation
-    tsunami_lab::t_real l_endSimTime = 1.25;
     if (l_configFile.contains("simTime")) {
-        l_endSimTime = l_configFile.at("simTime");
+        o_simConfig.endSimTime = l_configFile.at("simTime");
     }
 
-    // set start time of simulation
-    tsunami_lab::t_real l_startSimTime = 0;
-
     // set boundary condition
-    e_boundary l_boundaryCond[4] = {OUTFLOW, OUTFLOW, OUTFLOW, OUTFLOW};
     if (l_configFile.contains("boundaryCond")) {
         std::string l_boundary = l_configFile.at("boundaryCond");
         for (t_idx l_i = 0; l_i < l_boundary.length(); l_i++) {
             if (l_boundary[l_i] == 'R') {
-                l_boundaryCond[l_i] = REFLECTING;
+                o_simConfig.boundaryCondition[l_i] = REFLECTING;
             }
         }
     }
 
-    // set solver
-    bool l_useRoeSolver = false;
-    if (l_configFile.contains("solver")) {
-        std::string solver = l_configFile.at("solver");
-        if (solver.compare("Roe") == 0) {
-            l_useRoeSolver = true;
-        }
-    }
-
     // factor for coarse output
-    tsunami_lab::t_idx l_checkPointCount = 5;
-    if (l_configFile.contains("checkPoints")) {
-        l_checkPointCount = l_configFile.at("checkPoints");
-    }
-
-    // factor for coarse output
-    tsunami_lab::t_idx l_coarseFactor = 1;
     if (l_configFile.contains("coarseFactor")) {
-        l_coarseFactor = l_configFile.at("coarseFactor");
+        o_simConfig.coarseFactor = l_configFile.at("coarseFactor");
 
-        if (l_coarseFactor < 1) {
+        if (o_simConfig.coarseFactor < 1) {
             std::cout << "factor for coarse input can't be smaller than 1" << std::endl;
             return EXIT_FAILURE;
         }
@@ -121,8 +98,8 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
         l_displacementsFileName = l_configFile.at("displacementsFileName");
     }
 
-    std::string l_configName = i_configName.substr(0, i_configName.find_last_of("."));
-    if(i_rank == 0) {
+    o_simConfig.configName = i_configName.substr(0, i_configName.find_last_of("."));
+    if (i_rank == 0) {
         tsunami_lab::t_idx l_bathymetryDimX, l_bathymetryDimY, l_dispDimX, l_dispDimY;
         tsunami_lab::t_real *l_bathymetry;
         tsunami_lab::t_real *l_bathymetryPosX;
@@ -149,8 +126,8 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
             return EXIT_FAILURE;
         }
 
-        o_setup = new tsunami_lab::setups::TsunamiEvent2d(l_xLen,
-                                                          l_yLen,
+        o_setup = new tsunami_lab::setups::TsunamiEvent2d(o_simConfig.xLen,
+                                                          o_simConfig.xLen,
                                                           l_bathymetryDimX,
                                                           l_bathymetryDimY,
                                                           l_bathymetryPosX,
@@ -165,19 +142,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
                                                           l_epicenterOffsetY);
     }
 
-    o_simConfig = tsunami_lab::configs::SimConfig(l_configName,
-                                                  i_flagConfig,
-                                                  l_checkPointCount,
-                                                  l_nx,
-                                                  l_ny,
-                                                  l_xLen,
-                                                  l_yLen,
-                                                  l_endSimTime,
-                                                  l_startSimTime,
-                                                  0,
-                                                  l_coarseFactor,
-                                                  l_boundaryCond,
-                                                  l_useRoeSolver);
+    o_simConfig.flagConfig = i_flagConfig;
 
     return 0;
 }

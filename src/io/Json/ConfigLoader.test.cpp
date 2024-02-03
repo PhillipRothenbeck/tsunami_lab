@@ -24,16 +24,14 @@ TEST_CASE("Test reading a config JSON file.", "[ConfigLoader]") {
                                                     l_simConfig);
 
     REQUIRE(err == 0);
-    REQUIRE(l_simConfig.getXCells() == 500);
-    REQUIRE(l_simConfig.getYCells() == 500);
-    REQUIRE(l_simConfig.getXLength() == 100.0);
-    REQUIRE(l_simConfig.getYLength() == 500.0);
-    REQUIRE(l_simConfig.getEndSimTime() == 5.0);
-    REQUIRE(l_simConfig.getStartSimTime() == 0);
-    REQUIRE(l_simConfig.getCoarseFactor() == 1.0);
-    REQUIRE(l_simConfig.getBoundaryCondition()[0] == tsunami_lab::OUTFLOW);
-    REQUIRE(l_simConfig.getBoundaryCondition()[1] == tsunami_lab::REFLECTING);
-    REQUIRE(l_simConfig.isRoeSolver());
-    REQUIRE(l_simConfig.getCheckPointCount() == 2);
+    REQUIRE(l_simConfig.nx == 500);
+    REQUIRE(l_simConfig.ny == 500);
+    REQUIRE(l_simConfig.xLen == 100.0);
+    REQUIRE(l_simConfig.yLen == 500.0);
+    REQUIRE(l_simConfig.endSimTime == 5.0);
+    REQUIRE(l_simConfig.startSimTime == 0);
+    REQUIRE(l_simConfig.coarseFactor == 1.0);
+    REQUIRE(l_simConfig.boundaryCondition[0] == tsunami_lab::OUTFLOW);
+    REQUIRE(l_simConfig.boundaryCondition[1] == tsunami_lab::REFLECTING);
     delete l_setups;
 }
