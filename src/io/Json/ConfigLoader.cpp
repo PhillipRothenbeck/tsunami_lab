@@ -121,7 +121,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
         l_displacementsFileName = l_configFile.at("displacementsFileName");
     }
 
-    
+    std::string l_configName = i_configName.substr(0, i_configName.find_last_of("."));
     if(i_rank == 0) {
         tsunami_lab::t_idx l_bathymetryDimX, l_bathymetryDimY, l_dispDimX, l_dispDimY;
         tsunami_lab::t_real *l_bathymetry;
@@ -174,7 +174,7 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
                                                   l_yLen,
                                                   l_endSimTime,
                                                   l_startSimTime,
-                                                  l_startFrame,
+                                                  0,
                                                   l_coarseFactor,
                                                   l_boundaryCond,
                                                   l_useRoeSolver);
