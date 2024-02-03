@@ -1,5 +1,5 @@
 /**
- * @author Phillip Rothenbeck
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Class loading the config.json file and initializing the simulation.

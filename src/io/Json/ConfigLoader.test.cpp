@@ -1,5 +1,5 @@
 /**
- * @author Phillip Rothenbeck
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Test loading the config files.
