@@ -79,13 +79,16 @@ void tsunami_lab::Simulator::sendData(setups::Setup *i_setup, Timer *i_timer) {
         if (l_processID != 0) {
             int l_error = MPI_SUCCESS;
 
-            l_error = MPI_Send(l_tempHeight, m_localSize, MPI_FLOAT, l_processID, 0, m_parallelData.communicator);
+            l_error = MPI_Isend(l_tempHeight, 1, m_parallelData.subgrid, l_processID, 0, m_parallelData.communicator, &m_parallelData.subgridRequest[0]);
             assert(l_error == MPI_SUCCESS);
-            l_error = MPI_Send(l_tempMomentumX, m_localSize, MPI_FLOAT, l_processID, 1, m_parallelData.communicator);
+            l_error = MPI_Isend(l_tempMomentumX, 1, m_parallelData.subgrid, l_processID, 1, m_parallelData.communicator, &m_parallelData.subgridRequest[1]);
             assert(l_error == MPI_SUCCESS);
-            l_error = MPI_Send(l_tempMomentumY, m_localSize, MPI_FLOAT, l_processID, 2, m_parallelData.communicator);
+            l_error = MPI_Isend(l_tempMomentumY, 1, m_parallelData.subgrid, l_processID, 2, m_parallelData.communicator, &m_parallelData.subgridRequest[2]);
             assert(l_error == MPI_SUCCESS);
-            l_error = MPI_Send(l_tempBathymetry, m_localSize, MPI_FLOAT, l_processID, 3, m_parallelData.communicator);
+            l_error = MPI_Isend(l_tempBathymetry, 1, m_parallelData.subgrid, l_processID, 3, m_parallelData.communicator, &m_parallelData.subgridRequest[3]);
+            assert(l_error == MPI_SUCCESS);
+
+            l_error = MPI_Waitall(4, m_parallelData.subgridRequest, MPI_STATUS_IGNORE);
             assert(l_error == MPI_SUCCESS);
             std::cout << "Rank 0: Successfully send the subgrid to process " << l_processID << std::endl;
         }
@@ -146,15 +149,17 @@ void tsunami_lab::Simulator::sendData(setups::Setup *i_setup, Timer *i_timer) {
 void tsunami_lab::Simulator::recieveData(Timer *i_timer) {
     int l_error = MPI_SUCCESS;
 
-    l_error = MPI_Recv(m_height, m_localSize, MPI_FLOAT, 0, 0, m_parallelData.communicator, MPI_STATUS_IGNORE);
+    l_error = MPI_Irecv(m_height, m_localSize, MPI_FLOAT, 0, 0, m_parallelData.communicator, &m_parallelData.subgridRequest[0]);
     assert(l_error == MPI_SUCCESS);
-    l_error = MPI_Recv(m_momentumX, m_localSize, MPI_FLOAT, 0, 1, m_parallelData.communicator, MPI_STATUS_IGNORE);
+    l_error = MPI_Irecv(m_momentumX, m_localSize, MPI_FLOAT, 0, 1, m_parallelData.communicator, &m_parallelData.subgridRequest[1]);
     assert(l_error == MPI_SUCCESS);
-    l_error = MPI_Recv(m_momentumY, m_localSize, MPI_FLOAT, 0, 2, m_parallelData.communicator, MPI_STATUS_IGNORE);
+    l_error = MPI_Irecv(m_momentumY, m_localSize, MPI_FLOAT, 0, 2, m_parallelData.communicator, &m_parallelData.subgridRequest[2]);
     assert(l_error == MPI_SUCCESS);
-    l_error = MPI_Recv(m_bathymetry, m_localSize, MPI_FLOAT, 0, 3, m_parallelData.communicator, MPI_STATUS_IGNORE);
+    l_error = MPI_Irecv(m_bathymetry, m_localSize, MPI_FLOAT, 0, 3, m_parallelData.communicator, &m_parallelData.subgridRequest[3]);
     assert(l_error == MPI_SUCCESS);
 
+    l_error = MPI_Waitall(4, m_parallelData.subgridRequest, MPI_STATUS_IGNORE);
+    assert(l_error == MPI_SUCCESS);
     i_timer->printTime("recieving data", m_parallelData.rank);
 
     l_error = MPI_Recv(&m_dxy, 1, MPI_FLOAT, 0, 4, m_parallelData.communicator, MPI_STATUS_IGNORE);
