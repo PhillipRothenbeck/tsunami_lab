@@ -59,9 +59,7 @@ int main(int i_argc, char *i_argv[]) {
     tsunami_lab::configs::FlagConfig l_flagConfig = tsunami_lab::configs::FlagConfig();
     if (i_argc > 2) {
         for (int l_arguments = 1; l_arguments < i_argc; l_arguments++) {
-            if (std::string(i_argv[l_arguments]).compare("-c") == 0) {
-                l_flagConfig.setUseCheckPoint(true);
-            } else if (std::string(i_argv[l_arguments]).compare("-t") == 0) {
+            if (std::string(i_argv[l_arguments]).compare("-t") == 0) {
                 l_flagConfig.setUseTiming(true);
             } else if (std::string(i_argv[l_arguments]).compare("-nio") == 0) {
                 l_flagConfig.setUseIO(false);
