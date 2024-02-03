@@ -17,7 +17,6 @@
 #include "../io/Csv/Csv.h"
 #include "../io/NetCDF/NetCDF.h"
 #include "../patches/2d/WavePropagation2d.h"
-#include "../setups/CheckPoint/CheckPoint.h"
 #include "../setups/Setup.h"
 #include "../timer.h"
 
@@ -41,28 +40,28 @@ class tsunami_lab::Simulator {
     alignas(8) t_real *m_height, *m_momentumX, *m_momentumY, *m_bathymetry;
 
     /**
-     * @brief sends data from process 0 to the other processes
+     * @brief sends data from process 0 to the other processes.
      *
-     * @param i_setup data stored in setup
-     * @param i_timer timer helper class
+     * @param i_setup data stored in setup.
+     * @param i_timer timer helper class.
      */
     void sendData(setups::Setup *i_setup, Timer *i_timer);
 
     /**
-     * @brief recieve data from process 0
+     * @brief recieve data from process 0.
      *
-     * @param i_timer timer helper class
+     * @param i_timer timer helper class.
      */
     void recieveData(Timer *i_timer);
 
    public:
     /**
-     * @brief starts and runs the simulation
+     * @brief starts and runs the simulation.
      *
-     * @param i_setup data stored in setup
-     * @param i_simConfig configuration of the simulation
-     * @param i_parallelData data for MPI usage
-     * @param i_grid dimensions of the grid
+     * @param i_setup data stored in setup.
+     * @param i_simConfig configuration of the simulation.
+     * @param i_parallelData data for MPI usage.
+     * @param i_grid dimensions of the grid.
      */
     void runSimulation(tsunami_lab::setups::Setup *i_setup,
                        tsunami_lab::configs::SimConfig i_simConfig,
