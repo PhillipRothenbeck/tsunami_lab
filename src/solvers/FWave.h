@@ -1,6 +1,7 @@
 /**
- * @author Bohdan Babii, Phillip Rothenbeck
- *
+ * @author Bohdan Babii
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * 
  * @section DESCRIPTION
  * F Wave solver for the one-dimensional shallow water equations.
  **/
@@ -25,11 +26,11 @@ class tsunami_lab::solvers::FWave {
     static t_real constexpr c_sqrt_g = 3.131557121;
 
     /**
-     * Computes the average wave height.
+     * @brief Computes the average wave height.
      *
      * @param i_hL height of the left side.
      * @param i_hR height of the right side.
-     * @param o_hight will be set to the average speed.
+     * @param o_height will be set to the average speed.
      **/
 
     static void heightAvg(t_real i_hL,
@@ -37,7 +38,7 @@ class tsunami_lab::solvers::FWave {
                           t_real &o_height);
 
     /**
-     * Computes the average particle_Velocity
+     * @brief Computes the average particle_Velocity
      *
      * @param i_hL height of the left side.
      * @param i_hR height of the right side.
@@ -52,7 +53,7 @@ class tsunami_lab::solvers::FWave {
                                     t_real i_uR,
                                     t_real &o_velocity);
     /**
-     * Computes the wave speeds.
+     * @brief Computes the wave speeds.
      *
      * @param i_hL height of the left side.
      * @param i_hR height of the right side.
@@ -70,7 +71,7 @@ class tsunami_lab::solvers::FWave {
                            t_real &o_waveSpeedR);
 
     /**
-     * Computes the flux function for one cell.
+     * @brief Computes the flux function for one cell.
      *
      * @param i_h height of the cell
      * @param i_hu momentum of the cell
@@ -81,7 +82,7 @@ class tsunami_lab::solvers::FWave {
                      t_real o_flux[2]);
 
     /**
-     * Computes the wave strengths
+     * @brief Computes the wave strengths
      *
      * @param i_hL height of the left side.
      * @param i_hR height of the right side.
@@ -108,7 +109,7 @@ class tsunami_lab::solvers::FWave {
 
    public:
     /**
-     * Computes the net-updates.
+     * @brief Computes the net-updates.
      *
      * @param i_hL height of the left side.
      * @param i_hR height of the right side.
