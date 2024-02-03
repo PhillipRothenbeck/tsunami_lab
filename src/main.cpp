@@ -102,7 +102,7 @@ int main(int i_argc, char *i_argv[]) {
     delete l_timer;
 
     // free parallel datatypes
-    tsunami_lab::MPIKernel::freeParallelData(&l_parallelData);
+    tsunami_lab::MPIKernel::freeTypes(&l_parallelData);
 
     l_error = MPI_Finalize();
     assert(l_error == MPI_SUCCESS);

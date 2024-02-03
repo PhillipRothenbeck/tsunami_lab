@@ -96,5 +96,5 @@ TEST_CASE("Test the 2d wave propagation solver.", "[WaveProp2d]") {
             REQUIRE(l_waveProp.getMomentumY()[l_ceY * 12 + l_ceX] == Approx(0));
         }
     }
-    tsunami_lab::MPIKernel::freeParallelData(&l_parallelData);
+    tsunami_lab::MPIKernel::freeTypes(&l_parallelData);
 }

@@ -38,7 +38,7 @@ void tsunami_lab::MPIKernel::init(t_idx i_nx, t_idx i_ny, ParallelData *o_parall
     }
 
     initParallelData(l_localNX, l_localNY, l_dimension, o_parallelData);
-    initGrid(l_localNX, l_localNY, i_nx, i_ny, o_grid);
+    initGridData(l_localNX, l_localNY, i_nx, i_ny, o_grid);
 }
 
 void tsunami_lab::MPIKernel::initParallelData(t_idx i_localNX, t_idx i_localNY, int *i_dimension, ParallelData *o_parallelData) {
@@ -68,15 +68,14 @@ void tsunami_lab::MPIKernel::initParallelData(t_idx i_localNX, t_idx i_localNY, 
     MPI_Type_commit(&o_parallelData->subgrid);
 }
 
-void tsunami_lab::MPIKernel::initGrid(t_idx i_localNX, t_idx i_localNY, t_idx i_globalNX, t_idx i_globalNY, GridData *o_grid) {
+void tsunami_lab::MPIKernel::initGridData(t_idx i_localNX, t_idx i_localNY, t_idx i_globalNX, t_idx i_globalNY, GridData *o_grid) {
     o_grid->localNX = i_localNX;
     o_grid->localNY = i_localNY;
     o_grid->globalNX = i_globalNX;
     o_grid->globalNY = i_globalNY;
 }
 
-void tsunami_lab::MPIKernel::freeParallelData(ParallelData *o_parallelData) {
-    // Free MPI datatypes
+void tsunami_lab::MPIKernel::freeTypes(ParallelData *o_parallelData) {
     MPI_Type_free(&o_parallelData->horizontalBorder);
     MPI_Type_free(&o_parallelData->verticalBorder);
     MPI_Type_free(&o_parallelData->subgrid);
