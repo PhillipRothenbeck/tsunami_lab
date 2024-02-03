@@ -39,14 +39,14 @@ class Timer {
     }
 
     /**
-     * prints out time took since last reset, resets time afterwards
+     * @brief prints out time took since last reset, resets time afterwards
      */
     void printTime(std::string i_description = "") {
         std::chrono::duration<double> l_chronoTimeElapsed = now() - m_startTime;
+        std::cout << "Took: " << l_chronoTimeElapsed.count() << "s";
         if (i_description.compare("") != 0) {
-            std::cout << i_description << std::endl;
+            std::cout << ", Reason: " << i_description << std::endl;
         }
-        std::cout << "Took: " << l_chronoTimeElapsed.count() << "s" << std::endl;
         start();
     }
 };
