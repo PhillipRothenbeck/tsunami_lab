@@ -107,6 +107,6 @@ int main(int i_argc, char *i_argv[]) {
     l_error = MPI_Finalize();
     assert(l_error == MPI_SUCCESS);
 
-    std::cout << "Rank " << l_rank << ": finished and exiting" << std::endl;
+    std::cout << "Rank " << l_rank << ": Finished and exiting" << std::endl;
     return EXIT_SUCCESS;
 }
