@@ -15,26 +15,47 @@ class Timer {
    private:
     typedef std::chrono::high_resolution_clock::time_point t_time;
     t_time m_startTime;
+    bool m_useTiming;
 
    public:
-    Timer() {
+    /**
+     * @brief timer constructer, runs timer->start() when init
+     */
+    Timer(bool i_useTiming) {
+        m_useTiming = i_useTiming;
         start();
     }
 
+    /**
+     * @brief helper function to get current time
+     */
     t_time now() {
         return std::chrono::high_resolution_clock::now();
     }
 
+    /**
+     * @brief resets timer to current time
+     */
     void start() {
+        if (!m_useTiming)
+            return;
         m_startTime = now();
     }
 
-    void printTime(std::string i_description = "") {
+    /**
+     * @brief prints out time took since last reset, resets time afterwards
+     */
+    void printTime(std::string i_description = "", int i_rank = -1) {
+        if (!m_useTiming)
+            return;
+
         std::chrono::duration<double> l_chronoTimeElapsed = now() - m_startTime;
-		  if (i_description.compare("") != 0) {
-			std::cout << i_description << std::endl;
-		  }
-        std::cout << "Took: " << l_chronoTimeElapsed.count() << "s" << std::endl;
+
+        if (i_rank != -1) std::cout << "Rank " << std::to_string(i_rank) << ": ";
+        std::cout << "Took " << l_chronoTimeElapsed.count() << "s";
+        if (i_description.compare("") != 0) std::cout << " for " << i_description;
+        std::cout << std::endl;
+
         start();
     }
 };
