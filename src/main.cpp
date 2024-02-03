@@ -1,5 +1,8 @@
 /**
  * @author Alexander Breuer (alex.breuer AT uni-jena.de)
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+ * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Entry-point for simulations.
@@ -34,7 +37,6 @@ int main(int i_argc, char *i_argv[]) {
     assert(l_error == MPI_SUCCESS);
 
     // timer and setup
-    Timer *l_timer = new Timer();
     tsunami_lab::setups::Setup *l_setup = nullptr;
     tsunami_lab::configs::SimConfig l_simConfig = tsunami_lab::configs::SimConfig();
 
@@ -67,18 +69,18 @@ int main(int i_argc, char *i_argv[]) {
         }
     }
 
-    if (l_flagConfig.useTiming()) l_timer->start();
+    Timer *l_timer = new Timer(l_flagConfig.useTiming());
+
     // load parameters from runtimeConfig.json
     tsunami_lab::t_idx err = tsunami_lab::io::ConfigLoader::loadConfig(l_rank,
                                                                        l_configName,
                                                                        l_flagConfig,
                                                                        l_setup,
                                                                        l_simConfig);
-    if (l_flagConfig.useTiming()) l_timer->printTime("Loading Config");
+    l_timer->printTime("loading config", l_rank);
 
     if (err != 0) {
         std::cout << "failed to read: " << l_configName << std::endl;
-        delete l_setup;
         delete l_timer;
         return EXIT_FAILURE;
     }
@@ -86,24 +88,25 @@ int main(int i_argc, char *i_argv[]) {
     l_nx = l_simConfig.getXCells();
     l_ny = l_simConfig.getYCells();
 
-    // create ParralelData struct
+    // init parallel data
     tsunami_lab::MPIKernel::ParallelData l_parallelData;
     tsunami_lab::MPIKernel::Grid l_grid;
 
-    // init parallel data
     tsunami_lab::MPIKernel::init(l_nx, l_ny, &l_parallelData, &l_grid);
 
     // start simulation from config
-    tsunami_lab::Simulator::runSimulation(l_setup, l_simConfig, l_parallelData, l_grid);
+    tsunami_lab::Simulator simulator = tsunami_lab::Simulator();
+    simulator.runSimulation(l_setup, l_simConfig, l_parallelData, l_grid);
 
-    delete l_setup;
+	 // free memory
     delete l_timer;
 
     // free parallel datatypes
     tsunami_lab::MPIKernel::freeParallelData(&l_parallelData);
-    std::cout << "finished, exiting" << std::endl;
 
     l_error = MPI_Finalize();
     assert(l_error == MPI_SUCCESS);
+
+    std::cout << "Rank " << l_rank << ": finished and exiting" << std::endl;
     return EXIT_SUCCESS;
 }

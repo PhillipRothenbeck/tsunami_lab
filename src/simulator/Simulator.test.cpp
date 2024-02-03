@@ -1,5 +1,6 @@
 /**
- * @author Bohdan Babii, Phillip Rothenbeck
+ * @author Bohdan Babii
+ * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Unit-tests for Simulator.
