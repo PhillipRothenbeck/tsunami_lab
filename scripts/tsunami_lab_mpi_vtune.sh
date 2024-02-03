@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=tsunami
-#SBATCH --output=tsunami.output_mpi
-#SBATCH --error=tsunami.error_mpi
+#SBATCH --output=tsunami.output_vtune_mpi
+#SBATCH --error=tsunami.error_vtune_mpi
 #SBATCH --partition=s_hadoop
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -18,4 +18,4 @@ python3.8 -m pip install --user scons
 date
 cd /beegfs/ri26lit/tsunami_lab
 scons CXX=mpic++
-mpirun -n 10 ./build/tsunami_lab chile_500m.json -t
+mpirun -n 10 vtune -collect hotspots -trace-mpi -r ./vtune_out/r004hs ./build/tsunami_lab chile_1000m.json

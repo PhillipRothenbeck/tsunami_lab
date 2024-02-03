@@ -17,6 +17,8 @@
 #include <limits>
 #include <string>
 
+#include "../allocator.h"
+
 template <typename Base, typename T>
 inline bool instanceof (const T *ptr) {
     return dynamic_cast<const Base *>(ptr) != nullptr;
@@ -37,10 +39,10 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
     Timer *l_timer = new Timer();
 
     // initialize local subgrids for each MPI process
-    tsunami_lab::t_real *l_height = new tsunami_lab::t_real[l_localSize];
-    tsunami_lab::t_real *l_momentumX = new tsunami_lab::t_real[l_localSize];
-    tsunami_lab::t_real *l_momentumY = new tsunami_lab::t_real[l_localSize];
-    tsunami_lab::t_real *l_bathymetry = new tsunami_lab::t_real[l_localSize];
+    auto *l_height = tsunami_lab::aligned_alloc_real(l_localSize);
+    auto *l_momentumX = tsunami_lab::aligned_alloc_real(l_localSize);
+    auto *l_momentumY = tsunami_lab::aligned_alloc_real(l_localSize);
+    auto *l_bathymetry = tsunami_lab::aligned_alloc_real(l_localSize);
 
     // define number of cells
     if (i_parallelData.rank == 0) {
@@ -50,10 +52,10 @@ void tsunami_lab::Simulator::runSimulation(setups::Setup *i_setup,
         t_real l_dy = i_simConfig.getYLength() / l_ny;
 
         // init sub-domain on rank 0 for holding the values of other processes
-        float *l_tempHeight = new float[l_localSize];
-        float *l_tempMomentumX = new float[l_localSize];
-        float *l_tempMomentumY = new float[l_localSize];
-        float *l_tempBathymetry = new float[l_localSize];
+        auto *l_tempHeight = tsunami_lab::aligned_alloc_real(l_localSize);
+        auto *l_tempMomentumX = tsunami_lab::aligned_alloc_real(l_localSize);
+        auto *l_tempMomentumY = tsunami_lab::aligned_alloc_real(l_localSize);
+        auto *l_tempBathymetry = tsunami_lab::aligned_alloc_real(l_localSize);
 
         // maximum observed height in the setup
         t_real l_hMax = std::numeric_limits<t_real>::lowest();
