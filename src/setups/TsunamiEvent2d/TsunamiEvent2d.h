@@ -19,8 +19,10 @@ namespace tsunami_lab {
     }
 
 }  // namespace tsunami_lab
+
 /**
- * 2d tsunami event setup.
+ * @brief 2d tsunami event setup.
+ * 
  **/
 class tsunami_lab::setups::TsunamiEvent2d : public Setup {
    private:
@@ -71,7 +73,7 @@ class tsunami_lab::setups::TsunamiEvent2d : public Setup {
 
    public:
     /**
-     * Construct.
+     * @brief Constructor.
      *
      * @param i_simLenX length of the simulation in x-direction.
      * @param i_simLenY length of the simulation in y-direction.
@@ -104,12 +106,12 @@ class tsunami_lab::setups::TsunamiEvent2d : public Setup {
                    t_real i_epicenterOffsetY);
 
     /**
-     * Destructor.
+     * @brief Destructor.
      */
     ~TsunamiEvent2d();
 
     /**
-     * Gets the height in x-direction.
+     * @brief Gets the height in x-direction.
      *
      * @param i_x x-coordinate of the queried point.
      * @param i_y y-coordinate of the queried point.
@@ -119,7 +121,7 @@ class tsunami_lab::setups::TsunamiEvent2d : public Setup {
                      t_real i_y) const;
 
     /**
-     * Gets the momentum in x-direction.
+     * @brief Gets the momentum in x-direction.
      *
      * @param in_x x-coordinate of the queried point.
      * @return momentum in x-direction.
@@ -128,7 +130,7 @@ class tsunami_lab::setups::TsunamiEvent2d : public Setup {
                         t_real) const;
 
     /**
-     * Gets the momentum in y-direction.
+     * @brief Gets the momentum in y-direction.
      *
      * @return momentum in y-direction.
      **/
@@ -136,7 +138,7 @@ class tsunami_lab::setups::TsunamiEvent2d : public Setup {
                         t_real) const;
 
     /**
-     * Gets the bathymetry at a given point.
+     * @brief Gets the bathymetry at a given point.
      *
      * @param i_x x-coordinate of the queried point.
      * @param i_y y-coordinate of the queried point.

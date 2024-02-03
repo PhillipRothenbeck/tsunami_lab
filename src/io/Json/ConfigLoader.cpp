@@ -121,40 +121,8 @@ tsunami_lab::t_idx tsunami_lab::io::ConfigLoader::loadConfig(int i_rank,
         l_displacementsFileName = l_configFile.at("displacementsFileName");
     }
 
-    // check if checkpoint exists
-    std::string l_configName = i_configName.substr(0, i_configName.find_last_of("."));
-    std::string l_checkPointPath = "out/" + l_configName + "_checkpoint.nc";
-    std::ifstream f(l_checkPointPath.c_str());
-    t_idx l_startFrame = 0;
-    if (i_flagConfig.useCheckPoint() && f.good()) {
-        std::cout << "Reading out/" + l_configName + "_checkpoint.nc" << std::endl;
-        t_real *l_height;
-        t_real *l_momentumX;
-        t_real *l_momentumY;
-        t_real *l_bathymetry;
-        t_real *l_time;
-        t_real l_endSimTime;
-        tsunami_lab::io::NetCDF::readCheckpoint(l_checkPointPath,
-                                                l_height,
-                                                l_momentumX,
-                                                l_momentumY,
-                                                l_bathymetry,
-                                                l_time,
-                                                &l_startFrame,
-                                                &l_endSimTime,
-                                                &l_startSimTime);
-
-        o_setup = new tsunami_lab::setups::CheckPoint(l_xLen,
-                                                      l_yLen,
-                                                      l_nx,
-                                                      l_ny,
-                                                      l_startFrame,
-                                                      l_height,
-                                                      l_momentumX,
-                                                      l_momentumY,
-                                                      l_bathymetry,
-                                                      l_time);
-    } else if(i_rank == 0) {
+    
+    if(i_rank == 0) {
         tsunami_lab::t_idx l_bathymetryDimX, l_bathymetryDimY, l_dispDimX, l_dispDimY;
         tsunami_lab::t_real *l_bathymetry;
         tsunami_lab::t_real *l_bathymetryPosX;

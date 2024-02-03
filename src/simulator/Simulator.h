@@ -1,6 +1,8 @@
 /**
  * @author Bohdan Babii
  * @author Phillip Rothenbeck (phillip.rothenbeck AT uni-jena.de)
+ * @author Marek Sommerfeld (marek.sommerfeld AT uni-jena.de)
+ * @author Moritz Rätz (moritz.raetz AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Simulator class that runs all simulations.
@@ -39,24 +41,24 @@ class tsunami_lab::Simulator {
 
     alignas(8) t_real *m_height, *m_momentumX, *m_momentumY, *m_bathymetry;
 
-    /**
-     * @brief sends data from process 0 to the other processes.
-     *
-     * @param i_setup data stored in setup.
-     * @param i_timer timer helper class.
-     */
+	 /**
+	  * @brief Sends data from process 0 to the other processes.
+	  * 
+	  * @param i_setup data stored in setup.
+	  * @param i_timer timer helper class.
+	  */
     void sendData(setups::Setup *i_setup, Timer *i_timer);
 
-    /**
-     * @brief recieve data from process 0.
-     *
-     * @param i_timer timer helper class.
-     */
+	 /**
+	  * @brief Recieve data from process 0.
+	  * 
+	  * @param i_timer timer helper class.
+	  */
     void recieveData(Timer *i_timer);
 
    public:
     /**
-     * @brief starts and runs the simulation.
+     * @brief Starts and runs the simulation.
      *
      * @param i_setup data stored in setup.
      * @param i_simConfig configuration of the simulation.
