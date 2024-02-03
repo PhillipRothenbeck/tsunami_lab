@@ -87,7 +87,7 @@ void tsunami_lab::Simulator::sendData(setups::Setup *i_setup, Timer *i_timer) {
             assert(l_error == MPI_SUCCESS);
             l_error = MPI_Send(l_tempBathymetry, m_localSize, MPI_FLOAT, l_processID, 3, m_parallelData.communicator);
             assert(l_error == MPI_SUCCESS);
-            std::cout << "Successfully recieved the subgrid to " << l_processID << std::endl;
+            std::cout << "Rank 0: Successfully send the subgrid to process " << l_processID << std::endl;
         }
     }
 
