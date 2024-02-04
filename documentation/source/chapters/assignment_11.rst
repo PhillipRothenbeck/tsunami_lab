@@ -19,11 +19,11 @@ Message Passing Interface (MPI)
 -------------------------------
 
 When parallelizing our solver, we have used OpenMP in the past to partially parallelize our code.
-OpenMP enables a program to be processed by several processors by declaring parallel areas that are executed on each core.
-However, the possibilities of OpenMP are limited. One solution is to run several processes in parallel, all of which execute the entire code.
+OpenMP enables a program to be processed by multiple processors by declaring parallel regions that are executed on each core. 
+One solution is to run several processes in parallel, all of which execute the entire code.
 However, sharing data and results of local calculations among multiple processors in OpenMP can be complex.
-This is where the Message Passing Interface (MPI) is used.
-MPI spawns a certain number of processes of the program on the cores. If there were no restrictions, this would result in every process executing / calculating exactly the same work.
+This is where the Message Passing Interface is used.
+MPI spawns a certain number of processes each on one respective core. If there were no restrictions, this would result in every process executing exactly the same work.
 Therefore, each core has an ID called 'rank' to identify the process running the code and distinguish the work done on each process. 
 MPI provides functions to facilitate communication, allowing for the sending and receiving of single or multiple data to or from another processor.
 
