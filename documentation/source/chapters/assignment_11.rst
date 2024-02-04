@@ -18,23 +18,24 @@ to integrate them into the simulation.
 Message Passing Interface (MPI)
 -------------------------------
 
-OpenMP enables a program to be processed by multiple processors this is done by declaring parallel regions that are executed on each core.
-However, sharing data and results of local calculations among multiple processors in OpenMP can be complex. To facilitate communication 
-between two parallel working cores, MPI provides the necessary functionality. MPI spawns a process of the program on each core. If not 
-restricted, this would result in each core would execute the exact same work. Therefore, each core has an ID called 'rank' to be able to 
-identify the process the code is running on and differentiate the work done on each process. The Message Passing Interface provides 
-functions that allow for sending and receiving single or multiple data to or from another processor. 
+When parallelizing our solver, we have used OpenMP in the past to partially parallelize our code.
+OpenMP enables a program to be processed by several processors by declaring parallel areas that are executed on each core.
+However, the possibilities of OpenMP are limited. One solution is to run several processes in parallel, all of which execute the entire code.
+However, sharing data and results of local calculations among multiple processors in OpenMP can be complex.
+This is where the Message Passing Interface (MPI) is used.
+MPI spawns a certain number of processes of the program on the cores. If there were no restrictions, this would result in every process executing / calculating exactly the same work.
+Therefore, each core has an ID called 'rank' to identify the process running the code and distinguish the work done on each process. 
+MPI provides functions to facilitate communication, allowing for the sending and receiving of single or multiple data to or from another processor.
 
 MPI provides a mechanism for arranging the used processes on a Cartesian coordinate system. By using the shifting method, each core can 
 determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point-stencil.
 
-Parallelizing with MPI requires consideration of blocking and non-blocking communication. Blocking communication requires the sending process
-to wait for confirmation, that the data has been received and communication has ended. While blocking communication is safe, it can result in 
-longer runtimes for large data transfers due to the waiting period. Non-blocking communication functions, on the other hand, run the communication 
-in the background and return immediately after being called, allowing for other tasks to be processed simultaneously. This can be used to process 
-other tasks while the communication is ongoing. The waiting functionality of MPI enables one to wait until all communication is complete. Non-blocking 
-communication can be more complex since the a process cannot work with the communicated data until it is finished communicating. However, when used 
-correctly it can be faster than when working with blocking communication.
+Parallelizing with MPI requires consideration of blocking and non-blocking communication. Blocking communication requires the sending process to wait for confirmation, that the data has been received and communication has ended. 
+Although communication that is blocked is secure, it can result in longer runtimes for large data transfers due to idle time. 
+Non-blocking communication functions, on the other hand, run the communication in the background and return immediately after being called, allowing for other tasks to be processed simultaneously. 
+This can be used to process other tasks while the communication is ongoing. The MPI_Wait function enables communication synchronization before continuing computation. 
+Non-blocking communication can be more complex. This is because a process cannot continue working with the transmitted data until the communication has ended. 
+However, if used correctly, it can be faster than working with blocking communication.
 
 Was haben wir gemacht? (technisch)
 ----------------------------------
