@@ -256,9 +256,16 @@ The following table shows the measured values of the overall time :math:`T_{over
     
     plots?
 
-Fazit (hats sich gelohnt?)
---------------------------
-können wir noch nicht
+Discussion
+----------
+
+When analyzing the speedups, it is evident that MPI parallelization has a greater impact on the simulations imulations that involve larger amounts of data. This is due 
+to the fact that the communication overhead, relative to the compute time needed for a small grid, has a greater impact on the runtime  than on a large grid. 
+Additionally, the initialization speed of the grid increases with a larger amount of data, mainly due to the communication of each subgrid. Another reason is that only rank 0 
+calculates the values of each grid. To solve this problem, a program should load the data in every process and initialize the data for each subgrid on the respective process.
+
+Since all cache optimizations that we tried to implement failed to provide any speed improvements, we must examine our own methods. The reason for this could be either mistakes on our part or an incorrect methodology.
+
 
 References
 ----------
