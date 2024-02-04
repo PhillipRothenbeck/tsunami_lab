@@ -15,24 +15,26 @@ subdomains and running each corresponding simulation on a respective core. Furth
 optimize the cache usage. In this section, we will outline the necessary concepts for the optimization process and the strategy we developed 
 to integrate them into the simulation.
 
-Einführung MPI
---------------
+Message Passing Interface (MPI)
+-------------------------------
 
-Erklären was MPI ist (mehrere Prozesse laufen echt Parallel, alle führen gesamten Code aus)
-MPI ist message parsing interface - parallele prozesse kommunizieren untereinander
-verwendet um compute domain aufzuteilen und Rechenlast zu verringern / compute time zu verringern
+OpenMP enables a program to be processed by multiple processors this is done by declaring parallel regions that are executed on each core.
+However, sharing data and results of local calculations among multiple processors in OpenMP can be complex. To facilitate communication 
+between two parallel working cores, MPI provides the necessary functionality. MPI spawns a process of the program on each core. If not 
+restricted, this would result in each core would execute the exact same work. Therefore, each core has an ID called 'rank' to be able to 
+identify the process the code is running on and differentiate the work done on each process. The Message Passing Interface provides 
+functions that allow for sending and receiving single or multiple data to or from another processor. 
 
-During parallelization, several processes are executed in parallel. If not further specified, each process executes the entire code.
+MPI provides a mechanism for arranging the used processes on a Cartesian coordinate system. By using the shifting method, each core can 
+determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point-stencil.
 
-However, if there are dependencies between data on different processes, there needs to be a way to communicate this data between the processes.
-oder
-In order to parallelize a program, you need a way to transfer data between the parallel running processes for critical sections or data dependencies.
-
-This is where MPI comes into play. Each process executes the program itself and is initially independent of the others. 
-This means that every process has its own address space and therefore does not share a global address space.
-MPI means nothing other than Message Parsing Interface. It is used to move data from the address space of one process to that of another (through cooperative operations on each process).
-
-For example Send Data ... to process ... Beispiel
+Parallelizing with MPI requires consideration of blocking and non-blocking communication. Blocking communication requires the sending process
+to wait for confirmation, that the data has been received and communication has ended. While blocking communication is safe, it can result in 
+longer runtimes for large data transfers due to the waiting period. Non-blocking communication functions, on the other hand, run the communication 
+in the background and return immediately after being called, allowing for other tasks to be processed simultaneously. This can be used to process 
+other tasks while the communication is ongoing. The waiting functionality of MPI enables one to wait until all communication is complete. Non-blocking 
+communication can be more complex since the a process cannot work with the communicated data until it is finished communicating. However, when used 
+correctly it can be faster than when working with blocking communication.
 
 Was haben wir gemacht? (technisch)
 ----------------------------------
