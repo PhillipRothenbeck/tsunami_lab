@@ -119,7 +119,7 @@ x-sweep and one for the y-sweep. This results in the corner ghost cells being al
   :align: center
   :width: 600
 
-  Process with rank 4 recieves orange border cells from processes 3 and 5 before the x-sweep and the green cells (results from the x-sweep) from 1 and 7 before the y-sweep.
+  Process with rank 4 receives orange border cells from processes 3 and 5 before the x-sweep and the green cells (results from the x-sweep) from 1 and 7 before the y-sweep.
 
 The resulting workflow is as follows: First, the vertical borders are sent from the old data to the left and right neighbors. Then the x-sweep is performed. Then we send 
 the horizontal borders from the results to the upper and lower neighbors. Finally, we can perform the y-sweep.
