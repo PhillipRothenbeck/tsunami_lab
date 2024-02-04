@@ -137,8 +137,10 @@ X- and Y-sweep
 In our WavePropagation, we iterate twice over all elements. 
 In the first iteration, we calculate the net updates in x-direction (x-sweep) and in the second in y-direction (y-sweep). 
 During the x-sweep, we first loop through all the elements in the first row and then jump to the next row. 
-This works cache-efficiently, as every time we load a value from the data array, the next values are also loaded into the cache. Since we first iterate over the entire line, we can take advantage of this. 
-However, with the y-sweep we intuitively iterated over the y-elements first, and only after a complete row had been calculated we jumped to the next column. This works against the cache, as the next data line is stored in the cache but not used for the next calculation. 
+This works cache-efficiently, as every time we load a value from the data array, the next values are also loaded into the cache. 
+
+However, with the y-sweep we intuitively iterated over the y-elements first, and only after a complete row had been calculated we jumped to the next column. 
+This works against the cache, as the next contigous data is stored in the cache but not used for the next calculation. 
 To prevent this and to utilize the cache efficiently, we have changed the order in which the cells are calculated so that we always only load two lines into the cache and then iterate over the x-elements until we jump to the next two lines.
 
 Cache lines
@@ -147,7 +149,7 @@ Cache lines
 Although our optimization of the y-sweep was already better than before, we found that we were still loading things into the cache multiple times, which is inefficient.
 
 During the y-sweep, we need each row (except the first and last) twice to calculate the value of the row itself and the value above that row.
-Our idea to solve this is to only iterate over as many cells in the data array as a cache line can hold, which in our case was 16 floats.
+Our idea to solve this is to only iterate over as many cells in the data array as a cache line can hold, which in our case is 16 floats.
 Then we jump to the next row, which is already cached, and repeat the process. 
 Once the entire cache column is processed, the next 16 columns are processed and the process is repeated until it is complete.
 
