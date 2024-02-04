@@ -1,11 +1,29 @@
+#directories
 /cmake-build-default/
 /build/
+/.vscode/
 /.idea/
 /out/
+/.sconf_temp/
+/vtune_out/
+/r0*
+/documentation/build/
+
+# files
 *.dblite
-.vscode/
-.sconf_temp/
+*.cdl
+/res/middle_states.csv
 config.log
-documentation/build/*
-documentation/_build/*
 _build/*
+
+# bathymerty and displacement files
+/res/artificialtsunami_bathymetry_1000.nc
+/res/artificialtsunami_displ_1000.nc
+
+/res/chile*
+/res/tohoku*
+/res/
+
+# ara output / error
+*.out*
+*.err*
