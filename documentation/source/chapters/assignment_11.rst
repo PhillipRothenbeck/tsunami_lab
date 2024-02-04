@@ -137,38 +137,32 @@ This means that we have to communicate twice. The columns (left and right border
 
 
 Cache optimization
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
-In order to make the cache usage of our solver more efficient, we first looked at the cache specifications of the ARA cluster Hadoop nodes.
+In order to make the cache usage of our solver more efficient, we considered possible areas in which optimizing the cache would be beneficial.
 
-16 Hadoop nodes each with:
+X- and Y-sweep
+~~~~~~~~~~~~~~
 
-    - 36 CPU cores (2x Intel Xeon Gold 6140 18 Core 2.3 Ghz)
-    - 192 GB RAM
+In our WavePropagation, we iterate twice over all elements. 
+In the first iteration, we calculate the net updates in x-direction (x-sweep) and in the second in y-direction (y-sweep). 
+During the x-sweep, we first loop through all the elements in the first row and then jump to the next row. 
+This works cache-efficiently, as every time we load a value from the data array, the next values are also loaded into the cache. Since we first iterate over the entire line, we can take advantage of this. 
+However, with the y-sweep we intuitively iterated over the y-elements first, and only after a complete row had been calculated we jumped to the next column. This works against the cache, as the next data line is stored in the cache but not used for the next calculation. 
+To prevent this and to utilize the cache efficiently, we have changed the order in which the cells are calculated so that we always only load two lines into the cache and then iterate over the x-elements until we jump to the next two lines.
 
-Intel Xeon Gold 6140 18 Core 2.3 Ghz Cache specifications:
+Cache lines
+~~~~~~~~~~~
 
-L1 Cache: 8-way set associative, write-back
+Although our optimization of the y-sweep was already better than before, we found that we were still loading things into the cache multiple times, which is inefficient.
 
-    L1i = 576 KiB (18 x 32 KiB) 
-    L1d = 576 KiB (18 x 32 KiB) 
+During the y-sweep, we need each row (except the first and last) twice to calculate the value of the row itself and the value above that row.
+Our idea to solve this is to only iterate over as many cells in the data array as a cache line can hold, which in our case was 16 floats.
+Then we jump to the next row, which is already cached, and repeat the process. 
+Once the entire cache column is processed, the next 16 columns are processed and the process is repeated until it is complete.
 
-L2 Cache: 16-way set associative, write-back
-
-    L2 = 18 MiB (18 x 1 MiB) 
-
-L3 Cache: 11-way set associative, write-back
-
-    L3 = 24.75 MiB (18 x 1.375 MiB) 
-
-Anzahl an Sets in Cache: cache size / (block size * set size)
-
-Cache line füllen und dann möglichst alle Operationen durchführen um capacity misses zu minimieren
-
-Alignement check.
-
-Blocking?
-
+Unfortunately, this did not improve our performance, but rather slowed it down.
+We believe that this is due to the fact that the openMP parallelization is faster than our cache improvement. The entire Y-sweep was previously parallelized, but with the introduction of this new feature, the parallelization software is probably no longer as efficient as before.
 
 Ergebnisse (Berechnungen und vid von Sim)
 -----------------------------------------
