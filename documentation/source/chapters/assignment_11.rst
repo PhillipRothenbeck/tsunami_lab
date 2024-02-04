@@ -31,7 +31,7 @@ Therefore, each core has an ID called 'rank' to identify the process running the
 MPI provides functions to facilitate communication, allowing for the sending and receiving of single or multiple data to or from another processor.
 
 MPI provides a mechanism for arranging the used processes on a Cartesian coordinate system. By using the shifting method, each core can 
-determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point-stencil.
+determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point stencil.
 
 Parallelizing with MPI requires consideration of blocking and non-blocking communication. Blocking communication requires the sending process to wait for confirmation, that the data has been received and communication has ended. 
 Although communication that is blocked is secure, it can result in longer runtimes for large data transfers due to idle time. 
@@ -84,10 +84,11 @@ In this segment, we explain how we used MPI to fully parallelize our tsunami sol
 Simulation Initialisation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To start the simulation all configurations must be set up. This process starts with the declaration of a Cartesian MPI environment and retrieving the information about 
-it on each process. To ensure that all the necessary information is readily available, we have introduced the ParallelData struct. In addition, we need load the configuration 
-file. We decided to have each process will load the file instead of loading it only on one process and communicating the information to all other processes. This reduces the
-amount of communications performed and improves runtime. 
+To start the simulation all configurations must be set up. 
+This process starts with the initialization and declaration of a Cartesian MPI environment and retrieving the information about it on each process. 
+To ensure that all the necessary information is readily available, we have introduced the ParallelData struct. In addition, we need to load the configuration file. 
+We have decided that each process should load the file individually rather than loading it for one process and sharing the information with others. 
+This reduces the amount of communications performed and improves runtime. 
 
 I/O
 ~~~
@@ -106,34 +107,23 @@ next process, it is important to wait for the communication it is important to c
 
 Time Step
 ~~~~~~~~~
-- explain the problem at hand: should be a 8-point-stencil for communication
- - lowering the dimension for the simulation means we have a 2-point-stencil
- - this means we do not have to do 8 communications but 4
 
-- first we do the x communication
-- secondly we do the x-sweep
-- thirdly we communicate the result by doing the y communication
-- lastly we do the y-sweep
+Each process calculates the time step on its own domain. To ensure a correct results on a global scale, the borders of each subgrid must be net-updated by taking into
+account of their respective neighboring cells in the neighboring processes. To accomplish this, we fill the ghost cells of a subgrid with the corresponding cells sent by 
+the neighbor. Since we use 2-point stencils we have a ghost cell border of the width of one cell. A problem arises when considering the corner ghost cells, for 
+which one cell needs to be sent from each diagonal neighbor. To avoid these small extra communications, the communication can be split into one for the
+x-sweep and one for the y-sweep. This results in the corner ghost cells being already processed in the x-sweep performed in the process above and below.
 
-Domain decomp
-comm vor x sweep (left / right) und vor y sweep (up down)
+.. figure:: ../_static/assignment_11/sweep_communication.png
+  :name: fig:wet_dry_boundary
+  :align: center
+  :width: 300
 
-In order to reduce the computation time, the global compute domain was divided into several smaller subgrids that run in parallel.
-The input files are read in the root process and distributed to the subgrids. 
-Once each process has received its local domain and the associated data, the calculation is performed as normal with the respective smaller domain.
+  Process with rank 4 recieves orange border cells from processes 3 and 5 before the x-sweep and the green cells (results from the x-sweep) from 1 and 7 before the y-sweep.
 
-Since our solver uses a two-point-stencil, a column or row of values is missing at the edges of the subgrids for the calculation, which can be found in the respective neighboring grids.
+The resulting workflow is as follows: First, the vertical borders are sent from the old data to the left and right neighbors. Then the x-sweep is performed. Then we send 
+the horizontal borders from the results to the upper and lower neighbors. Finally, we can perform the y-sweep.
 
-.. warning::
-
-    Grafik über data dependency in zwischen subgrids
-
-As the calculation of the NetUpdates is split up into x and y sweep and takes place one after the other, our data is interdependent.
-This means that we have to communicate twice. The columns (left and right border) are communicated before the x-sweep and the rows (top and bottom border) before the y-sweep.
-
-.. warning::
-
-    Grafik einfügen was wann kommuniziert wird.
 
 
 Cache optimization
@@ -167,40 +157,98 @@ We believe that this is due to the fact that the openMP parallelization is faste
 Ergebnisse (Berechnungen und vid von Sim)
 -----------------------------------------
 
-Anmerken, welche Zwischenergebnisse wir hatten, die falsch waren? (z.B. kaputte Bathymetry etc.)
+First things first: we have successfully MPI-parallelized our solver. 
+In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
 
-video von fehlschlägen
+.. warning::
+    
+    vid einfügen von Sim
 
-MPI läuft korrekt
+The borders between the subgrids are caused by the fact that we let each subgrid write its own output file.
+Apart from that, the edges are communicated properly and the waves are therefore calculated correctly.
 
-video of Sim with [?] number of processes als Beweis
+Performance Analysis
+^^^^^^^^^^^^^^^^^^^^^^^
 
-We have successfully MPI-parallelized our solver. In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
+In order to measure the change in performance due to MPI parallelisation and compare it with the normal version, we have defined the following test conditions.
 
-The following measured values were recorded in comparison to the non-parallelized version of our solver.
-
-+---------------+----------+----------+
-| Simulation    |  time    |   icpc   |
-+===============+==========+==========+
-|      1000     | 13.1988s | 12.6979s |
-+---------------+----------+----------+
-|   1000 | 5    | 11.1114s |  13.11s  |
-+---------------+----------+----------+
-|   1000 | 10   |          | 10.9384s |
-+---------------+----------+----------+
-
-You can see that the time needed to read and set the initial grids is longer in the parallelized version, for which in turn the time needed to calculate is shorter.
-
-You can see that the normal version is faster than the parallelized version when reading / loading data and defining the Grid. On the other hand, the parallelized version requires less computing time than the normal version.
-The larger the computational domain (or the smaller the cells become), the greater the time difference between normal and parallelized version when calculating the NetUpdates.
-
-Speedup :math:`S_p` of computation time :math:`T_{comp}` for various simulations with different numbers of subgrids: 
+All time measurements were carried out using our -t flag and deactivating the output with our -nio flag.
+The time used to load and send the input data :math:`T_{init}` and the computation time :math:`T_{comp}` were measured. The overall time :math:`T_{overall}` was calculated by adding the initialization time and the computation time.
 
 .. math::   
     
-    S_p &= \frac{T_1}{T_p} \\
-    S_{72} &= \frac{2078.36s}{37.2162s} = 55.845
+    T_{overall} &= T_{init} + T_{comp} \\
 
+The speedup can then be calculated by dividing the overall time of the normal version :math:`T_{1}` by the overall time of the mpi parallelization :math:`T_{p}`, where p is the number of processes.
+
+The following table shows the measured values of the initialization time :math:`T_{init}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+
++-----------------------------------+-----------------------------+
+| .. centered:: Number of processes | .. centered:: cell size     |
+|                                   +---------+---------+---------+
+|                                   | 1000m   | 500m    | 250m    |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 1               | 37.1201 | 147.245 | 592.112 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 5               | 86.5288 | 330.326 | 1300.77 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 10              | 92.5038 | 366.491 | 1410.27 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 16              | /       | 394.263 | 1474.11 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 25              | 112.018 | 448.267 | 1695.47 |
++-----------------------------------+---------+---------+---------+
+
+As you can see, one value is missing in the table. This is due to the fact that for :math:`p = 16` processes no domain decomposition can be performed on the 1000m cell size file that fulfills our conditions. 
+However, we only noticed this after we had started the measurements, which is why there is no measured value for :math:`p = 16 processes at 1000m cell size in the following tables.
+
+.. warning::
+    
+    plots?
+
+The following table shows the measured values of the computation time :math:`T_{comp}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+
++-----------------------------------+-----------------------------+
+| .. centered:: Number of processes | .. centered:: cell size     |
+|                                   +---------+---------+---------+
+|                                   | 1000m   | 500m    | 250m    |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 1               | 357.985 | 5084.05 | 5412.09 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 5               | 493.491 | 1308.02 | 2749.71 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 10              | 885.82  | 1311.65 | 2482.66 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 16              | /       | 1583.94 | 2934.86 |
++-----------------------------------+---------+---------+---------+
+| .. centered:: p = 25              | 1832.62 | 2223.12 | 3192.11 |
++-----------------------------------+---------+---------+---------+
+
+.. warning::
+    
+    plots?
+
+The following table shows the measured values of the overall time :math:`T_{overall}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+
++-----------------------------------+--------------------------------+
+| .. centered:: Number of processes | .. centered:: cell size        |
+|                                   +----------+----------+----------+
+|                                   | 1000m    | 500m     | 250m     |
++-----------------------------------+----------+----------+----------+
+| .. centered:: p = 1               | 729.186  | 5231.295 | 6004.202 |
++-----------------------------------+----------+----------+----------+
+| .. centered:: p = 5               | 580.0198 | 1638.346 | 4050.48  |
++-----------------------------------+----------+----------+----------+
+| .. centered:: p = 10              | 978.3238 | 1678.141 | 3892.93  |
++-----------------------------------+----------+----------+----------+
+| .. centered:: p = 16              | /        | 1978.203 | 4408.97  |
++-----------------------------------+----------+----------+----------+
+| .. centered:: p = 25              | 1944.638 | 2671.387 | 4887.58  |
++-----------------------------------+----------+----------+----------+
+
+.. warning::
+    
+    plots?
 
 Fazit (hats sich gelohnt?)
 --------------------------
