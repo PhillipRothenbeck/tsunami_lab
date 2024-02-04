@@ -117,7 +117,7 @@ x-sweep and one for the y-sweep. This results in the corner ghost cells being al
 .. figure:: ../_static/assignment_11/sweep_communication.png
   :name: fig:wet_dry_boundary
   :align: center
-  :width: 300
+  :width: 600
 
   Process with rank 4 recieves orange border cells from processes 3 and 5 before the x-sweep and the green cells (results from the x-sweep) from 1 and 7 before the y-sweep.
 
@@ -204,9 +204,6 @@ The following table shows the measured values of the initialization time :math:`
 As you can see, one value is missing in the table. This is due to the fact that for :math:`p = 16` processes no domain decomposition can be performed on the 1000m cell size file that fulfills our conditions. 
 However, we only noticed this after we had started the measurements, which is why there is no measured value for :math:`p = 16 processes at 1000m cell size in the following tables.
 
-.. warning::
-    
-    plots?
 
 Table of the calculation time :math:`T_{comp}` for different numbers of processes:
 
@@ -230,7 +227,7 @@ Table of the calculation time :math:`T_{comp}` for different numbers of processe
 .. figure:: ../_static/assignment_11/computation_time.png
   :name: fig:comp_time
   :align: center
-  :width: 300
+  :width: 600
 
   Plot of the computation time :math:`T_{comp}` for different number of processes :math:`T_{p}` and cell sizes
 
@@ -274,7 +271,7 @@ The following table shows the Speedup :math:`S_p` between the normal and the mpi
 .. figure:: ../_static/assignment_11/speedup.png
   :name: fig:speedup
   :align: center
-  :width: 300
+  :width: 600
 
   Plot of the Speedup :math:`S_p` of normal version vs. mpi-parallelized version.
 
