@@ -115,7 +115,7 @@ which one cell needs to be sent from each diagonal neighbor. To avoid these smal
 x-sweep and one for the y-sweep. This results in the corner ghost cells being already processed in the x-sweep performed in the process above and below.
 
 .. figure:: ../_static/assignment_11/sweep_communication.png
-  :name: fig:wet_dry_boundary
+  :name: fig:sweep_comm
   :align: center
   :width: 600
 
@@ -163,10 +163,11 @@ First things first: we have successfully MPI-parallelized our solver.
 In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
 
 .. figure:: ../_static/assignment_11/sim.gif
-  :name: fig:comp_time
+  :name: fig:sim
   :align: center
   :width: 600
 
+  Simulation of chile with a cell size of 1000m and 10 processes
 
 The borders between the subgrids are caused by the fact that we let each subgrid write its own output file.
 Apart from that, the edges are communicated properly and the waves are therefore calculated correctly.
@@ -202,6 +203,7 @@ The following table shows the measured values of the initialization time :math:`
 +-----------------------------------+---------+---------+---------+
 | .. centered:: p = 25              | 112.018 | 448.267 | 1695.47 |
 +-----------------------------------+---------+---------+---------+
+
 
 As you can see, one value is missing in the table. This is due to the fact that for :math:`p = 16` processes no domain decomposition can be performed on the 1000m cell size file that fulfills our conditions. 
 However, we only noticed this after we had started the measurements, which is why there is no measured value for :math:`p = 16 processes at 1000m cell size in the following tables.
