@@ -212,7 +212,7 @@ However, we only noticed this after we had started the measurements, which is wh
     
     plots?
 
-The following table shows the measured values of the computation time :math:`T_{comp}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+Table of the calculation time :math:`T_{comp}` for different numbers of processes:
 
 +-----------------------------------+-----------------------------+
 | .. centered:: Number of processes | .. centered:: cell size     |
@@ -230,11 +230,16 @@ The following table shows the measured values of the computation time :math:`T_{
 | .. centered:: p = 25              | 1832.62 | 2223.12 | 3192.11 |
 +-----------------------------------+---------+---------+---------+
 
-.. warning::
-    
-    plots?
 
-The following table shows the measured values of the overall time :math:`T_{overall}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+.. figure:: ../_static/assignment_11/computation_time.png
+  :name: fig:comp_time
+  :align: center
+  :width: 300
+
+  Plot of the computation time :math:`T_{comp}` for different number of processes :math:`T_{p}` and cell sizes
+
+
+Table of the calculation time :math:`T_{overall}` for different numbers of processes:
 
 +-----------------------------------+--------------------------------+
 | .. centered:: Number of processes | .. centered:: cell size        |
@@ -252,9 +257,30 @@ The following table shows the measured values of the overall time :math:`T_{over
 | .. centered:: p = 25              | 1944.638 | 2671.387 | 4887.58  |
 +-----------------------------------+----------+----------+----------+
 
-.. warning::
-    
-    plots?
+
+The following table shows the Speedup :math:`S_p` between the normal and the mpi-parallelized version. The number of processes :math:`p` here means the speedup between the normal version and the MPI parallelized version with p processes.
+
++-----------------------------------+--------------------------------------------+
+| .. centered:: Number of processes | .. centered:: cell size                    |
+|                                   +--------------+--------------+--------------+
+|                                   | 1000m        | 500m         | 250m         |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 5               | 1.257174324  | 3.193133715  | 1.4823433272 |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 10              | 0.7453421863 | 3.11731553   | 1.5423349508 |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 16              | /            | 2.644468237  | 1.3618151178 |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 25              | 0.374972617  | 1.9582692437 | 1.2284611198 |
++-----------------------------------+--------------+--------------+--------------+
+
+
+.. figure:: ../_static/assignment_11/speedup.png
+  :name: fig:speedup
+  :align: center
+  :width: 300
+
+  Plot of the Speedup :math:`S_p` of normal version vs. mpi-parallelized version.
 
 Discussion
 ----------
