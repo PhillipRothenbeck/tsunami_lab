@@ -129,30 +129,36 @@ the horizontal borders from the results to the upper and lower neighbors. Finall
 Cache optimization
 ^^^^^^^^^^^^^^^^^^
 
-In order to make the cache usage of our solver more efficient, we considered possible areas in which optimizing the cache would be beneficial.
+In order to make the cache usage of our solver more efficient, we first looked at the cache specifications of the ARA cluster Hadoop nodes.
 
-X- and Y-sweep
-~~~~~~~~~~~~~~
+16 Hadoop nodes each with:
 
-In our WavePropagation, we iterate twice over all elements. 
-In the first iteration, we calculate the net updates in x-direction (x-sweep) and in the second in y-direction (y-sweep). 
-During the x-sweep, we first loop through all the elements in the first row and then jump to the next row. 
-This works cache-efficiently, as every time we load a value from the data array, the next values are also loaded into the cache. Since we first iterate over the entire line, we can take advantage of this. 
-However, with the y-sweep we intuitively iterated over the y-elements first, and only after a complete row had been calculated we jumped to the next column. This works against the cache, as the next data line is stored in the cache but not used for the next calculation. 
-To prevent this and to utilize the cache efficiently, we have changed the order in which the cells are calculated so that we always only load two lines into the cache and then iterate over the x-elements until we jump to the next two lines.
+    - 36 CPU cores (2x Intel Xeon Gold 6140 18 Core 2.3 Ghz)
+    - 192 GB RAM
 
-Cache lines
-~~~~~~~~~~~
+Intel Xeon Gold 6140 18 Core 2.3 Ghz Cache specifications:
 
-Although our optimization of the y-sweep was already better than before, we found that we were still loading things into the cache multiple times, which is inefficient.
+L1 Cache: 8-way set associative, write-back
 
-During the y-sweep, we need each row (except the first and last) twice to calculate the value of the row itself and the value above that row.
-Our idea to solve this is to only iterate over as many cells in the data array as a cache line can hold, which in our case was 16 floats.
-Then we jump to the next row, which is already cached, and repeat the process. 
-Once the entire cache column is processed, the next 16 columns are processed and the process is repeated until it is complete.
+    L1i = 576 KiB (18 x 32 KiB) 
+    L1d = 576 KiB (18 x 32 KiB) 
 
-Unfortunately, this did not improve our performance, but rather slowed it down.
-We believe that this is due to the fact that the openMP parallelization is faster than our cache improvement. The entire Y-sweep was previously parallelized, but with the introduction of this new feature, the parallelization software is probably no longer as efficient as before.
+L2 Cache: 16-way set associative, write-back
+
+    L2 = 18 MiB (18 x 1 MiB) 
+
+L3 Cache: 11-way set associative, write-back
+
+    L3 = 24.75 MiB (18 x 1.375 MiB) 
+
+Anzahl an Sets in Cache: cache size / (block size * set size)
+
+Cache line füllen und dann möglichst alle Operationen durchführen um capacity misses zu minimieren
+
+Alignement check.
+
+Blocking?
+
 
 Ergebnisse (Berechnungen und vid von Sim)
 -----------------------------------------
@@ -206,7 +212,7 @@ However, we only noticed this after we had started the measurements, which is wh
     
     plots?
 
-The following table shows the measured values of the computation time :math:`T_{comp}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+Table of the calculation time :math:`T_{comp}` for different numbers of processes:
 
 +-----------------------------------+-----------------------------+
 | .. centered:: Number of processes | .. centered:: cell size     |
@@ -224,11 +230,16 @@ The following table shows the measured values of the computation time :math:`T_{
 | .. centered:: p = 25              | 1832.62 | 2223.12 | 3192.11 |
 +-----------------------------------+---------+---------+---------+
 
-.. warning::
-    
-    plots?
 
-The following table shows the measured values of the overall time :math:`T_{overall}` for :math:`p = {1, 5, 10, 16, 25}` processes, where :math:`p = 1` corresponds to the normal version.
+.. figure:: ../_static/assignment_11/computation_time.png
+  :name: fig:comp_time
+  :align: center
+  :width: 300
+
+  Plot of the computation time :math:`T_{comp}` for different number of processes :math:`T_{p}` and cell sizes
+
+
+Table of the calculation time :math:`T_{overall}` for different numbers of processes:
 
 +-----------------------------------+--------------------------------+
 | .. centered:: Number of processes | .. centered:: cell size        |
@@ -246,9 +257,30 @@ The following table shows the measured values of the overall time :math:`T_{over
 | .. centered:: p = 25              | 1944.638 | 2671.387 | 4887.58  |
 +-----------------------------------+----------+----------+----------+
 
-.. warning::
-    
-    plots?
+
+The following table shows the Speedup :math:`S_p` between the normal and the mpi-parallelized version. The number of processes :math:`p` here means the speedup between the normal version and the MPI parallelized version with p processes.
+
++-----------------------------------+--------------------------------------------+
+| .. centered:: Number of processes | .. centered:: cell size                    |
+|                                   +--------------+--------------+--------------+
+|                                   | 1000m        | 500m         | 250m         |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 5               | 1.257174324  | 3.193133715  | 1.4823433272 |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 10              | 0.7453421863 | 3.11731553   | 1.5423349508 |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 16              | /            | 2.644468237  | 1.3618151178 |
++-----------------------------------+--------------+--------------+--------------+
+| .. centered:: p = 25              | 0.374972617  | 1.9582692437 | 1.2284611198 |
++-----------------------------------+--------------+--------------+--------------+
+
+
+.. figure:: ../_static/assignment_11/speedup.png
+  :name: fig:speedup
+  :align: center
+  :width: 300
+
+  Plot of the Speedup :math:`S_p` of normal version vs. mpi-parallelized version.
 
 Fazit (hats sich gelohnt?)
 --------------------------
