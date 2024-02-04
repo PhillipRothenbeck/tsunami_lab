@@ -92,14 +92,17 @@ amount of communications performed and improves runtime.
 I/O
 ~~~
 
-- decision to load the data only on rank 0
-- writing each subgrid to its own file 
+The input loading of the bathymetry and displacement files is only performed on the process with the rank 0. For the output, each process writes 
+its sub-domain into its own output file. This approach avoids holding we won't have to hold all data of every existing cell on a single core and eliminates the need for 
+further communication of whole subgrids.
 
 Domain Decomposition
 ~~~~~~~~~~~~~~~~~~~~
-- only rank 0 loads the data and decomposes it into several subgrids
-- sending the subgrid via non-blocking communication
 
+As only the process with the rank 0 loads the data, it must split the domain into subgrids. This is accomplished by creating four temporary arrays for height, the hu 
+(momentum in the x direction), hv (momentum in the y direction), and the bathymetry, each in the size of one subgrid. Once filled with the respective data, all four arrays 
+are sent to the process with the corresponding rank using non-blocking communication, allowing all four arrays to be sent simultaneously. When using the temporal arrays for the 
+next process, it is important to wait for the communication it is important to complete to ensure no unsend data is overwritten.  
 
 Time Step
 ~~~~~~~~~
