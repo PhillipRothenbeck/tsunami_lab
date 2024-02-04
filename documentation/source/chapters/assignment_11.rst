@@ -31,7 +31,7 @@ Therefore, each core has an ID called 'rank' to identify the process running the
 MPI provides functions to facilitate communication, allowing for the sending and receiving of single or multiple data to or from another processor.
 
 MPI provides a mechanism for arranging the used processes on a Cartesian coordinate system. By using the shifting method, each core can 
-determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point-stencil.
+determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point stencil.
 
 Parallelizing with MPI requires consideration of blocking and non-blocking communication. Blocking communication requires the sending process to wait for confirmation, that the data has been received and communication has ended. 
 Although communication that is blocked is secure, it can result in longer runtimes for large data transfers due to idle time. 
@@ -106,38 +106,27 @@ next process, it is important to wait for the communication it is important to c
 
 Time Step
 ~~~~~~~~~
-- explain the problem at hand: should be a 8-point-stencil for communication
- - lowering the dimension for the simulation means we have a 2-point-stencil
- - this means we do not have to do 8 communications but 4
 
-- first we do the x communication
-- secondly we do the x-sweep
-- thirdly we communicate the result by doing the y communication
-- lastly we do the y-sweep
+Each process calculates the time step on its own domain. To ensure a correct results on a global scale, the borders of each subgrid must be net-updated by taking into
+account of their respective neighboring cells in the neighboring processes. To accomplish this, we fill the ghost cells of a subgrid with the corresponding cells sent by 
+the neighbor. Since we use 2-point stencils we have a ghost cell border of the width of one cell. A problem arises when considering the corner ghost cells, for 
+which one cell needs to be sent from each diagonal neighbor. To avoid these small extra communications, the communication can be split into one for the
+x-sweep and one for the y-sweep. This results in the corner ghost cells being already processed in the x-sweep performed in the process above and below.
 
-Domain decomp
-comm vor x sweep (left / right) und vor y sweep (up down)
+.. figure:: ../_static/assignment_11/sweep_communication.png
+  :name: fig:wet_dry_boundary
+  :align: center
+  :width: 300
 
-In order to reduce the computation time, the global compute domain was divided into several smaller subgrids that run in parallel.
-The input files are read in the root process and distributed to the subgrids. 
-Once each process has received its local domain and the associated data, the calculation is performed as normal with the respective smaller domain.
+  Process with rank 4 recieves orange border cells from processes 3 and 5 before the x-sweep and the green cells (results from the x-sweep) from 1 and 7 before the y-sweep.
 
-Since our solver uses a two-point-stencil, a column or row of values is missing at the edges of the subgrids for the calculation, which can be found in the respective neighboring grids.
+The resulting workflow is as follows: First, the vertical borders are sent from the old data to the left and right neighbors. Then the x-sweep is performed. Then we send 
+the horizontal borders from the results to the upper and lower neighbors. Finally, we can perform the y-sweep.
 
-.. warning::
-
-    Grafik über data dependency in zwischen subgrids
-
-As the calculation of the NetUpdates is split up into x and y sweep and takes place one after the other, our data is interdependent.
-This means that we have to communicate twice. The columns (left and right border) are communicated before the x-sweep and the rows (top and bottom border) before the y-sweep.
-
-.. warning::
-
-    Grafik einfügen was wann kommuniziert wird.
 
 
 Cache optimization
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 In order to make the cache usage of our solver more efficient, we first looked at the cache specifications of the ARA cluster Hadoop nodes.
 
