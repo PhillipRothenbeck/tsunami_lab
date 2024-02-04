@@ -156,8 +156,8 @@ Once the entire cache column is processed, the next 16 columns are processed and
 Unfortunately, this did not improve our performance, but rather slowed it down.
 We believe that this is due to the fact that the openMP parallelization is faster than our cache improvement. The entire Y-sweep was previously parallelized, but with the introduction of this new feature, the parallelization software is probably no longer as efficient as before.
 
-Ergebnisse (Berechnungen und vid von Sim)
------------------------------------------
+Results
+---------
 
 First things first: we have successfully MPI-parallelized our solver. 
 In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
