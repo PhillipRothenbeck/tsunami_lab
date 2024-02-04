@@ -34,16 +34,16 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
     t_idx m_nCellsAll = 0;
 
     //! water heights for the current and next time step for all cells
-    alignas(8) t_real *m_h[2] = {nullptr, nullptr};
+    alignas(4) t_real *m_h[2] = {nullptr, nullptr};
 
     //! momenta in x-direction for the current and next time step for all cells
-    alignas(8) t_real *m_hu[2] = {nullptr, nullptr};
+    alignas(4) t_real *m_hu[2] = {nullptr, nullptr};
 
     //! momenta in y-direction for the current and next time step for all cells
-    alignas(8) t_real *m_hv[2] = {nullptr, nullptr};
+    alignas(4) t_real *m_hv[2] = {nullptr, nullptr};
 
     //! bathymetries for all cells
-    alignas(8) t_real *m_b = nullptr;
+    alignas(4) t_real *m_b = nullptr;
 
     //! parallel data like neighbour threads
     MPIKernel::ParallelData m_parallelData;
@@ -69,7 +69,7 @@ class tsunami_lab::patches::WavePropagation2d : public WavePropagation {
      *
      * @param i_nCellsX number of cells in x-direction.
      * @param i_nCellsY number of cells in y-direction.
-	  * @param i_parallelData data for MPI usage.
+     * @param i_parallelData data for MPI usage.
      * @param i_height array of height values for step 0 (including ghost cell space).
      * @param i_momentumX array of momentum values in x-direction for step 0 (including ghost cell space).
      * @param i_momentumY array of momentum values in y-direction for step 0 (including ghost cell space).

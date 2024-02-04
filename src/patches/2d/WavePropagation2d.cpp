@@ -78,9 +78,9 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scalingX,
     t_real *l_hvNew = m_hv[m_step];
 
     // create arrays to save the data from the x-sweep
-    alignas(8) t_real *l_hStar = new t_real[m_nCellsAll];
-    alignas(8) t_real *l_huStar = new t_real[m_nCellsAll];
-    alignas(8) t_real *l_hvStar = new t_real[m_nCellsAll];
+    alignas(4) t_real *l_hStar = new t_real[m_nCellsAll];
+    alignas(4) t_real *l_huStar = new t_real[m_nCellsAll];
+    alignas(4) t_real *l_hvStar = new t_real[m_nCellsAll];
 
     // init cell (Star) quantities
 #pragma omp parallel for collapse(2) schedule(static, 32)

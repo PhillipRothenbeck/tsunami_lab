@@ -33,10 +33,10 @@ void tsunami_lab::Simulator::sendData(setups::Setup *i_setup, Timer *i_timer) {
     t_real l_dy = m_simConfig.yLen / m_grid.globalNY;
 
     // init sub-domain on rank 0 for holding the values of other processes
-    alignas(8) t_real *l_tempHeight = new t_real[m_localSize];
-    alignas(8) t_real *l_tempMomentumX = new t_real[m_localSize];
-    alignas(8) t_real *l_tempMomentumY = new t_real[m_localSize];
-    alignas(8) t_real *l_tempBathymetry = new t_real[m_localSize];
+    alignas(4) t_real *l_tempHeight = new t_real[m_localSize];
+    alignas(4) t_real *l_tempMomentumX = new t_real[m_localSize];
+    alignas(4) t_real *l_tempMomentumY = new t_real[m_localSize];
+    alignas(4) t_real *l_tempBathymetry = new t_real[m_localSize];
 
     // maximum observed height in the setup
     t_real l_hMax = std::numeric_limits<t_real>::lowest();

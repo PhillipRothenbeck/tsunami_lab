@@ -38,7 +38,7 @@ class tsunami_lab::Simulator {
     t_real m_dxy, m_dt, m_scalingX, m_scalingY, m_endTime;
     long int m_localSize;
 
-    alignas(8) t_real *m_height, *m_momentumX, *m_momentumY, *m_bathymetry;
+    alignas(4) t_real *m_height, *m_momentumX, *m_momentumY, *m_bathymetry;
 
     /**
      * @brief Sends data from process 0 to the other processes.
