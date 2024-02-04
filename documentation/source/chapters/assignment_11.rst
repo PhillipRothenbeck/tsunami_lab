@@ -162,15 +162,11 @@ Results
 First things first: we have successfully MPI-parallelized our solver. 
 In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
 
-.. figure:: ../_static/assignment_11/sim_0.png
+.. figure:: ../_static/assignment_11/sim.gif
   :name: fig:comp_time
   :align: center
   :width: 600
 
-.. figure:: ../_static/assignment_11/sim_1.png
-  :name: fig:comp_time
-  :align: center
-  :width: 600
 
 The borders between the subgrids are caused by the fact that we let each subgrid write its own output file.
 Apart from that, the edges are communicated properly and the waves are therefore calculated correctly.
