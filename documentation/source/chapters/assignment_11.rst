@@ -204,6 +204,7 @@ The following table shows the measured values of the initialization time :math:`
 As you can see, one value is missing in the table. This is due to the fact that for :math:`p = 16` processes no domain decomposition can be performed on the 1000m cell size file that fulfills our conditions. 
 However, we only noticed this after we had started the measurements, which is why there is no measured value for :math:`p = 16 processes at 1000m cell size in the following tables.
 
+The initialization takes longer for all cell sizes as soon as more than 1 process is running. This makes sense, as the mpi-parallelized version not only reads the grid, but also communicates it to the individual subgrids.
 
 Table of the calculation time :math:`T_{comp}` for different numbers of processes:
 
@@ -231,6 +232,9 @@ Table of the calculation time :math:`T_{comp}` for different numbers of processe
 
   Plot of the computation time :math:`T_{comp}` for different number of processes :math:`T_{p}` and cell sizes
 
+It can be seen that MPI parallelization has a negative influence on the computation time for larger cell sizes (1000m). One of the reasons for this is the bottleneck caused by insufficient domain size.
+For the smaller cell sizes, however, a very large difference can be seen between the normal version :math:`p = 1` and the MPI-parallelized version :math:`p = 5`. 
+However, 5 or 10 are already the optimal number of processes, which is why the computation time increases again for :math:`p > 10`.
 
 Table of the calculation time :math:`T_{overall}` for different numbers of processes:
 
@@ -250,6 +254,7 @@ Table of the calculation time :math:`T_{overall}` for different numbers of proce
 | .. centered:: p = 25              | 1944.638 | 2671.387 | 4887.58  |
 +-----------------------------------+----------+----------+----------+
 
+In most cases, the overall time is dominated by the computation time and the bottlenecks, which is why there are no major differences between the ratios of the individual values.
 
 The following table shows the Speedup :math:`S_p` between the normal and the mpi-parallelized version. The number of processes :math:`p` here means the speedup between the normal version and the MPI parallelized version with p processes.
 
@@ -274,6 +279,12 @@ The following table shows the Speedup :math:`S_p` between the normal and the mpi
   :width: 600
 
   Plot of the Speedup :math:`S_p` of normal version vs. mpi-parallelized version.
+
+You can see that the speedup for a cell size of 1000m for 5 processes is only just positive, i.e. slightly faster. For more processes the speedup is even negative, i.e. the program runs slower than without MPI parallelization.
+We have the largest speedup with a cell size of 500m with 5 processes. With more processes, the speedup also decreases again, but it remains positive here.
+The cell size of 250m is the only one where it can be observed that the speedup for 10 processes is greater than for 5 processes.
+In summary, it can be said that the optimum number of processes for (almost) all cell sizes is 5 processes. The decrease in speedup is due to the bottleneck caused by our communication.
+The larger the domain size, the less influence this bottleneck has on our simulation.
 
 Discussion
 ----------
