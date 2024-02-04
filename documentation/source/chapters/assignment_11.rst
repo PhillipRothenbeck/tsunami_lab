@@ -15,8 +15,11 @@ subdomains and running each corresponding simulation on a respective core. Furth
 optimize the cache usage. In this section, we will outline the necessary concepts for the optimization process and the strategy we developed 
 to integrate them into the simulation.
 
+Methods
+-------
+
 Message Passing Interface (MPI)
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When parallelizing our solver, we have used OpenMP in the past to partially parallelize our code.
 OpenMP enables a program to be processed by multiple processors by declaring parallel regions that are executed on each core. 
@@ -36,6 +39,41 @@ Non-blocking communication functions, on the other hand, run the communication i
 This can be used to process other tasks while the communication is ongoing. The MPI_Wait function enables communication synchronization before continuing computation. 
 Non-blocking communication can be more complex. This is because a process cannot continue working with the transmitted data until the communication has ended. 
 However, if used correctly, it can be faster than working with blocking communication.
+
+Cache
+^^^^^
+
+Caches are small, but fast memory units on a processor chip that are supposed to reduce the number of slow memory accesses. They are a less expensive alternative to 
+registers which are even faster. Each processor has three levels of cache: the core-specific are the level 1 data (L1D), level 1 instruction (L1I), and level 2 
+(L2) cache. The level (L3) cache is shared by the cores on a processor. Memory can only be transferred in a cache line consisting of a specific number of bytes.
+
+If a query does not find the data in the cache, it is referred to as a cache miss; otherwise, it is called a cache hit. When a program queries the memory for a particular 
+data, it first looks in the L1D cache; if it does not find the seached data, it continues to look for it in the next lower level, in this case the L2 cache, and so on. 
+If the data is found, its cache line is loaded directly into the L1D cache.
+
+On the Ara cluster [1]_ each Hadoop node consists of 2 Intel Xeon Gold 6140 [2]_ processors with 18 cores each. These have an L1D cache size of 576 KiB, an L2 cache size 
+of 18 MiB, and an L3 cache size of 24.75 MiB. In addition, each cache is divided into multiple sets, which are consisting of n lines, which is called an n-way 
+set associative cache. Finally, all caches of the processors' caches are write-back, meaning that they write the changes to data in to the memory only when the 
+data in the cache needs to be replaced in cache. These specifications must be taken into account when writing cache-optimized code on the Ara cluster.
+
+.. note::
+    16 Hadoop nodes on Ara cluster with each:
+
+    - 36 CPU-cores (2x Intel Xeon Gold 6140 18 Core 2,3 Ghz)
+    - 192 GB RAM
+    - one local SSD
+
+    L1 = 1.125 MiB	
+        - L1I	576 KiB	18x32 KiB	8-way set associative	 
+        - L1D	576 KiB	18x32 KiB	8-way set associative	write-back
+
+    L2 = 18 MiB
+ 	 	- 18x1 MiB	16-way set associative	write-back
+    
+    L3 = 24.75 MiB	
+ 	 	- 18x1.375 MiB	11-way set associative	write-back
+
+
 
 Was haben wir gemacht? (technisch)
 ----------------------------------
@@ -88,26 +126,6 @@ L2 Cache: 16-way set associative, write-back
 L3 Cache: 11-way set associative, write-back
 
     L3 = 24.75 MiB (18 x 1.375 MiB) 
-
-.. warning::
-
-    Hier bitte Cache Specs von ARA
-
-    16 Hadoop-Knoten mit jeweils:
-
-    - 36 CPU-Kernen (2x Intel Xeon Gold 6140 18 Core 2,3 Ghz)
-    - 192 GB Arbeitsspeicher
-    - einer lokalen SSD
-
-    L1 = 1.125 MiB	
-        - L1I	576 KiB	18x32 KiB	8-way set associative	 
-        - L1D	576 KiB	18x32 KiB	8-way set associative	write-back
-
-    L2 = 18 MiB
- 	 	- 18x1 MiB	16-way set associative	write-back
-    
-    L3 = 24.75 MiB	
- 	 	- 18x1.375 MiB	11-way set associative	write-back
 
 Anzahl an Sets in Cache: cache size / (block size * set size)
 
@@ -203,3 +221,9 @@ It shows that as the number of resources approaches infinity, the efficiency goe
 Fazit (hats sich gelohnt?)
 --------------------------
 können wir noch nicht
+
+References
+----------
+
+.. [1] Ara cluster specifications: https://wiki.uni-jena.de/pages/viewpage.action?pageId=22453005 (04.02.2024)
+.. [2] Intel Xeon Gold 6140 specifications: https://en.wikichip.org/wiki/intel/xeon_gold/6140 (04.02.2024)
