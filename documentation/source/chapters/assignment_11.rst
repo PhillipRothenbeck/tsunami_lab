@@ -73,14 +73,45 @@ data in the cache needs to be replaced in cache. These specifications must be ta
     L3 = 24.75 MiB	
  	 	- 18x1.375 MiB	11-way set associative	write-back
 
-
-
-Was haben wir gemacht? (technisch)
-----------------------------------
-
+Implementation
+--------------
 
 Parallelization with MPI
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this segment, we explain how we used MPI to fully parallelize our tsunami solver.
+
+Simulation Initialisation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To start the simulation all configurations must be set up. This process starts with the declaration of a Cartesian MPI environment and retrieving the information about 
+it on each process. To ensure that all the necessary information is readily available, we have introduced the ParallelData struct. In addition, we need load the configuration 
+file. We decided to have each process will load the file instead of loading it only on one process and communicating the information to all other processes. This reduces the
+amount of communications performed and improves runtime. 
+
+I/O
+~~~
+
+- decision to load the data only on rank 0
+- writing each subgrid to its own file 
+
+Domain Decomposition
+~~~~~~~~~~~~~~~~~~~~
+- only rank 0 loads the data and decomposes it into several subgrids
+- sending the subgrid via non-blocking communication
+
+
+Time Step
+~~~~~~~~~
+- explain the problem at hand: should be a 8-point-stencil for communication
+ - lowering the dimension for the simulation means we have a 2-point-stencil
+ - this means we do not have to do 8 communications but 4
+
+- first we do the x communication
+- secondly we do the x-sweep
+- thirdly we communicate the result by doing the y communication
+- lastly we do the y-sweep
+
 Domain decomp
 comm vor x sweep (left / right) und vor y sweep (up down)
 
