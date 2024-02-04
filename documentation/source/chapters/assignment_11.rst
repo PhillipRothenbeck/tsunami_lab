@@ -48,7 +48,7 @@ registers which are even faster. Each processor has three levels of cache: the c
 (L2) cache. The level (L3) cache is shared by the cores on a processor. Memory can only be transferred in a cache line consisting of a specific number of bytes.
 
 If a query does not find the data in the cache, it is referred to as a cache miss; otherwise, it is called a cache hit. When a program queries the memory for a particular 
-data, it first looks in the L1D cache; if it does not find the seached data, it continues to look for it in the next lower level, in this case the L2 cache, and so on. 
+data, it first looks in the L1D cache; if the data searched for is not found, the search is continued in the next lower level, in this case in the L2 cache, and so on.
 If the data is found, its cache line is loaded directly into the L1D cache.
 
 On the Ara cluster [1]_ each Hadoop node consists of 2 Intel Xeon Gold 6140 [2]_ processors with 18 cores each. These have an L1D cache size of 576 KiB, an L2 cache size 
@@ -204,50 +204,6 @@ Speedup :math:`S_p` of computation time :math:`T_{comp}` for various simulations
     S_p &= \frac{T_1}{T_p} \\
     S_{72} &= \frac{2078.36s}{37.2162s} = 55.845
 
-Amdahl vs. Gustafson
-
-.. warning::
-
-    Auszug aus pc1 Website als Kontext (https://scalable.uni-jena.de/opt/pc/chapters/assignment_performance_metrics.html)
-    
-    Kann später wieder weg
-
-Amdahl's Law predicts the speedup of a computation when only a fraction of the computation can be parallelized. The law is named after Gene Amdahl, who introduced it in 1967:
-
-.. math::
-
-   S = \frac{1}{{(1 - \alpha) + \frac{\alpha}{p}}}
-
-Where:
-   - :math:`S` is the speedup of the parallelized computation,
-   - :math:`\alpha` is the fraction of the computation that can be parallelized,
-   - :math:`p` is the number of processors.
-
-Gustafson's Law emphasizes scalability, stating that as the problem size increases, the parallelizable portion grows, allowing better scaling with more resources. 
-Gustafson's Law introduces the idea that we can adjust the problem size to  utilize larger parallel systems. While Amdahl's Law highlights limitations in fixed-sized problems. 
-This law is named after John Gustafson, who introduced it in 1988.
-
-In mathematical terms, Gustafson's Law can be expressed as:
-
-.. math:: T_p = (1 - \alpha) + \alpha
-
-.. math:: T_1(p) = (1 - \alpha) + \alpha \cdot p
-
-.. math:: S(p) = \frac{T_1(p)}{T_p} = \frac{1 - \alpha + \alpha \cdot p}{1}
-
-where:
-
-- :math:`T_p` is the execution time for parallel processing with :math:`p > 1` worker,
-- :math:`T_1(p)` is the execution time on one worker,
-- :math:`\alpha` is the fraction of the problem that can be parallelized.
-- :math:`S(p)` is the speedup with :math:`p` workers
-
-Additionally:
-
-.. math:: E(p) = \frac{S(p)}{p} = \frac{1 - \alpha}{p} + \alpha
-
-This expression represents the parallel efficiency :math:`E(p)` and is defined in terms of speedup :math:`S(p)` and the number of resources :math:`p`. 
-It shows that as the number of resources approaches infinity, the efficiency goes towards the parallel fraction :math:`\alpha`.
 
 Fazit (hats sich gelohnt?)
 --------------------------
