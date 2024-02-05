@@ -165,7 +165,6 @@ In the following video you can see the simulation of the tsunami event in Chile 
 .. video:: ../_static/assignment_11/sim.mp4
   :autoplay:
   :loop:
-  :align: center
   :width: 600
 
   Simulation of chile with a cell size of 1000m and 10 processes
