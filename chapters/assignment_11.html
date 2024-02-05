@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>12. Individual Phase - Final Report &mdash; Tsunami Lab  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="11. individual Phase - Intermediate Report" href="assignment_10.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Tsunami Lab
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_documentation.html">1. User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_1.html">2. Report Week 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_2.html">3. Report Week 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_3.html">4. Week Report 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_4.html">5. Week Report 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_5.html">6. Week Report 5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_6.html">7. Week Report 6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_7.html">8. Week Report 7</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_8.html">9. Weekly Report 8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_9.html">10. Weekly Report 9</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_10.html">11. individual Phase - Intermediate Report</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">12. Individual Phase - Final Report</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">12.1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">12.2. Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#message-passing-interface-mpi">12.2.1. Message Passing Interface (MPI)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cache">12.2.2. Cache</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation">12.3. Implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parallelization-with-mpi">12.3.1. Parallelization with MPI</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#simulation-initialisation">12.3.1.1. Simulation Initialisation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#i-o">12.3.1.2. I/O</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#domain-decomposition">12.3.1.3. Domain Decomposition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#time-step">12.3.1.4. Time Step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#cache-optimization">12.3.2. Cache optimization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#x-and-y-sweep">12.3.2.1. X- and Y-sweep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cache-lines">12.3.2.2. Cache lines</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#results">12.4. Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#performance-analysis">12.4.1. Performance Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#discussion">12.5. Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">12.6. References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Tsunami Lab</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">12. </span>Individual Phase - Final Report</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/chapters/assignment_11.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="individual-phase-final-report">
+<span id="ch-task-11"></span><h1><span class="section-number">12. </span>Individual Phase - Final Report<a class="headerlink" href="#individual-phase-final-report" title="Link to this heading"></a></h1>
+<section id="introduction">
+<h2><span class="section-number">12.1. </span>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>With the conclusion of the Tsunami Lab project, our final task was to implement a mechanism of our choosing. The program developed in the project
+takes netCDF data as input, runs the simulation, and outputs the results. Due to the potentially large domain of these input files, the simulation
+can be lengthy. As a result, the simulation may take some time to complete. One way to improve program efficiency is to utilize parallelization, which
+involves instructing multiple cores to run independent parts of the code simultaneously. As dealt with in assignment 9 we already implemented
+parallelization on a smaller scale using OpenMP. Now, our team decided on taking it to a greater scale, splitting our domain into several
+subdomains and running each corresponding simulation on a respective core. Furthermore, to make each simulation more memory efficient, we
+optimize the cache usage. In this section, we will outline the necessary concepts for the optimization process and the strategy we developed
+to integrate them into the simulation.</p>
+</section>
+<section id="methods">
+<h2><span class="section-number">12.2. </span>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
+<section id="message-passing-interface-mpi">
+<h3><span class="section-number">12.2.1. </span>Message Passing Interface (MPI)<a class="headerlink" href="#message-passing-interface-mpi" title="Link to this heading"></a></h3>
+<p>When parallelizing our solver, we have used OpenMP in the past to partially parallelize our code.
+OpenMP enables a program to be processed by multiple processors by declaring parallel regions that are executed on each core.
+One solution is to run several processes in parallel, all of which execute the entire code.
+However, sharing data and results of local calculations among multiple processors in OpenMP can be complex.
+This is where the Message Passing Interface is used.
+MPI spawns a certain number of processes each on one respective core. If there were no restrictions, this would result in every process executing exactly the same work.
+Therefore, each core has an ID called ‘rank’ to identify the process running the code and distinguish the work done on each process.
+MPI provides functions to facilitate communication, allowing for the sending and receiving of single or multiple data to or from another processor.</p>
+<p>MPI provides a mechanism for arranging the used processes on a Cartesian coordinate system. By using the shifting method, each core can
+determine which processes are adjacent in the grid. When a process relies on n neighbors it is in a so-called n-point stencil.</p>
+<p>Parallelizing with MPI requires consideration of blocking and non-blocking communication. Blocking communication requires the sending process to wait for confirmation, that the data has been received and communication has ended.
+Although communication that is blocked is secure, it can result in longer runtimes for large data transfers due to idle time.
+Non-blocking communication functions, on the other hand, run the communication in the background and return immediately after being called, allowing for other tasks to be processed simultaneously.
+This can be used to process other tasks while the communication is ongoing. The MPI_Wait function enables communication synchronization before continuing computation.
+Non-blocking communication can be more complex. This is because a process cannot continue working with the transmitted data until the communication has ended.
+However, if used correctly, it can be faster than working with blocking communication.</p>
+</section>
+<section id="cache">
+<h3><span class="section-number">12.2.2. </span>Cache<a class="headerlink" href="#cache" title="Link to this heading"></a></h3>
+<p>Caches are small, but fast memory units on a processor chip that are supposed to reduce the number of slow memory accesses. They are a less expensive alternative to
+registers which are even faster. Each processor has three levels of cache: the core-specific are the level 1 data (L1D), level 1 instruction (L1I), and level 2
+(L2) cache. The level (L3) cache is shared by the cores on a processor. Memory can only be transferred in a cache line consisting of a specific number of bytes.</p>
+<p>If a query does not find the data in the cache, it is referred to as a cache miss; otherwise, it is called a cache hit. When a program queries the memory for a particular
+data, it first looks in the L1D cache; if the data searched for is not found, the search is continued in the next lower level, in this case in the L2 cache, and so on.
+If the data is found, its cache line is loaded directly into the L1D cache.</p>
+<p>On the Ara cluster <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> each Hadoop node consists of 2 Intel Xeon Gold 6140 <a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> processors with 18 cores each. These have an L1D cache size of 576 KiB, an L2 cache size
+of 18 MiB, and an L3 cache size of 24.75 MiB. In addition, each cache is divided into multiple sets, which are consisting of n lines, which is called an n-way
+set associative cache. Finally, all caches of the processors’ caches are write-back, meaning that they write the changes to data in to the memory only when the
+data in the cache needs to be replaced in cache. These specifications must be taken into account when writing cache-optimized code on the Ara cluster.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>16 Hadoop nodes on Ara cluster with each:</p>
+<ul class="simple">
+<li><p>36 CPU-cores (2x Intel Xeon Gold 6140 18 Core 2,3 Ghz)</p></li>
+<li><p>192 GB RAM</p></li>
+<li><p>one local SSD</p></li>
+</ul>
+<dl class="simple">
+<dt>L1 = 1.125 MiB</dt><dd><ul class="simple">
+<li><p>L1I   576 KiB 18x32 KiB       8-way set associative</p></li>
+<li><p>L1D   576 KiB 18x32 KiB       8-way set associative   write-back</p></li>
+</ul>
+</dd>
+<dt>L2 = 18 MiB</dt><dd><ul class="simple">
+<li><p>18x1 MiB      16-way set associative  write-back</p></li>
+</ul>
+</dd>
+<dt>L3 = 24.75 MiB</dt><dd><ul class="simple">
+<li><p>18x1.375 MiB  11-way set associative  write-back</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</section>
+<section id="implementation">
+<h2><span class="section-number">12.3. </span>Implementation<a class="headerlink" href="#implementation" title="Link to this heading"></a></h2>
+<section id="parallelization-with-mpi">
+<h3><span class="section-number">12.3.1. </span>Parallelization with MPI<a class="headerlink" href="#parallelization-with-mpi" title="Link to this heading"></a></h3>
+<p>In this segment, we explain how we used MPI to fully parallelize our tsunami solver.</p>
+<section id="simulation-initialisation">
+<h4><span class="section-number">12.3.1.1. </span>Simulation Initialisation<a class="headerlink" href="#simulation-initialisation" title="Link to this heading"></a></h4>
+<p>To start the simulation all configurations must be set up.
+This process starts with the initialization and declaration of a Cartesian MPI environment and retrieving the information about it on each process.
+To ensure that all the necessary information is readily available, we have introduced the ParallelData struct. In addition, we need to load the configuration file.
+We have decided that each process should load the file individually rather than loading it for one process and sharing the information with others.
+This reduces the amount of communications performed and improves runtime.</p>
+</section>
+<section id="i-o">
+<h4><span class="section-number">12.3.1.2. </span>I/O<a class="headerlink" href="#i-o" title="Link to this heading"></a></h4>
+<p>The input loading of the bathymetry and displacement files is only performed on the process with the rank 0. For the output, each process writes
+its sub-domain into its own output file. This approach avoids holding we won’t have to hold all data of every existing cell on a single core and eliminates the need for
+further communication of whole subgrids.</p>
+</section>
+<section id="domain-decomposition">
+<h4><span class="section-number">12.3.1.3. </span>Domain Decomposition<a class="headerlink" href="#domain-decomposition" title="Link to this heading"></a></h4>
+<p>As only the process with the rank 0 loads the data, it must split the domain into subgrids. This is accomplished by creating four temporary arrays for height, the hu
+(momentum in the x direction), hv (momentum in the y direction), and the bathymetry, each in the size of one subgrid. Once filled with the respective data, all four arrays
+are sent to the process with the corresponding rank using non-blocking communication, allowing all four arrays to be sent simultaneously. When using the temporal arrays for the
+next process, it is important to wait for the communication it is important to complete to ensure no unsend data is overwritten.</p>
+</section>
+<section id="time-step">
+<h4><span class="section-number">12.3.1.4. </span>Time Step<a class="headerlink" href="#time-step" title="Link to this heading"></a></h4>
+<p>Each process calculates the time step on its own domain. To ensure a correct results on a global scale, the borders of each subgrid must be net-updated by taking into
+account of their respective neighboring cells in the neighboring processes. To accomplish this, we fill the ghost cells of a subgrid with the corresponding cells sent by
+the neighbor. Since we use 2-point stencils we have a ghost cell border of the width of one cell. A problem arises when considering the corner ghost cells, for
+which one cell needs to be sent from each diagonal neighbor. To avoid these small extra communications, the communication can be split into one for the
+x-sweep and one for the y-sweep. This results in the corner ghost cells being already processed in the x-sweep performed in the process above and below.</p>
+<figure class="align-center" id="fig-sweep-comm">
+<a class="reference internal image-reference" href="../_images/sweep_communication.png"><img alt="../_images/sweep_communication.png" src="../_images/sweep_communication.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-text">Process with rank 4 receives orange border cells from processes 3 and 5 before the x-sweep and the green cells (results from the x-sweep) from 1 and 7 before the y-sweep.</span><a class="headerlink" href="#fig-sweep-comm" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The resulting workflow is as follows: First, the vertical borders are sent from the old data to the left and right neighbors. Then the x-sweep is performed. Then we send
+the horizontal borders from the results to the upper and lower neighbors. Finally, we can perform the y-sweep.</p>
+</section>
+</section>
+<section id="cache-optimization">
+<h3><span class="section-number">12.3.2. </span>Cache optimization<a class="headerlink" href="#cache-optimization" title="Link to this heading"></a></h3>
+<p>In order to make the cache usage of our solver more efficient, we considered possible areas in which optimizing the cache would be beneficial.</p>
+<section id="x-and-y-sweep">
+<h4><span class="section-number">12.3.2.1. </span>X- and Y-sweep<a class="headerlink" href="#x-and-y-sweep" title="Link to this heading"></a></h4>
+<p>In our WavePropagation, we iterate twice over all elements.
+In the first iteration, we calculate the net updates in x-direction (x-sweep) and in the second in y-direction (y-sweep).
+During the x-sweep, we first loop through all the elements in the first row and then jump to the next row.
+This works cache-efficiently, as every time we load a value from the data array, the next values are also loaded into the cache.</p>
+<p>However, with the y-sweep we intuitively iterated over the y-elements first, and only after a complete row had been calculated we jumped to the next column.
+This works against the cache, as the next contigous data is stored in the cache but not used for the next calculation.
+To prevent this and to utilize the cache efficiently, we have changed the order in which the cells are calculated so that we always only load two lines into the cache and then iterate over the x-elements until we jump to the next two lines.</p>
+</section>
+<section id="cache-lines">
+<h4><span class="section-number">12.3.2.2. </span>Cache lines<a class="headerlink" href="#cache-lines" title="Link to this heading"></a></h4>
+<p>Although our optimization of the y-sweep was already better than before, we found that we were still loading things into the cache multiple times, which is inefficient.</p>
+<p>During the y-sweep, we need each row (except the first and last) twice to calculate the value of the row itself and the value above that row.
+Our idea to solve this is to only iterate over as many cells in the data array as a cache line can hold, which in our case is 16 floats.
+Then we jump to the next row, which is already cached, and repeat the process.
+Once the entire cache column is processed, the next 16 columns are processed and the process is repeated until it is complete.</p>
+<p>Unfortunately, this did not improve our performance, but rather slowed it down.
+We believe that this is due to the fact that the openMP parallelization is faster than our cache improvement. The entire Y-sweep was previously parallelized, but with the introduction of this new feature, the parallelization software is probably no longer as efficient as before.</p>
+<figure class="align-center" id="fig-cache">
+<a class="reference internal image-reference" href="../_images/cache.png"><img alt="../_images/cache.png" src="../_images/cache.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-text">Each cache line visualized in the row of the grid it is positioned in. First the red lines are loaded. Before optimization the next cache lines would be the ones in green.
+For optimization we load in the one in blue leading to one less memory access.</span><a class="headerlink" href="#fig-cache" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+</section>
+<section id="results">
+<h2><span class="section-number">12.4. </span>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
+<p>First things first: we have successfully MPI-parallelized our solver.
+In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.</p>
+<video autoplay="True" controls="True" loop="True" preload="auto" width="600"><source src="../_static/assignment_11/sim.mp4" type="video/mp4"></video><p>The borders between the subgrids are caused by the fact that we let each subgrid write its own output file.
+Apart from that, the edges are communicated properly and the waves are therefore calculated correctly.</p>
+<section id="performance-analysis">
+<h3><span class="section-number">12.4.1. </span>Performance Analysis<a class="headerlink" href="#performance-analysis" title="Link to this heading"></a></h3>
+<p>In order to measure the change in performance due to MPI parallelisation and compare it with the normal version, we have defined the following test conditions.</p>
+<p>All time measurements were carried out using our -t flag and deactivating the output with our -nio flag.
+The time used to load and send the input data <span class="math notranslate nohighlight">\(T_{init}\)</span> and the computation time <span class="math notranslate nohighlight">\(T_{comp}\)</span> were measured. The overall time <span class="math notranslate nohighlight">\(T_{overall}\)</span> was calculated by adding the initialization time and the computation time.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}T_{overall} &amp;= T_{init} + T_{comp} \\\end{split}\]</div>
+<p>The speedup can then be calculated by dividing the overall time of the normal version <span class="math notranslate nohighlight">\(T_{1}\)</span> by the overall time of the mpi parallelization <span class="math notranslate nohighlight">\(T_{p}\)</span>, where p is the number of processes.</p>
+<p>The following table shows the measured values of the initialization time <span class="math notranslate nohighlight">\(T_{init}\)</span> for <span class="math notranslate nohighlight">\(p = {1, 5, 10, 16, 25}\)</span> processes, where <span class="math notranslate nohighlight">\(p = 1\)</span> corresponds to the normal version.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td rowspan="2"><p class="centered">
+<strong>Number of processes</strong></p></td>
+<td colspan="3"><p class="centered">
+<strong>cell size</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>1000m</p></td>
+<td><p>500m</p></td>
+<td><p>250m</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 1</strong></p></td>
+<td><p>37.1201</p></td>
+<td><p>147.245</p></td>
+<td><p>592.112</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 5</strong></p></td>
+<td><p>86.5288</p></td>
+<td><p>330.326</p></td>
+<td><p>1300.77</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 10</strong></p></td>
+<td><p>92.5038</p></td>
+<td><p>366.491</p></td>
+<td><p>1410.27</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 16</strong></p></td>
+<td><p>/</p></td>
+<td><p>394.263</p></td>
+<td><p>1474.11</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 25</strong></p></td>
+<td><p>112.018</p></td>
+<td><p>448.267</p></td>
+<td><p>1695.47</p></td>
+</tr>
+</tbody>
+</table>
+<p>As you can see, one value is missing in the table. This is due to the fact that for <span class="math notranslate nohighlight">\(p = 16\)</span> processes no domain decomposition can be performed on the 1000m cell size file that fulfills our conditions.
+However, we only noticed this after we had started the measurements, which is why there is no measured value for :math:<a href="#id3"><span class="problematic" id="id4">`</span></a>p = 16 processes at 1000m cell size in the following tables.</p>
+<p>The initialization takes longer for all cell sizes as soon as more than 1 process is running. This makes sense, as the mpi-parallelized version not only reads the grid, but also communicates it to the individual subgrids.</p>
+<p>Table of the calculation time <span class="math notranslate nohighlight">\(T_{comp}\)</span> for different numbers of processes:</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td rowspan="2"><p class="centered">
+<strong>Number of processes</strong></p></td>
+<td colspan="3"><p class="centered">
+<strong>cell size</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>1000m</p></td>
+<td><p>500m</p></td>
+<td><p>250m</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 1</strong></p></td>
+<td><p>357.985</p></td>
+<td><p>5084.05</p></td>
+<td><p>5412.09</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 5</strong></p></td>
+<td><p>493.491</p></td>
+<td><p>1308.02</p></td>
+<td><p>2749.71</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 10</strong></p></td>
+<td><p>885.82</p></td>
+<td><p>1311.65</p></td>
+<td><p>2482.66</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 16</strong></p></td>
+<td><p>/</p></td>
+<td><p>1583.94</p></td>
+<td><p>2934.86</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 25</strong></p></td>
+<td><p>1832.62</p></td>
+<td><p>2223.12</p></td>
+<td><p>3192.11</p></td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center" id="fig-comp-time">
+<a class="reference internal image-reference" href="../_images/computation_time.png"><img alt="../_images/computation_time.png" src="../_images/computation_time.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-text">Plot of the computation time <span class="math notranslate nohighlight">\(T_{comp}\)</span> for different number of processes <span class="math notranslate nohighlight">\(T_{p}\)</span> and cell sizes</span><a class="headerlink" href="#fig-comp-time" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>It can be seen that MPI parallelization has a negative influence on the computation time for larger cell sizes (1000m). One of the reasons for this is the bottleneck caused by insufficient domain size.
+For the smaller cell sizes, however, a very large difference can be seen between the normal version <span class="math notranslate nohighlight">\(p = 1\)</span> and the MPI-parallelized version <span class="math notranslate nohighlight">\(p = 5\)</span>.
+However, 5 or 10 are already the optimal number of processes, which is why the computation time increases again for <span class="math notranslate nohighlight">\(p &gt; 10\)</span>.</p>
+<p>Table of the calculation time <span class="math notranslate nohighlight">\(T_{overall}\)</span> for different numbers of processes:</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td rowspan="2"><p class="centered">
+<strong>Number of processes</strong></p></td>
+<td colspan="3"><p class="centered">
+<strong>cell size</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>1000m</p></td>
+<td><p>500m</p></td>
+<td><p>250m</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 1</strong></p></td>
+<td><p>729.186</p></td>
+<td><p>5231.295</p></td>
+<td><p>6004.202</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 5</strong></p></td>
+<td><p>580.0198</p></td>
+<td><p>1638.346</p></td>
+<td><p>4050.48</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 10</strong></p></td>
+<td><p>978.3238</p></td>
+<td><p>1678.141</p></td>
+<td><p>3892.93</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 16</strong></p></td>
+<td><p>/</p></td>
+<td><p>1978.203</p></td>
+<td><p>4408.97</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 25</strong></p></td>
+<td><p>1944.638</p></td>
+<td><p>2671.387</p></td>
+<td><p>4887.58</p></td>
+</tr>
+</tbody>
+</table>
+<p>In most cases, the overall time is dominated by the computation time and the bottlenecks, which is why there are no major differences between the ratios of the individual values.</p>
+<p>The following table shows the Speedup <span class="math notranslate nohighlight">\(S_p\)</span> between the normal and the mpi-parallelized version. The number of processes <span class="math notranslate nohighlight">\(p\)</span> here means the speedup between the normal version and the MPI parallelized version with p processes.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td rowspan="2"><p class="centered">
+<strong>Number of processes</strong></p></td>
+<td colspan="3"><p class="centered">
+<strong>cell size</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>1000m</p></td>
+<td><p>500m</p></td>
+<td><p>250m</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 5</strong></p></td>
+<td><p>1.257174324</p></td>
+<td><p>3.193133715</p></td>
+<td><p>1.4823433272</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 10</strong></p></td>
+<td><p>0.7453421863</p></td>
+<td><p>3.11731553</p></td>
+<td><p>1.5423349508</p></td>
+</tr>
+<tr class="row-odd"><td><p class="centered">
+<strong>p = 16</strong></p></td>
+<td><p>/</p></td>
+<td><p>2.644468237</p></td>
+<td><p>1.3618151178</p></td>
+</tr>
+<tr class="row-even"><td><p class="centered">
+<strong>p = 25</strong></p></td>
+<td><p>0.374972617</p></td>
+<td><p>1.9582692437</p></td>
+<td><p>1.2284611198</p></td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center" id="fig-speedup">
+<a class="reference internal image-reference" href="../_images/speedup.png"><img alt="../_images/speedup.png" src="../_images/speedup.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-text">Plot of the Speedup <span class="math notranslate nohighlight">\(S_p\)</span> of normal version vs. mpi-parallelized version.</span><a class="headerlink" href="#fig-speedup" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>You can see that the speedup for a cell size of 1000m for 5 processes is only just positive, i.e. slightly faster. For more processes the speedup is even negative, i.e. the program runs slower than without MPI parallelization.
+We have the largest speedup with a cell size of 500m with 5 processes. With more processes, the speedup also decreases again, but it remains positive here.
+The cell size of 250m is the only one where it can be observed that the speedup for 10 processes is greater than for 5 processes.
+In summary, it can be said that the optimum number of processes for (almost) all cell sizes is 5 processes. The decrease in speedup is due to the bottleneck caused by our communication.
+The larger the domain size, the less influence this bottleneck has on our simulation.</p>
+</section>
+</section>
+<section id="discussion">
+<h2><span class="section-number">12.5. </span>Discussion<a class="headerlink" href="#discussion" title="Link to this heading"></a></h2>
+<p>When analyzing the speedups, it is evident that MPI parallelization has a greater impact on the simulations imulations that involve larger amounts of data. This is due
+to the fact that the communication overhead, relative to the compute time needed for a small grid, has a greater impact on the runtime  than on a large grid.
+Additionally, the initialization speed of the grid increases with a larger amount of data, mainly due to the communication of each subgrid. Another reason is that only rank 0
+calculates the values of each grid. To solve this problem, a program should load the data in every process and initialize the data for each subgrid on the respective process.</p>
+<p>Since all cache optimizations that we tried to implement failed to provide any speed improvements, we must examine our own methods. The reason for this could be either mistakes on our part or an incorrect methodology.</p>
+</section>
+<section id="references">
+<h2><span class="section-number">12.6. </span>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Ara cluster specifications: <a class="reference external" href="https://wiki.uni-jena.de/pages/viewpage.action?pageId=22453005">https://wiki.uni-jena.de/pages/viewpage.action?pageId=22453005</a> (04.02.2024)</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Intel Xeon Gold 6140 specifications: <a class="reference external" href="https://en.wikichip.org/wiki/intel/xeon_gold/6140">https://en.wikichip.org/wiki/intel/xeon_gold/6140</a> (04.02.2024)</p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="assignment_10.html" class="btn btn-neutral float-left" title="11. individual Phase - Intermediate Report" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bohdan Babii, Phillip Rothenbeck, Moritz Rätz, Marek Sommerfeld.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5. Week Report 4 &mdash; Tsunami Lab  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Week Report 5" href="assignment_5.html" />
+    <link rel="prev" title="4. Week Report 3" href="assignment_3.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Tsunami Lab
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_documentation.html">1. User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_1.html">2. Report Week 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_2.html">3. Report Week 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_3.html">4. Week Report 3</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">5. Week Report 4</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#adding-two-dimensional-support">5.1. Adding two-dimensional support</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#implementation-of-dimensional-splitting">5.1.1. Implementation of dimensional splitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implementation-of-2d-dam-break-setup">5.1.2. Implementation of 2D dam break setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-an-obstacle">5.1.3. Adding an obstacle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_5.html">6. Week Report 5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_6.html">7. Week Report 6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_7.html">8. Week Report 7</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_8.html">9. Weekly Report 8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_9.html">10. Weekly Report 9</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_10.html">11. individual Phase - Intermediate Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_11.html">12. Individual Phase - Final Report</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Tsunami Lab</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">5. </span>Week Report 4</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/chapters/assignment_4.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="week-report-4">
+<span id="ch-task-4"></span><h1><span class="section-number">5. </span>Week Report 4<a class="headerlink" href="#week-report-4" title="Link to this heading"></a></h1>
+<section id="adding-two-dimensional-support">
+<span id="ch-task-4-1"></span><h2><span class="section-number">5.1. </span>Adding two-dimensional support<a class="headerlink" href="#adding-two-dimensional-support" title="Link to this heading"></a></h2>
+<div class="admonition-tasks admonition">
+<p class="admonition-title">Tasks</p>
+<ol class="arabic simple">
+<li><p>Add support for two-dimensional problems to the solver. Implement dimensional splitting through a new class <code class="docutils literal notranslate"><span class="pre">patches::WavePropagation2d</span></code>. Change other parts of the software as required but keep supporting one-dimensional settings.</p></li>
+<li><p>Implement a circular dam break setup in the computational domain <span class="math notranslate nohighlight">\([-50,50]^2\)</span> by using the following initial values:</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+    [h, hu, hv]^T = [10, 0, 0]^T &amp; \text{ if } \sqrt{x^2 + y^2} &lt; 10 \\
+    [h, hu, hv]^T = [5, 0, 0]^T &amp;\text{else}.
+\end{cases}\end{split}\]</div>
+<ol class="arabic simple">
+<li><p>Illustrate your support for bathymetry in two dimensions by adding an obstacle to the computational domain of the circular dam break setup.</p></li>
+</ol>
+</div>
+<section id="implementation-of-dimensional-splitting">
+<h3><span class="section-number">5.1.1. </span>Implementation of dimensional splitting<a class="headerlink" href="#implementation-of-dimensional-splitting" title="Link to this heading"></a></h3>
+<p>To implement the dimensional splitting I needed to write the class <code class="docutils literal notranslate"><span class="pre">patches::WavePropagation2d</span></code>. It has an additional member variable that holds
+an array containing the momentum in y-direction. Each array is the size of
+<span class="math notranslate nohighlight">\((n+2)\cdot (m+2)\)</span> elements with <span class="math notranslate nohighlight">\(n\)</span> being the number of cells in x-direction
+and <span class="math notranslate nohighlight">\(m\)</span> the number of cells in y-direction.</p>
+<p>The timestep needs to first do the x-sweep and then do the y-sweep. In the x-sweep
+the momentum in x-direction is fed into the solver, while in the y-sweep the momentum in y-direction is used.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">void</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">patches</span><span class="p">::</span><span class="n">WavePropagation2d</span><span class="p">::</span><span class="n">timeStep</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_scalingX</span><span class="p">,</span>
+                                                       <span class="n">t_real</span> <span class="n">i_scalingY</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_hOld</span> <span class="o">=</span> <span class="n">m_h</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_huOld</span> <span class="o">=</span> <span class="n">m_hu</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_hvOld</span> <span class="o">=</span> <span class="n">m_hv</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+
+    <span class="n">m_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">m_step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_hNew</span> <span class="o">=</span> <span class="n">m_h</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_huNew</span> <span class="o">=</span> <span class="n">m_hu</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_hvNew</span> <span class="o">=</span> <span class="n">m_hv</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_hStar</span> <span class="o">=</span> <span class="n">new</span> <span class="n">t_real</span><span class="p">[</span><span class="n">m_mnCells</span><span class="p">];</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_huStar</span> <span class="o">=</span> <span class="n">new</span> <span class="n">t_real</span><span class="p">[</span><span class="n">m_mnCells</span><span class="p">];</span>
+    <span class="n">t_real</span> <span class="o">*</span><span class="n">l_hvStar</span> <span class="o">=</span> <span class="n">new</span> <span class="n">t_real</span><span class="p">[</span><span class="n">m_mnCells</span><span class="p">];</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_ceY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l_ceY</span> <span class="o">&lt;</span> <span class="n">m_mCellsY</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span> <span class="n">l_ceY</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_ceX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l_ceX</span> <span class="o">&lt;</span> <span class="n">m_nCellsX</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span> <span class="n">l_ceX</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">t_idx</span> <span class="n">l_idx</span> <span class="o">=</span> <span class="n">getIndex</span><span class="p">(</span><span class="n">l_ceX</span><span class="p">,</span> <span class="n">l_ceY</span><span class="p">);</span>
+            <span class="n">l_hStar</span><span class="p">[</span><span class="n">l_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_hOld</span><span class="p">[</span><span class="n">l_idx</span><span class="p">];</span>
+            <span class="n">l_huStar</span><span class="p">[</span><span class="n">l_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_huOld</span><span class="p">[</span><span class="n">l_idx</span><span class="p">];</span>
+            <span class="n">l_hvStar</span><span class="p">[</span><span class="n">l_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_hvOld</span><span class="p">[</span><span class="n">l_idx</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_edY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l_edY</span> <span class="o">&lt;</span> <span class="n">m_mCellsY</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span> <span class="n">l_edY</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_edX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l_edX</span> <span class="o">&lt;</span> <span class="n">m_nCellsX</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_edX</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">t_idx</span> <span class="n">l_ceL</span> <span class="o">=</span> <span class="n">getIndex</span><span class="p">(</span><span class="n">l_edX</span><span class="p">,</span> <span class="n">l_edY</span><span class="p">);</span>
+            <span class="n">t_idx</span> <span class="n">l_ceR</span> <span class="o">=</span> <span class="n">getIndex</span><span class="p">(</span><span class="n">l_edX</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">l_edY</span><span class="p">);</span>
+
+            <span class="n">t_real</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+
+            <span class="n">solvers</span><span class="p">::</span><span class="n">FWave</span><span class="p">::</span><span class="n">netUpdates</span><span class="p">(</span><span class="n">l_hOld</span><span class="p">[</span><span class="n">l_ceL</span><span class="p">],</span>
+                                    <span class="n">l_hOld</span><span class="p">[</span><span class="n">l_ceR</span><span class="p">],</span>
+                                    <span class="n">l_huOld</span><span class="p">[</span><span class="n">l_ceL</span><span class="p">],</span>
+                                    <span class="n">l_huOld</span><span class="p">[</span><span class="n">l_ceR</span><span class="p">],</span>
+                                    <span class="n">m_b</span><span class="p">[</span><span class="n">l_ceL</span><span class="p">],</span>
+                                    <span class="n">m_b</span><span class="p">[</span><span class="n">l_ceR</span><span class="p">],</span>
+                                    <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+            <span class="n">l_hStar</span><span class="p">[</span><span class="n">l_ceL</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingX</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+            <span class="n">l_huStar</span><span class="p">[</span><span class="n">l_ceL</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingX</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+
+            <span class="n">l_hStar</span><span class="p">[</span><span class="n">l_ceR</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingX</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+            <span class="n">l_huStar</span><span class="p">[</span><span class="n">l_ceR</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingX</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_ceY</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_ceY</span> <span class="o">&lt;</span> <span class="n">m_mCellsY</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_ceY</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_ceX</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_ceX</span> <span class="o">&lt;</span> <span class="n">m_nCellsX</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_ceX</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">t_idx</span> <span class="n">l_idx</span> <span class="o">=</span> <span class="n">getIndex</span><span class="p">(</span><span class="n">l_ceX</span><span class="p">,</span> <span class="n">l_ceY</span><span class="p">);</span>
+            <span class="n">l_hNew</span><span class="p">[</span><span class="n">l_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_hStar</span><span class="p">[</span><span class="n">l_idx</span><span class="p">];</span>
+            <span class="n">l_huNew</span><span class="p">[</span><span class="n">l_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_huStar</span><span class="p">[</span><span class="n">l_idx</span><span class="p">];</span>
+            <span class="n">l_hvNew</span><span class="p">[</span><span class="n">l_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_hvStar</span><span class="p">[</span><span class="n">l_idx</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_edX</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_edX</span> <span class="o">&lt;</span> <span class="n">m_nCellsX</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_edX</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t_idx</span> <span class="n">l_edY</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l_edY</span> <span class="o">&lt;</span> <span class="n">m_mCellsY</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">l_edY</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">t_idx</span> <span class="n">l_ceU</span> <span class="o">=</span> <span class="n">getIndex</span><span class="p">(</span><span class="n">l_edX</span><span class="p">,</span> <span class="n">l_edY</span><span class="p">);</span>
+            <span class="n">t_idx</span> <span class="n">l_ceD</span> <span class="o">=</span> <span class="n">getIndex</span><span class="p">(</span><span class="n">l_edX</span><span class="p">,</span> <span class="n">l_edY</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+
+            <span class="n">t_real</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span>
+
+            <span class="n">solvers</span><span class="p">::</span><span class="n">FWave</span><span class="p">::</span><span class="n">netUpdates</span><span class="p">(</span><span class="n">l_hStar</span><span class="p">[</span><span class="n">l_ceU</span><span class="p">],</span>
+                                    <span class="n">l_hStar</span><span class="p">[</span><span class="n">l_ceD</span><span class="p">],</span>
+                                    <span class="n">l_hvStar</span><span class="p">[</span><span class="n">l_ceU</span><span class="p">],</span>
+                                    <span class="n">l_hvStar</span><span class="p">[</span><span class="n">l_ceD</span><span class="p">],</span>
+                                    <span class="n">m_b</span><span class="p">[</span><span class="n">l_ceU</span><span class="p">],</span>
+                                    <span class="n">m_b</span><span class="p">[</span><span class="n">l_ceD</span><span class="p">],</span>
+                                    <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+            <span class="n">l_hNew</span><span class="p">[</span><span class="n">l_ceU</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingY</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+            <span class="n">l_hvNew</span><span class="p">[</span><span class="n">l_ceU</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingY</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+
+            <span class="n">l_hNew</span><span class="p">[</span><span class="n">l_ceD</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingY</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span>
+            <span class="n">l_hvNew</span><span class="p">[</span><span class="n">l_ceD</span><span class="p">]</span> <span class="o">-=</span> <span class="n">i_scalingY</span> <span class="o">*</span> <span class="n">l_netUpdates</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">delete</span><span class="p">[]</span> <span class="n">l_hStar</span><span class="p">;</span>
+    <span class="n">delete</span><span class="p">[]</span> <span class="n">l_huStar</span><span class="p">;</span>
+    <span class="n">delete</span><span class="p">[]</span> <span class="n">l_hvStar</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Additionally I needed to calculate the sizes of the time step and the cells. For
+the former the CFL-criterion needs to be true.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>...
+
+// check if delta x is smaller than delta y
+bool l_isXStepSmaller = (l_dx &lt;= l_dy);
+
+// choose l_dxy as l_dx if it is smaller or l_dy if it is smaller
+tsunami_lab::t_real l_dxy = l_dx * l_isXStepSmaller + l_dy * !l_isXStepSmaller;
+
+std::cout &lt;&lt; &quot;runtime configuration&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;  number of cells in x-direction: &quot; &lt;&lt; l_nx &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;  number of cells in y-direction: &quot; &lt;&lt; l_ny &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;  cell size:                      &quot; &lt;&lt; l_dxy &lt;&lt; std::endl;
+
+// derive constant time step; changes at simulation time are ignored
+tsunami_lab::t_real l_dt = 0.5 * l_dxy / l_speedMax;
+
+// derive scaling for a time step
+tsunami_lab::t_real l_scalingX = l_dt / l_dx;
+tsunami_lab::t_real l_scalingY = l_dt / l_dy;
+
+...
+</pre></div>
+</div>
+</section>
+<section id="implementation-of-2d-dam-break-setup">
+<h3><span class="section-number">5.1.2. </span>Implementation of 2D dam break setup<a class="headerlink" href="#implementation-of-2d-dam-break-setup" title="Link to this heading"></a></h3>
+<p>Only the <code class="docutils literal notranslate"><span class="pre">setups::DamBreak2d::getHeight</span></code> need to be shown since the rest
+ar returning 0 for each position.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">DamBreak2d</span><span class="p">::</span><span class="n">getHeight</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_x</span><span class="p">,</span>
+                                                               <span class="n">t_real</span> <span class="n">i_y</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="n">t_real</span> <span class="n">l_x</span> <span class="o">=</span> <span class="n">i_x</span> <span class="o">-</span> <span class="p">(</span><span class="n">m_simLenX</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">t_real</span> <span class="n">l_y</span> <span class="o">=</span> <span class="n">i_y</span> <span class="o">-</span> <span class="p">(</span><span class="n">m_simLenY</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">l_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">(</span><span class="n">l_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">m_damLimit</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">10</span> <span class="o">+</span> <span class="n">fabs</span><span class="p">(</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">i_x</span><span class="p">,</span> <span class="n">i_y</span><span class="p">));</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">fabs</span><span class="p">(</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">i_x</span><span class="p">,</span> <span class="n">i_y</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The resulting simulation:</p>
+<video autoplay="True" controls="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_4/dambreak_2d.mp4" type="video/mp4"></video></section>
+<section id="adding-an-obstacle">
+<h3><span class="section-number">5.1.3. </span>Adding an obstacle<a class="headerlink" href="#adding-an-obstacle" title="Link to this heading"></a></h3>
+<p>Finally for adding an obstacle. The method <code class="docutils literal notranslate"><span class="pre">setups::DamBreak2d::getBathymetry</span></code> was edited.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">DamBreak2d</span><span class="p">::</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_x</span><span class="p">,</span>
+                                                                   <span class="n">t_real</span> <span class="n">i_y</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="nb">bool</span> <span class="n">l_inRangeX</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">m_simLenX</span> <span class="o">&lt;</span> <span class="n">i_x</span> <span class="o">&amp;&amp;</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">m_simLenX</span> <span class="o">&gt;</span> <span class="n">i_x</span><span class="p">;</span>
+    <span class="nb">bool</span> <span class="n">l_inRangeY</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">m_simLenY</span> <span class="o">&lt;</span> <span class="n">i_y</span> <span class="o">&amp;&amp;</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">m_simLenY</span> <span class="o">&gt;</span> <span class="n">i_y</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">l_inRangeX</span> <span class="o">&amp;&amp;</span> <span class="n">l_inRangeY</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">10</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The influence of this can be seen in the resulting animation.</p>
+<video autoplay="True" controls="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_4/dambreak_2d_obs.mp4" type="video/mp4"></video></section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="assignment_3.html" class="btn btn-neutral float-left" title="4. Week Report 3" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="assignment_5.html" class="btn btn-neutral float-right" title="6. Week Report 5" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bohdan Babii, Phillip Rothenbeck, Moritz Rätz, Marek Sommerfeld.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

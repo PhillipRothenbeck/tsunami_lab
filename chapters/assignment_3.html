@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4. Week Report 3 &mdash; Tsunami Lab  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Week Report 4" href="assignment_4.html" />
+    <link rel="prev" title="3. Report Week 2" href="assignment_2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Tsunami Lab
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_documentation.html">1. User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_1.html">2. Report Week 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_2.html">3. Report Week 2</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Week Report 3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#adding-bathymetry-support">4.1. Adding bathymetry support</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#implementation-in-f-wave-solver">4.1.1. Implementation in F-Wave solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implementation-in-wavepropagation1d">4.1.2. Implementation in WavePropagation1d</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#boundary-conditions">4.2. Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#maximum-froude-value">4.3. Maximum Froude value</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subcritical-flow">4.3.1. Subcritical Flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supercritical-flow">4.3.2. Supercritical Flow:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implementing-the-setups">4.3.3. Implementing the setups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stationary-discontinuity">4.3.4. Stationary Discontinuity</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tsunamievent-simulation">4.4. TsunamiEvent simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_4.html">5. Week Report 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_5.html">6. Week Report 5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_6.html">7. Week Report 6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_7.html">8. Week Report 7</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_8.html">9. Weekly Report 8</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_9.html">10. Weekly Report 9</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_10.html">11. individual Phase - Intermediate Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assignment_11.html">12. Individual Phase - Final Report</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Tsunami Lab</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">4. </span>Week Report 3</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/chapters/assignment_3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="week-report-3">
+<span id="ch-task-3"></span><h1><span class="section-number">4. </span>Week Report 3<a class="headerlink" href="#week-report-3" title="Link to this heading"></a></h1>
+<section id="adding-bathymetry-support">
+<span id="ch-task-3-1"></span><h2><span class="section-number">4.1. </span>Adding bathymetry support<a class="headerlink" href="#adding-bathymetry-support" title="Link to this heading"></a></h2>
+<div class="admonition-tasks admonition">
+<p class="admonition-title">Tasks</p>
+<ol class="arabic simple">
+<li><p>Extend the f-wave solver with support for bathymetry according to Eq. 3.1.1 and Eq. 3.1.2.</p></li>
+<li><p>Implement an example which illustrates the effect of bathymetry in your extended solver.
+<strong>Note:</strong> You have to add bathymetry to the respective patches implementing the abstract class <code class="docutils literal notranslate"><span class="pre">patches::WavePropagation</span></code> as well.
+Also, ghost cells require a valid value for the bathymetry, i.e., <span class="math notranslate nohighlight">\(b_0 := b_1\)</span> set and <span class="math notranslate nohighlight">\(b_{n+1} := b_n\)</span>.</p></li>
+</ol>
+</div>
+<section id="implementation-in-f-wave-solver">
+<h3><span class="section-number">4.1.1. </span>Implementation in F-Wave solver<a class="headerlink" href="#implementation-in-f-wave-solver" title="Link to this heading"></a></h3>
+<p>Adding the implementation for bathymetry in the f-wave solver comes down to changing the computation of the wave strengths from:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix} \alpha_1 \\ \alpha_2 \end{bmatrix} = \begin{bmatrix} 1 &amp; 1 \\ \lambda_1 &amp; \lambda_2 \end{bmatrix} \cdot \Delta f\end{split}\]</div>
+<p>to the following, which was taken from Eq. 3.1.2:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix} \alpha_1 \\ \alpha_2 \end{bmatrix} = \begin{bmatrix} 1 &amp; 1 \\ \lambda_1 &amp; \lambda_2 \end{bmatrix} \cdot (\Delta f  - \Delta x \Psi_{i + 1/2})\end{split}\]</div>
+<p>In the code this meant, that we only made changes in <code class="docutils literal notranslate"><span class="pre">solvers::FWave::waveStrengths</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+
+<span class="n">t_real</span> <span class="n">l_delta_x_psi</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="n">l_delta_x_psi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">l_delta_x_psi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">solvers</span><span class="p">::</span><span class="n">FWave</span><span class="p">::</span><span class="n">c_g</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">i_bR</span> <span class="o">-</span> <span class="n">i_bL</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">i_hL</span> <span class="o">+</span> <span class="n">i_hR</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+
+<span class="n">t_real</span> <span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_delta_flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">l_delta_x_psi</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_delta_flux</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">l_delta_x_psi</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+<span class="o">//</span> <span class="n">calculate</span> <span class="nb">reversed</span> <span class="n">determinant</span>
+<span class="n">t_real</span> <span class="n">l_rev_det</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">i_waveSpeedR</span> <span class="o">-</span> <span class="n">i_waveSpeedL</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="n">calculate</span> <span class="n">the</span> <span class="n">inverse</span> <span class="n">of</span> <span class="n">the</span> <span class="n">matrix</span> <span class="n">R</span>
+<span class="n">t_real</span> <span class="n">l_R_inv</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+<span class="n">l_R_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_rev_det</span> <span class="o">*</span> <span class="n">i_waveSpeedR</span><span class="p">;</span>
+<span class="n">l_R_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">l_rev_det</span><span class="p">;</span>
+<span class="n">l_R_inv</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">l_rev_det</span> <span class="o">*</span> <span class="n">i_waveSpeedL</span><span class="p">;</span>
+<span class="n">l_R_inv</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_rev_det</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="n">calculate</span> <span class="n">wave</span> <span class="n">strengths</span>
+<span class="n">o_strengthL</span> <span class="o">=</span> <span class="n">l_R_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">o_strengthL</span> <span class="o">+=</span> <span class="n">l_R_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="n">o_strengthR</span> <span class="o">=</span> <span class="n">l_R_inv</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="n">o_strengthR</span> <span class="o">+=</span> <span class="n">l_R_inv</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_decomposition_flux</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</pre></div>
+</div>
+<p>We added the variable <code class="docutils literal notranslate"><span class="pre">l_delta_x_psi</span></code> that holds the vector <span class="math notranslate nohighlight">\(\Delta x \Psi_{i + 1/2}\)</span> and <code class="docutils literal notranslate"><span class="pre">l_decomposition_flux</span></code>
+holding <span class="math notranslate nohighlight">\(\Delta f - \Delta x \Psi_{i + 1/2}\)</span>.</p>
+</section>
+<section id="implementation-in-wavepropagation1d">
+<h3><span class="section-number">4.1.2. </span>Implementation in WavePropagation1d<a class="headerlink" href="#implementation-in-wavepropagation1d" title="Link to this heading"></a></h3>
+<p>We added an array as a <code class="docutils literal notranslate"><span class="pre">m_b</span></code> private member variable, since the bathymetry needs to be stored for every cell. In addition,
+we needed the getter function <code class="docutils literal notranslate"><span class="pre">patches::WavePropagation::getBathymetry</span></code> to be able to access the bathymetry of each cell.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">...</span>
+
+ <span class="o">/**</span>
+ <span class="o">*</span> <span class="n">Sets</span> <span class="n">the</span> <span class="n">bathymetry</span> <span class="n">to</span> <span class="n">the</span> <span class="n">given</span> <span class="n">value</span><span class="o">.</span>
+ <span class="o">*</span>
+ <span class="o">*</span> <span class="nd">@param</span> <span class="n">i_ix</span> <span class="nb">id</span> <span class="n">of</span> <span class="n">the</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">x</span><span class="o">-</span><span class="n">direction</span><span class="o">.</span>
+ <span class="o">*</span> <span class="nd">@param</span> <span class="n">i_b</span> <span class="n">bathymetry</span><span class="o">.</span>
+ <span class="o">**/</span>
+<span class="n">void</span> <span class="n">setBathymetry</span><span class="p">(</span> <span class="n">t_idx</span> <span class="n">i_ix</span><span class="p">,</span>
+                    <span class="n">t_real</span> <span class="n">i_b</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">m_b</span><span class="p">[</span><span class="n">i_ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">i_b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>For demonstration, we constructed a created a DamBreak setup, that has bathymetry of 0 in all cells but
+from 50% to 75% where it has a value of -3.75. This had the following result:</p>
+<video autoplay="True" controls="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_3/only_hill.mp4" type="video/mp4"></video></section>
+</section>
+<section id="boundary-conditions">
+<span id="ch-part-3-2"></span><h2><span class="section-number">4.2. </span>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Link to this heading"></a></h2>
+<div class="admonition-tasks admonition">
+<p class="admonition-title">Tasks</p>
+<ol class="arabic simple">
+<li><p>Implement reflecting boundary conditions.</p></li>
+<li><p>Show that you obtain the shock-shock’s one-sided solution of the shock-shock setup if you set <span class="math notranslate nohighlight">\(q_l\)</span> everywhere initially and use reflecting boundary conditions at the right boundary, and outflow boundary conditions at the left boundary.
+<strong>Note:</strong> Reflecting boundary conditions for the right boundary can be implemented through a ghost cell <span class="math notranslate nohighlight">\(\mathcal{C}_{n+1}\)</span> that is dry.</p></li>
+</ol>
+</div>
+<p>Added new Boundary Conditions to WavePropagation1d so that</p>
+<div class="math notranslate nohighlight" id="equation-eq-reflecting-bc">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-reflecting-bc" title="Link to this equation"></a></span>\[\begin{split}h_{i} &amp;:= h_{i-1} \\
+(hu)_{i} &amp;:= -(hu)_{i-1} \\
+b_{i} &amp;:= b_{i-1}\end{split}\]</div>
+<p>the condition is met. Four different methods for setting ghost cells:</p>
+<p><strong>Case 1: Both ghost cells have the reflicting boundary condition.</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">tsunami_lab::patches::WavePropagation1d::setGhostReflectingBoundaryConditions</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_h</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_hu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_hu</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set left boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">l_hu</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set right boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Case 2: Left ghost cell has the reflecting boundary condition and the right one has the outflow boundary condition</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">tsunami_lab::patches::WavePropagation1d::setGhostLeftReflectingBoundaryCondition</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_h</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_hu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_hu</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set left boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">l_hu</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set right boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Case 3: Right ghost cell has the reflecting boundary condition and the left one has the outflow boundary condition</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">tsunami_lab::patches::WavePropagation1d::setGhostRightReflectingBoundaryCondition</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_h</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_hu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_hu</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set left boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_hu</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set right boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Case 4: Both ghost cells have the outflow condition</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">tsunami_lab::patches::WavePropagation1d::setGhostOutflow</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_h</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">l_hu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_hu</span><span class="p">[</span><span class="n">m_step</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set left boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_hu</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">m_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_b</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+<span class="w">    </span><span class="c1">// set right boundary</span>
+<span class="w">    </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_h</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="w">    </span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_hu</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="w">    </span><span class="n">m_b</span><span class="p">[</span><span class="n">m_nCells</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_b</span><span class="p">[</span><span class="n">m_nCells</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Added new Flag for the Boundary conditions for the boundary conditions in the main.cpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-f&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-r&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;invalid third argument(needs to be &#39;-r&#39; or &#39;-f&#39;)&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">EXIT_FAILURE</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-oo&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-rr&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-or&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-ro&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;invalid fourth argument(needs to be &#39;-rr&#39;, &#39;-oo&#39;, &#39;-or&#39; or &#39;-ro&#39;)&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">EXIT_FAILURE</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-rr&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Boundery condition of both ghost cells were set to reflecting condition&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-oo&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Boundery condition of both ghost cells were set to outflow condition&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-or&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Left boundery condition was set to outflow condition and right boundery condition to reflecting condition&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">i_argv</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;-ro&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Right boundery condition was set to outflow condition and left boundery condition to reflecting condition&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">...</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">l_boundary_conditions</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;-rr&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">l_waveProp</span><span class="o">-&gt;</span><span class="n">setGhostOutflow</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">l_boundary_conditions</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;-ro&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">l_waveProp</span><span class="o">-&gt;</span><span class="n">setGhostOutflow</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">l_boundary_conditions</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;-or&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">l_waveProp</span><span class="o">-&gt;</span><span class="n">setGhostOutflow</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">l_waveProp</span><span class="o">-&gt;</span><span class="n">setGhostOutflow</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="n">l_waveProp</span><span class="o">-&gt;</span><span class="n">timeStep</span><span class="p">(</span><span class="n">l_scaling</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p><strong>Visualization of left ghost cell with reflecting boundary condition and right ghost cell with outflow condition.</strong></p>
+<video autoplay="True" controls="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_3/boundary_condition.mp4" type="video/mp4"></video><video autoplay="True" controls="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_3/boundary_condition_mom.mp4" type="video/mp4"></video></section>
+<section id="maximum-froude-value">
+<span id="ch-part-3-3"></span><h2><span class="section-number">4.3. </span>Maximum Froude value<a class="headerlink" href="#maximum-froude-value" title="Link to this heading"></a></h2>
+<div class="admonition-tasks admonition">
+<p class="admonition-title">Tasks</p>
+<ol class="arabic simple">
+<li><p>Compute the location and value of the maximum Froude number for the subcritical setting given in Eq. 3.3.1 and the supercritical setting given in Eq. 3.3.2 at the initial time <span class="math notranslate nohighlight">\(t = 0\)</span>.</p></li>
+<li><p>Implement both cases through the base class setup::Setup.h. <span class="math notranslate nohighlight">\(t \in [0, 200]\)</span> is a reasonable time window for your simulation.</p></li>
+<li><p>Determine the position of the hydraulic jump (stationary discontinuity) in your supercritical solution and show that our f-wave solver fails to converge to the analytically expected constant momentum over the entire domain.</p></li>
+</ol>
+</div>
+<p>First we look upon the equation to calculate the Froude number:</p>
+<div class="math notranslate nohighlight">
+\[F = \frac{(\frac{hu}{h})}{\sqrt{g \cdot h}} = \frac{hu}{h} \cdot \frac{1}{\sqrt{g \cdot h}} = \frac{hu}{\sqrt{g} \cdot \sqrt{h}^3}\]</div>
+<p>Since for both cases <span class="math notranslate nohighlight">\(hu\)</span> and <span class="math notranslate nohighlight">\(g\)</span> are constant we only need to look at the height. <span class="math notranslate nohighlight">\(F\)</span> will be the highest, when <span class="math notranslate nohighlight">\(h\)</span> is the lowest.</p>
+<section id="subcritical-flow">
+<h3><span class="section-number">4.3.1. </span>Subcritical Flow<a class="headerlink" href="#subcritical-flow" title="Link to this heading"></a></h3>
+<p>For the height function:</p>
+<div class="math notranslate nohighlight">
+\[h(x, 0) = 1.8 + 0.05(10 - x)^2\]</div>
+<p>exists one minimum at <span class="math notranslate nohighlight">\(x = 10\)</span>, which was derived from the first derivation. Concluding in a Froude number of :<span class="math notranslate nohighlight">\(F = \frac{(\frac{hu}{h})}{\sqrt{g \cdot h}} = 0.59\)</span></p>
+</section>
+<section id="supercritical-flow">
+<h3><span class="section-number">4.3.2. </span>Supercritical Flow:<a class="headerlink" href="#supercritical-flow" title="Link to this heading"></a></h3>
+<p>For the height function:</p>
+<div class="math notranslate nohighlight">
+\[h(x, 0) = 0.13 + 0.05(10 - x)^2\]</div>
+<p>also exists a minimum at <span class="math notranslate nohighlight">\(x = 10\)</span>. This concludes in the Froude number: :<span class="math notranslate nohighlight">\(F = \frac{(\frac{hu}{h})}{\sqrt{g \cdot h}} = 1.22\)</span></p>
+</section>
+<section id="implementing-the-setups">
+<h3><span class="section-number">4.3.3. </span>Implementing the setups<a class="headerlink" href="#implementing-the-setups" title="Link to this heading"></a></h3>
+<p>For the subcritical case we implemented a class <code class="docutils literal notranslate"><span class="pre">setups::SubcriticalFlow1d</span></code> that inherits from the class in the file <code class="docutils literal notranslate"><span class="pre">setup::Setup.h</span></code>. The constructor has only one parameter <code class="docutils literal notranslate"><span class="pre">i_hu</span></code>, that is suposed
+to hold the momentum value used in the setup. The other function are implementing the class just like Eq. 3.3.1 dictates them to be.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_hu</span><span class="p">)</span> <span class="p">{</span>
+<span class="n">m_hu</span> <span class="o">=</span> <span class="n">i_hu</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">::</span><span class="n">getHeight</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_x</span><span class="p">,</span>
+                                                                      <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">::</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">i_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">::</span><span class="n">getMomentumX</span><span class="p">(</span><span class="n">t_real</span><span class="p">,</span>
+                                                                         <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">m_hu</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">::</span><span class="n">getMomentumY</span><span class="p">(</span><span class="n">t_real</span><span class="p">,</span>
+                                                                         <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SubcriticalFlow1d</span><span class="p">::</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_x</span><span class="p">,</span>
+                                                                          <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">i_x</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i_x</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">1.8</span> <span class="o">-</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">((</span><span class="n">i_x</span> <span class="o">-</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Similar to this the class <code class="docutils literal notranslate"><span class="pre">setup::SupercriticalFlow1d</span></code> was implemented.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_hu</span><span class="p">)</span> <span class="p">{</span>
+<span class="n">m_hu</span> <span class="o">=</span> <span class="n">i_hu</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">::</span><span class="n">getHeight</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_x</span><span class="p">,</span>
+                                                                        <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">::</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">i_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">::</span><span class="n">getMomentumX</span><span class="p">(</span><span class="n">t_real</span><span class="p">,</span>
+                                                                           <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">m_hu</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">::</span><span class="n">getMomentumY</span><span class="p">(</span><span class="n">t_real</span><span class="p">,</span>
+                                                                           <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="p">::</span><span class="n">t_real</span> <span class="n">tsunami_lab</span><span class="p">::</span><span class="n">setups</span><span class="p">::</span><span class="n">SupercriticalFlow1d</span><span class="p">::</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">t_real</span> <span class="n">i_x</span><span class="p">,</span>
+                                                                            <span class="n">t_real</span><span class="p">)</span> <span class="n">const</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">i_x</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i_x</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">0.13</span> <span class="o">-</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">((</span><span class="n">i_x</span> <span class="o">-</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">0.33</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When simulating these setups for 200 timesteps on 25 meters we got the following results.</p>
+<p>Subcritical Flow:</p>
+<video autoplay="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_3/subcritical_flow.mp4" type="video/mp4"></video><p>Supercritical Flow:</p>
+<video autoplay="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_3/supercritical_flow.mp4" type="video/mp4"></video><p>Supercritical Flow momentum:</p>
+<video autoplay="True" height="300" loop="True" preload="auto" width="650"><source src="../_static/assignment_3/supercritical_flow_mom.mp4" type="video/mp4"></video></section>
+<section id="stationary-discontinuity">
+<h3><span class="section-number">4.3.4. </span>Stationary Discontinuity<a class="headerlink" href="#stationary-discontinuity" title="Link to this heading"></a></h3>
+<p>The stationary discontinuity is located in the 115 cell or in at 11.5 meters.
+At the end all cells have a momentum around 0.12, but the 115-th cell has a
+momentum of 0.14. This makes shows, that the momentum does not converge to a constant.</p>
+</section>
+</section>
+<section id="tsunamievent-simulation">
+<span id="ch-part-3-4"></span><h2><span class="section-number">4.4. </span>TsunamiEvent simulation<a class="headerlink" href="#tsunamievent-simulation" title="Link to this heading"></a></h2>
+<div class="admonition-tasks admonition">
+<p class="admonition-title">Tasks</p>
+<ol class="arabic simple">
+<li><p>Extract bathymetry data for the 1D domain, from the GEBCO_2021 Grid. Use a 250m sampling between the two points <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span>.</p></li>
+<li><p>Extend the class <code class="docutils literal notranslate"><span class="pre">tsunami_lab::io::Csv</span></code> such that it can read your extracted bathymetry data.</p></li>
+<li><p>Add a new setup <code class="docutils literal notranslate"><span class="pre">setups::TsunamiEvent1d</span></code> which uses your CSV reader and the artificial displacement to initialize your quantities as defined in <a class="reference internal" href="#equation-eq-tsunami-event-1d">(2)</a>.</p></li>
+<li><p>Run and visualize the setup. What runup do you observe?</p></li>
+</ol>
+</div>
+<p><strong>Bathymetry Data</strong></p>
+<p>We extracted the data with the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">get</span> <span class="n">the</span> <span class="n">data</span>
+<span class="n">wget</span> <span class="n">linkgmt</span> <span class="n">drdinfor</span> <span class="n">data_in</span><span class="o">/</span><span class="n">GC0_2021</span><span class="o">.</span><span class="n">nc</span>
+
+<span class="o">//</span><span class="n">cut</span> <span class="n">part</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">map</span>
+<span class="n">gmt</span> <span class="n">grdcut</span> <span class="o">-</span><span class="n">R138</span><span class="o">/</span><span class="mi">147</span><span class="o">/</span><span class="mi">35</span><span class="o">/</span><span class="mi">39</span> <span class="n">data_in</span><span class="o">/</span><span class="n">DEBC0_2021</span><span class="o">.</span><span class="n">nc</span> <span class="o">-</span><span class="n">Gdata_temp</span><span class="o">/</span><span class="n">GEBC0_2021_cut</span><span class="o">.</span><span class="n">nc</span>
+
+<span class="o">//</span><span class="n">extract</span> <span class="mi">1</span><span class="n">d</span> <span class="n">data</span> <span class="kn">from</span> <span class="nn">cut</span>
+<span class="n">mt</span> <span class="n">drdtrack</span> <span class="o">-</span><span class="n">Gdata_temp</span><span class="o">/</span><span class="n">GEBC0_2021_cut</span><span class="o">.</span><span class="n">nc</span> <span class="o">-</span><span class="n">E141</span><span class="o">/</span><span class="mf">37.31</span><span class="o">/</span><span class="mi">146</span><span class="o">/</span><span class="mf">37.31</span><span class="o">+</span><span class="n">i250e</span><span class="o">+</span><span class="n">d</span> <span class="o">-</span><span class="n">Ar</span> <span class="o">&gt;</span> <span class="n">data_temp</span><span class="o">/</span><span class="n">dem</span><span class="o">.</span><span class="n">csv</span>
+
+<span class="o">//</span><span class="n">replace</span> <span class="n">whitespaces</span> <span class="k">with</span> <span class="p">,</span>
+<span class="n">cat</span> <span class="n">data_tem</span><span class="o">/</span><span class="n">dem</span><span class="o">.</span><span class="n">csv</span> <span class="o">|</span> <span class="n">tr</span> <span class="o">-</span><span class="n">s</span> <span class="s1">&#39;[:blank:]&#39;</span> <span class="s1">&#39;,&#39;</span> <span class="o">&gt;</span> <span class="n">dem</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<p>We created the read_gmt_states() function to extract information from the dem.csv file.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">tsunami_lab::io::Csv::read_gmt_states</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ifstream</span><span class="w"> </span><span class="o">&amp;</span><span class="n">io_stream</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">t_real</span><span class="w"> </span><span class="o">*&amp;</span><span class="n">o_bathymetry</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">t_real</span><span class="w"> </span><span class="o">*&amp;</span><span class="n">o_x</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">t_real</span><span class="w"> </span><span class="o">*&amp;</span><span class="n">o_y</span><span class="p">,</span>
+<span class="w">                                       </span><span class="n">t_real</span><span class="w"> </span><span class="o">*&amp;</span><span class="n">o_distance</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_idx</span><span class="w"> </span><span class="n">l_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1763</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">l_line</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">stringstream</span><span class="w"> </span><span class="n">l_lineStream</span><span class="p">;</span>
+
+<span class="n">o_bathymetry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_length</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">t_real</span><span class="p">));</span>
+<span class="n">o_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_length</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">t_real</span><span class="p">));</span>
+<span class="n">o_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_length</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">t_real</span><span class="p">));</span>
+<span class="n">o_distance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_length</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">t_real</span><span class="p">));</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">t_idx</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">l_length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// read next line</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">getline</span><span class="p">(</span><span class="n">io_stream</span><span class="p">,</span><span class="w"> </span><span class="n">l_line</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// std::cout &lt;&lt; i &lt;&lt; &quot; : &quot; &lt;&lt; l_line &lt;&lt; std::endl;</span>
+<span class="w">    </span><span class="n">l_lineStream</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">l_line</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">l_cell</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// load x-coordinate</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">getline</span><span class="p">(</span><span class="n">l_lineStream</span><span class="p">,</span><span class="w"> </span><span class="n">l_cell</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;,&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">o_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">stof</span><span class="p">(</span><span class="n">l_cell</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// load y-coordinate</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">getline</span><span class="p">(</span><span class="n">l_lineStream</span><span class="p">,</span><span class="w"> </span><span class="n">l_cell</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;,&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">o_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">stof</span><span class="p">(</span><span class="n">l_cell</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// load distance</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">getline</span><span class="p">(</span><span class="n">l_lineStream</span><span class="p">,</span><span class="w"> </span><span class="n">l_cell</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;,&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">o_distance</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">stof</span><span class="p">(</span><span class="n">l_cell</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// load bathymetry</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">getline</span><span class="p">(</span><span class="n">l_lineStream</span><span class="p">,</span><span class="w"> </span><span class="n">l_cell</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;,&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">o_bathymetry</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">stof</span><span class="p">(</span><span class="n">l_cell</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">l_lineStream</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This function, tsunami_lab::io::Csv::read_gmt_states, reads data from a CSV file represented by the input file stream (io_stream). It extracts information such as x-coordinates, y-coordinates, distances, and bathymetry values, and stores them in separate arrays (o_x, o_y, o_distance, o_bathymetry). The function assumes a fixed length of 1763 for these arrays, because we extracted exact 1763 data points.</p>
+<p>Now we calculate the height, momentum and bathymetry based on the following formulas:</p>
+<div class="math notranslate nohighlight" id="equation-eq-tsunami-event-1d">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-tsunami-event-1d" title="Link to this equation"></a></span>\[\begin{split}\begin{split}
+    h  &amp;= \begin{cases}
+            \max( -b_\text{in}, \delta), &amp;\text{if } b_\text{in} &lt; 0 \\
+            0, &amp;\text{else}
+          \end{cases}\\
+    hu &amp;= 0\\
+    b  &amp;= \begin{cases}
+            \min(b_\text{in}, -\delta) + d, &amp; \text{ if } b_\text{in} &lt; 0\\
+            \max(b_\text{in}, \delta) + d, &amp; \text{ else}.
+          \end{cases}
+\end{split}\end{split}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}d(x) = \begin{cases}
+         10\cdot\sin(\frac{x-175000}{37500} \pi + \pi), &amp; \text{ if } 175000 &lt; x &lt; 250000 \\
+         0, &amp;\text{else}.
+       \end{cases}\end{split}\]</div>
+<p>we assume, that <span class="math notranslate nohighlight">\(\delta := 20\,\text{m}\)</span>.</p>
+<p>So the implementation of the formulas are given in the following program.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;TsunamiEvent1d.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+
+<span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="n">i_bathymetry</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">m_bathymetry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i_bathymetry</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="o">::</span><span class="n">getHeight</span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span>
+<span class="w">                                                                </span><span class="n">t_real</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)];</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="o">::</span><span class="n">getMomentumX</span><span class="p">(</span><span class="n">t_real</span><span class="p">,</span>
+<span class="w">                                                                    </span><span class="n">t_real</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="o">::</span><span class="n">getMomentumY</span><span class="p">(</span><span class="n">t_real</span><span class="p">,</span>
+<span class="w">                                                                    </span><span class="n">t_real</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="o">::</span><span class="n">getBathymetry</span><span class="p">(</span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span>
+<span class="w">                                                                    </span><span class="n">t_real</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="mi">175000</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">i_x</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">250000</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">t_real</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14159265358979323846</span><span class="p">;</span>
+<span class="w">        </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(((</span><span class="n">i_x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">175000</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">37500</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pi</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">i_x</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">-20</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">-20</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">m_bathymetry</span><span class="p">[(</span><span class="n">t_idx</span><span class="p">)</span><span class="n">std</span><span class="o">::</span><span class="n">floor</span><span class="p">(</span><span class="n">i_x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">250</span><span class="p">)]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Changes in main.cpp for support of knew functionalities.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">l_scenario</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;TsunamiEvent1d&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// initialize middle state sanitization</span>
+<span class="w">    </span><span class="n">l_scenarioCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100000</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">filePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./res/dem.csv&quot;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">ifstream</span><span class="w"> </span><span class="n">l_stream</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// try to read middle states original file</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;reading /res/dem.csv ...&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">    </span><span class="n">l_stream</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">filePath</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">fstream</span><span class="o">::</span><span class="n">in</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;finished reading /res/dem.csv&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+
+<span class="w">    </span><span class="n">l_distance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="p">));</span>
+<span class="w">    </span><span class="n">l_bathymetry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="p">));</span>
+<span class="w">    </span><span class="n">l_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="p">));</span>
+<span class="w">    </span><span class="n">l_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">l_scenarioCount</span><span class="p">));</span>
+
+<span class="w">    </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">io</span><span class="o">::</span><span class="n">Csv</span><span class="o">::</span><span class="n">read_gmt_states</span><span class="p">(</span><span class="n">l_stream</span><span class="p">,</span>
+<span class="w">                                          </span><span class="n">l_bathymetry</span><span class="p">,</span>
+<span class="w">                                          </span><span class="n">l_x</span><span class="p">,</span>
+<span class="w">                                          </span><span class="n">l_y</span><span class="p">,</span>
+<span class="w">                                          </span><span class="n">l_distance</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">l_scenario</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;TsunamiEvent1d&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">l_setup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">TsunamiEvent1d</span><span class="p">(</span><span class="n">l_bathymetry</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="assignment_2.html" class="btn btn-neutral float-left" title="3. Report Week 2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="assignment_4.html" class="btn btn-neutral float-right" title="5. Week Report 4" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bohdan Babii, Phillip Rothenbeck, Moritz Rätz, Marek Sommerfeld.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
