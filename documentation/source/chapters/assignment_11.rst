@@ -162,10 +162,11 @@ Results
 First things first: we have successfully MPI-parallelized our solver. 
 In the following video you can see the simulation of the tsunami event in Chile from 2010 with a magnitude of 8.8 and a cell size of 1000m, divided into 10 subgrids.
 
-.. figure:: ../_static/assignment_11/sim.gif
-  :name: fig:sim
-  :align: center
-  :width: 600
+.. video:: ../_static/assignment_11/sim.mp4
+  :autoplay:
+  :loop:
+  :height: 794
+  :width: 1132
 
   Simulation of chile with a cell size of 1000m and 10 processes
 
