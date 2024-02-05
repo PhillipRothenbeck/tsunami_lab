@@ -146,6 +146,11 @@ directory.
 Running the MPI-parallelized version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+First make sure that you have checked out the correct branch:
+
+.. code-block::
+	git checkout mpi.cache.optimized
+
 When running the MPI version, you must use a batch script.
 In this script, computing time must be allocated on a compute node, the project must be built, compiled and then run.
 
