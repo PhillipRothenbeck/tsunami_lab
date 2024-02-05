@@ -156,6 +156,14 @@ Once the entire cache column is processed, the next 16 columns are processed and
 Unfortunately, this did not improve our performance, but rather slowed it down.
 We believe that this is due to the fact that the openMP parallelization is faster than our cache improvement. The entire Y-sweep was previously parallelized, but with the introduction of this new feature, the parallelization software is probably no longer as efficient as before.
 
+.. figure:: ../_static/assignment_11/cache.png
+  :name: fig:cache
+  :align: center
+  :width: 600
+
+  Each cache line visualized in the row of the grid it is positioned in. First the red lines are loaded. Before optimization the next cache lines would be the ones in green.
+  For optimization we load in the one in blue leading to one less memory access. 
+
 Results
 ---------
 
